@@ -4,7 +4,7 @@
 
 Welcome to the official repository for the Create Aether platform.
 
-Aether is a modern software platform focused on immersive digital experiences, modular architecture and future AI-assisted tooling.
+Aether is a modular experience engine for building immersive digital environments, bringing together visual, audio and environmental systems within a reusable architecture.
 
 ---
 
