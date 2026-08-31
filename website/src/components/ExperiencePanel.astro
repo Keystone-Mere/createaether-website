@@ -70,6 +70,23 @@
           </span>
         </span>
       </label>
+
+      <label class="experience-option">
+        <input
+          type="radio"
+          name="aether-experience"
+          value="christmas"
+        />
+
+        <span class="option-content">
+          <span class="option-icon" aria-hidden="true">✦</span>
+
+          <span>
+            <strong>Christmas</strong>
+            <small>Warm and quiet snowfall</small>
+          </span>
+        </span>
+      </label>
     </div>
   </fieldset>
 
@@ -148,7 +165,7 @@
 </section>
 
 <script>
-  type ExperienceName = 'temple' | 'forest' | 'ocean';
+  type ExperienceName = 'temple' | 'forest' | 'ocean' | 'christmas';
 
   interface AetherState {
     experience: ExperienceName;
@@ -163,6 +180,7 @@
     temple: 'Temple',
     forest: 'Forest',
     ocean: 'Ocean',
+    christmas: 'Christmas',
   };
 
   const defaultState: AetherState = {
@@ -202,7 +220,7 @@
     panel?.querySelector<HTMLAnchorElement>('[data-open-studio]');
 
   function isExperienceName(value: unknown): value is ExperienceName {
-    return value === 'temple' || value === 'forest' || value === 'ocean';
+    return value === 'temple' || value === 'forest' || value === 'ocean' || value === 'christmas';
   }
 
   function loadState(): AetherState {

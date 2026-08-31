@@ -2,7 +2,7 @@
   "id": "ocean",
   "name": "Ocean",
   "description": "A spacious coastal atmosphere combining waves, wind and slow cinematic movement.",
-  "status": "Published",
+  "status": "MVP",
   "audio": {
     "enabled": true,
     "volume": 45,

@@ -21,16 +21,16 @@ const capabilities = [
   {
     number: '03',
     title: 'Developer API',
-    text: 'Typed state, modular runtime systems and predictable lifecycle integration for building custom digital experiences.',
+    text: 'A future integration layer for typed state, runtime hooks and custom experience logic as the engine matures.',
     icon: 'api',
-    status: 'Active foundation',
+    status: 'Planned',
   },
   {
     number: '04',
     title: 'Experience Presets',
-    text: 'Reusable Temple, Forest and Ocean experiences provide editable foundations for audio, atmosphere and runtime configuration.',
+    text: 'Reusable Temple, Forest, Ocean and Christmas foundations provide editable starting points for audio, atmosphere and runtime configuration.',
     icon: 'presets',
-    status: 'Studio available',
+    status: 'Works now',
   },
 ];
 import '../styles/design-system.css';
@@ -49,9 +49,9 @@ import SiteFooter from '../components/SiteFooter.astro';
     />
     <meta
       name="description"
-      content="Aether transforms ordinary websites into immersive digital experiences through adaptive audio, atmospheric visuals and reusable experience systems."
+      content="Aether is a modular experience engine for composing immersive atmospheres through controllable audio, lighting, particles, fog and atmospheric effects."
     />
-    <title>Aether — Build websites people remember</title>
+    <title>Aether — Create digital atmospheres people can shape</title>
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
 
@@ -98,19 +98,19 @@ import SiteFooter from '../components/SiteFooter.astro';
         ></div>
 
         <div class="hero-content">
-          <p class="eyebrow">The experience engine for the modern web</p>
+          <p class="eyebrow">A modular experience engine</p>
 
-          <h1>Build websites people remember.</h1>
+          <h1>Create digital atmospheres people can shape.</h1>
 
           <p class="hero-copy">
-            Transform ordinary websites into immersive digital experiences with
-            adaptive audio, cinematic lighting, dynamic particles and reusable
-            experience systems.
+            Aether is a modular experience engine for composing immersive
+            environments through controllable audio, lighting, particles,
+            fog and atmospheric effects.
           </p>
 
           <div class="actions">
             <a class="button primary" href="/studio/">
-              Launch Studio →
+              Open Atmosphere Composer →
             </a>
 
             <a class="button secondary" href="#platform">
@@ -121,11 +121,11 @@ import SiteFooter from '../components/SiteFooter.astro';
           <div class="status" aria-label="Project status">
             <span class="status-online">
               <i aria-hidden="true"></i>
-              Runtime Online
+              Working MVP
             </span>
-            <span>Studio Online</span>
-            <span>Audio Engine Active</span>
-            <span>Open Source</span>
+            <span>Browser preview</span>
+            <span>Local saves</span>
+            <span>Atmosphere editing</span>
           </div>
         </div>
 
@@ -190,7 +190,7 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>01</span>
             <h3>Create</h3>
             <p>
-              Start with a Temple, Forest or Ocean experience.
+              Start with a Temple, Forest, Ocean or Christmas foundation.
             </p>
           </article>
 
@@ -198,7 +198,7 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>02</span>
             <h3>Configure</h3>
             <p>
-              Adjust audio, lighting, particles, fog and runtime behaviour.
+              Adjust audio, lighting, particles, fog and atmospheric behaviour.
             </p>
           </article>
 
@@ -206,21 +206,21 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>03</span>
             <h3>Preview</h3>
             <p>
-              Test the experience through the live visual and audio runtime.
+              Test the experience in the live browser-based preview.
             </p>
           </article>
 
           <article class="workflow-step">
             <span>04</span>
-            <h3>Publish</h3>
+            <h3>Refine</h3>
             <p>
-              Prepare the experience for deployment and sharing.
+              Save local changes and iterate toward the next atmosphere concept.
             </p>
           </article>
         </div>
 
         <a class="workflow-link" href="/studio/">
-          Open Create Aether Studio →
+          Open Atmosphere Composer →
         </a>
       </section>
 
@@ -844,6 +844,12 @@ import SiteFooter from '../components/SiteFooter.astro';
     --aether-accent: #55ddff;
     --aether-secondary: #3d83ff;
     --aether-deep: #154d89;
+  }
+
+  .hero[data-experience="christmas"] {
+    --aether-accent: #f9c76c;
+    --aether-secondary: #d84d4d;
+    --aether-deep: #2a1b18;
   }
 
   .hero-grid {

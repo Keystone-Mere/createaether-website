@@ -8,17 +8,17 @@ import { experiences } from '../data/experiences';
 ---
 
 <StudioLayout
-  title="Studio Dashboard"
-  description="Create, configure and manage Aether experiences."
+  title="Aether Atmosphere Composer"
+  description="Create and tune atmospheric experiences in the Aether working MVP."
 >
   <section class="studio-dashboard">
     <header class="studio-dashboard__header">
       <div>
-        <p class="studio-dashboard__eyebrow">Aether Studio</p>
-        <h1>Design immersive experiences.</h1>
+        <p class="studio-dashboard__eyebrow">Aether Atmosphere Composer</p>
+        <h1>Shape atmospheric experiences.</h1>
         <p class="studio-dashboard__intro">
-          Configure runtime systems, manage experience presets and monitor
-          your Aether workspace from one place.
+          Adjust the working MVP systems, tune each environment and iterate
+          locally in the browser before refining the next version.
         </p>
       </div>
 
@@ -30,61 +30,61 @@ import { experiences } from '../data/experiences';
     <section class="studio-dashboard__metrics" aria-label="Workspace overview">
       <MetricCard
         title="Experiences"
-        value="12"
-        description="4 currently active"
+        value="4"
+        description="Foundation presets"
       />
 
       <MetricCard
-        title="Modules"
-        value="28"
-        description="All systems available"
+        title="Editable systems"
+        value="4"
+        description="Audio, lighting, particles, fog"
       />
 
       <MetricCard
-        title="Runtime"
-        value="Online"
-        description="All services operational"
+        title="Preview"
+        value="Live"
+        description="Browser-based runtime"
       />
 
       <MetricCard
-        title="SDK Version"
-        value="v1.0.0"
-        description="Latest stable release"
+        title="Storage"
+        value="Local"
+        description="Saved in-browser"
       />
     </section>
 
     <section class="studio-dashboard__runtime">
       <div class="studio-dashboard__section-heading">
         <div>
-          <p class="studio-dashboard__workspace-label">System health</p>
-          <h2>Runtime services</h2>
+          <p class="studio-dashboard__workspace-label">Working MVP</p>
+          <h2>Available now</h2>
         </div>
 
-        <span>4 services monitored</span>
+        <span>Local-first system</span>
       </div>
 
       <div class="studio-dashboard__services">
         <StatusCard
-          title="Runtime Engine"
-          status="Operational"
+          title="Atmosphere editor"
+          status="Working"
           colour="green"
         />
 
         <StatusCard
-          title="Experience Manager"
-          status="Running"
+          title="Live preview"
+          status="Enabled"
           colour="green"
         />
 
         <StatusCard
-          title="Audio Engine"
-          status="Active"
+          title="Local saving"
+          status="Available"
           colour="green"
         />
 
         <StatusCard
           title="Marketplace"
-          status="Coming soon"
+          status="Planned"
           colour="yellow"
         />
       </div>
@@ -119,16 +119,17 @@ import { experiences } from '../data/experiences';
     <section class="studio-dashboard__workspace">
       <div>
         <p class="studio-dashboard__workspace-label">Workspace status</p>
-        <h2>Your Studio foundation is ready.</h2>
+        <h2>Aether works as a local MVP foundation.</h2>
         <p>
-          The reusable dashboard component system is now installed. Runtime
-          monitoring, recent activity and quick actions will be added next.
+          The available system covers editable atmosphere presets, live browser
+          preview and local experience storage. Marketplace, SDK, account
+          services and publishing remain planned in development.
         </p>
       </div>
 
       <span class="studio-dashboard__status">
         <span aria-hidden="true"></span>
-        Operational
+        Working MVP
       </span>
     </section>
   </section>

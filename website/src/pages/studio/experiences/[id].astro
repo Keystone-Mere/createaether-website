@@ -75,7 +75,7 @@ const selectedAudioTrack =
             <div
                 id="experience-preview-stage"
                 class="preview-stage"
-                aria-label="Temple atmosphere preview"
+                aria-label={`${experience.name} atmosphere preview`}
                 tabindex="-1"
             >
                 <div class="preview-glow"></div>
@@ -155,8 +155,13 @@ const selectedAudioTrack =
                     hidden
                 />
 
-                <button type="button">
-                    Publish
+                <button
+                    type="button"
+                    id="publish-experience-button"
+                    class="button-muted"
+                    disabled
+                >
+                    Publish — planned
                 </button>
             </div>
         </div>
@@ -531,6 +536,18 @@ const selectedAudioTrack =
     background:rgba(14,116,144,.24);
 }
 
+.preview-actions .button-muted{
+    border:1px solid rgba(148,163,184,.18);
+    background:rgba(51,65,85,.35);
+    color:#94a3b8;
+    cursor:not-allowed;
+    opacity:0.9;
+}
+
+.preview-actions .button-muted:hover{
+    background:rgba(51,65,85,.35);
+}
+
 @keyframes preview-float{
     0%,
     100%{
@@ -598,6 +615,7 @@ const selectedAudioTrack =
     display:flex;
     align-items:center;
     justify-content:space-between;
+    flex-wrap:wrap;
     gap:1rem;
     margin-top:1.25rem;
     padding:1rem;
@@ -606,9 +624,16 @@ const selectedAudioTrack =
     background:rgba(15,23,42,.55);
 }
 
+.audio-transport > div{
+    flex:1 1 14rem;
+    min-width:0;
+}
+
 .audio-transport h3{
     margin:.15rem 0;
     font-size:1rem;
+    line-height:1.35;
+    word-break:break-word;
 }
 
 .audio-transport span{
@@ -617,13 +642,25 @@ const selectedAudioTrack =
 }
 
 .audio-transport button{
-    flex-shrink:0;
+    flex:0 0 auto;
+    min-width:10.5rem;
+    max-width:100%;
 }
 
 @media (max-width:640px){
     .audio-transport{
-        align-items:flex-start;
+        align-items:stretch;
         flex-direction:column;
+    }
+
+    .audio-transport > div,
+    .audio-transport button{
+        width:100%;
+        flex-basis:100%;
+    }
+
+    .audio-transport button{
+        justify-content:center;
     }
 }
 
