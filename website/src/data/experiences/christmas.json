@@ -1,0 +1,30 @@
+{
+  "id": "christmas",
+  "name": "Christmas",
+  "description": "A warm seasonal atmosphere with soft golden light, gentle snowfall and a calm winter ambience.",
+  "status": "MVP",
+  "audio": {
+    "enabled": true,
+    "volume": 30,
+    "track": "om-so-hum"
+  },
+  "atmosphere": {
+    "particles": true,
+    "lighting": true,
+    "fog": true
+  },
+  "particles": {
+    "count": 64,
+    "colour": "#f8e7ae",
+    "glow": 6,
+    "minRadius": 0.9,
+    "maxRadius": 3.2,
+    "minSpeed": 2,
+    "maxSpeed": 9,
+    "drift": 8,
+    "minOpacity": 0.3,
+    "maxOpacity": 0.8,
+    "minLifetime": 7,
+    "maxLifetime": 16
+  }
+}
