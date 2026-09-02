@@ -197,6 +197,10 @@
                         return;
                     }
 
+                    window.posthog?.capture(
+                        'experience_renamed'
+                    );
+
                     renderLibrary();
                 }
             );
@@ -238,6 +242,10 @@
 
                         return;
                     }
+
+                    window.posthog?.capture(
+                        'experience_duplicated'
+                    );
 
                     renderLibrary();
                 }
@@ -289,6 +297,10 @@
 
                         return;
                     }
+
+                    window.posthog?.capture(
+                        'experience_deleted'
+                    );
 
                     renderLibrary();
                 }

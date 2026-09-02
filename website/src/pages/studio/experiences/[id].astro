@@ -1420,6 +1420,10 @@ const selectedAudioTrack =
                     cloneExperience(editableExperience)
                 );
 
+                window.posthog?.capture(
+                    'experience_preview_launched'
+                );
+
                 previewStage.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
@@ -1496,6 +1500,8 @@ const selectedAudioTrack =
                     experienceToSave
                 );
 
+                window.posthog?.capture('experience_saved');
+
                 saveExperienceButton.textContent =
                     'Saved';
 
@@ -1560,6 +1566,10 @@ const selectedAudioTrack =
 
                     synchroniseEditor(
                         editableExperience
+                    );
+
+                    window.posthog?.capture(
+                        'experience_imported'
                     );
 
                     importExperienceButton.textContent =
