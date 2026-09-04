@@ -1,4 +1,6 @@
 ---
+import AuthProfile from './AuthProfile.astro';
+
 const navigation = [
   { label: 'Dashboard', href: '/studio', active: true },
   { label: 'Library', href: '/studio/library' },
@@ -74,15 +76,7 @@ const secondaryNavigation = [
       }
     </ul>
   </nav>
-
-  <div class="studio-sidebar__profile">
-    <span class="studio-sidebar__avatar">BR</span>
-
-    <span class="studio-sidebar__profile-details">
-      <strong>Ben Roberts</strong>
-      <small>Workspace owner</small>
-    </span>
-  </div>
+      <AuthProfile />
 </aside>
 
 <style>

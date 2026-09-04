@@ -1,0 +1,220 @@
+<div class="auth-profile" aria-live="polite">
+  <span class="auth-profile__avatar" id="auth-avatar" aria-hidden="true">
+    A
+  </span>
+
+  <span class="auth-profile__details">
+    <strong id="auth-name">Checking account…</strong>
+    <small id="auth-status">Please wait</small>
+  </span>
+
+  <button class="auth-profile__action" id="auth-action" type="button" disabled>
+    Sign in
+  </button>
+</div>
+
+<script>
+  import { createAuth0Client } from '@auth0/auth0-spa-js';
+
+  const domain = import.meta.env.PUBLIC_AUTH0_DOMAIN;
+  const clientId = import.meta.env.PUBLIC_AUTH0_CLIENT_ID;
+
+  const avatar = document.querySelector<HTMLElement>('#auth-avatar');
+  const name = document.querySelector<HTMLElement>('#auth-name');
+  const status = document.querySelector<HTMLElement>('#auth-status');
+  const action = document.querySelector<HTMLButtonElement>('#auth-action');
+
+  const studioUrl = `${window.location.origin}/studio/`;
+
+  function setText(element: HTMLElement | null, value: string) {
+    if (element) element.textContent = value;
+  }
+
+  function getInitials(value: string) {
+    const parts = value.trim().split(/\s+/).filter(Boolean);
+
+    if (parts.length === 0) return 'A';
+
+    return parts
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  function showSignedOut() {
+    setText(avatar, 'A');
+    setText(name, 'Aether account');
+    setText(status, 'Not signed in');
+
+    if (action) {
+      action.textContent = 'Sign in';
+      action.disabled = false;
+      action.dataset.authState = 'signed-out';
+    }
+  }
+
+  try {
+    if (!domain || !clientId) {
+      throw new Error('Auth0 configuration is missing.');
+    }
+
+    const auth0 = await createAuth0Client({
+      domain,
+      clientId,
+      authorizationParams: {
+        redirect_uri: studioUrl,
+      },
+    });
+
+    const query = new URLSearchParams(window.location.search);
+
+    if (query.has('code') && query.has('state')) {
+      const result = await auth0.handleRedirectCallback();
+      const returnTo = result.appState?.returnTo;
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname,
+      );
+
+      if (
+        typeof returnTo === 'string' &&
+        returnTo.startsWith('/studio') &&
+        returnTo !== window.location.pathname
+      ) {
+        window.location.assign(returnTo);
+      }
+    }
+
+    const authenticated = await auth0.isAuthenticated();
+
+    if (authenticated) {
+      const user = await auth0.getUser();
+      const displayName = user?.name || user?.email || 'Aether user';
+
+      setText(avatar, getInitials(displayName));
+      setText(name, displayName);
+      setText(status, 'Workspace account');
+
+      if (action) {
+        action.textContent = 'Sign out';
+        action.disabled = false;
+        action.dataset.authState = 'signed-in';
+      }
+    } else {
+      showSignedOut();
+    }
+
+    action?.addEventListener('click', async () => {
+      action.disabled = true;
+
+      if (action.dataset.authState === 'signed-in') {
+        await auth0.logout({
+          logoutParams: {
+            returnTo: studioUrl,
+          },
+        });
+
+        return;
+      }
+
+      await auth0.loginWithRedirect({
+        authorizationParams: {
+          redirect_uri: studioUrl,
+        },
+        appState: {
+          returnTo: window.location.pathname,
+        },
+      });
+    });
+  } catch (error) {
+    console.error('Auth0 could not be started:', error);
+
+    setText(avatar, '!');
+    setText(name, 'Account unavailable');
+    setText(status, 'Please try again later');
+
+    if (action) {
+      action.textContent = 'Sign in';
+      action.disabled = true;
+    }
+  }
+</script>
+
+<style>
+  .auth-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: auto;
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    padding: 1.2rem 0.1rem 0;
+  }
+
+  .auth-profile__avatar {
+    display: grid;
+    width: 2.35rem;
+    height: 2.35rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(125, 211, 252, 0.18);
+    border-radius: 0.75rem;
+    background: rgba(30, 41, 59, 0.8);
+    color: #bae6fd;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .auth-profile__details {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    gap: 0.1rem;
+  }
+
+  .auth-profile__details strong,
+  .auth-profile__details small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .auth-profile__details strong {
+    color: #cbd5e1;
+    font-size: 0.76rem;
+  }
+
+  .auth-profile__details small {
+    color: #64748b;
+    font-size: 0.67rem;
+  }
+
+  .auth-profile__action {
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    border-radius: 0.55rem;
+    background: rgba(14, 165, 233, 0.1);
+    padding: 0.45rem 0.55rem;
+    color: #bae6fd;
+    font-size: 0.67rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .auth-profile__action:hover:not(:disabled) {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: rgba(14, 165, 233, 0.18);
+    color: #f0f9ff;
+  }
+
+  .auth-profile__action:disabled {
+    cursor: wait;
+    opacity: 0.55;
+  }
+
+  @media (max-width: 900px) {
+    .auth-profile {
+      display: none;
+    }
+  }
+</style>
