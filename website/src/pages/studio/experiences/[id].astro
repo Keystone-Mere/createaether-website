@@ -1614,6 +1614,11 @@ const selectedAudioTrack =
 
         runtimeDestroyed = true;
 
+        if (audioElement instanceof HTMLAudioElement) {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+        }
+
         experienceRuntime.stop();
         experienceRuntime.destroy();
     };
