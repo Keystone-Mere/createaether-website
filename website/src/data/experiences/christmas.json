@@ -6,7 +6,7 @@
   "audio": {
     "enabled": true,
     "volume": 30,
-    "track": "om-so-hum"
+    "track": "christmas-ambience"
   },
   "atmosphere": {
     "particles": true,

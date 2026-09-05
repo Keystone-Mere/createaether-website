@@ -695,6 +695,7 @@ const selectedAudioTrack =
     import {
         createStudioRuntime
     } from '../../../lib/studio/StudioRuntime';
+    import { audioTracks } from '../../../data/audio/tracks';
 
     const audioEnabledToggle =
         document.querySelector('#audio-enabled');
@@ -933,6 +934,10 @@ const selectedAudioTrack =
     const synchroniseEditor = (
         selectedExperience: Experience
     ): void => {
+        const selectedTrack = audioTracks.find(
+            (track) => track.id === selectedExperience.audio.track
+        );
+
         if (
             experienceNameControl
             instanceof HTMLInputElement
@@ -986,7 +991,8 @@ const selectedAudioTrack =
             instanceof HTMLElement
         ) {
             audioTrackTitle.textContent =
-                formatTrackName(
+                selectedTrack?.title
+                ?? formatTrackName(
                     selectedExperience.audio.track
                 );
         }
@@ -1284,6 +1290,11 @@ const selectedAudioTrack =
                             );
 
                             return;
+                        }
+
+                        if (audioElement instanceof HTMLAudioElement) {
+                            audioElement.pause();
+                            audioElement.currentTime = 0;
                         }
 
                         editableExperience =
