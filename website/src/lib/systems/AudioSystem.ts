@@ -227,9 +227,6 @@ export class AudioSystem
                 }
             );
 
-            const wasPlaying =
-                !this.audioElement.paused;
-
             this.audioElement.src =
                 resolvedTrack.src;
 
@@ -248,19 +245,6 @@ export class AudioSystem
                 }
             );
 
-            if (
-                wasPlaying &&
-                state.audio.enabled
-            ) {
-                void this.audioElement
-                    .play()
-                    .catch((error) => {
-                        console.error(
-                            'Unable to switch audio track.',
-                            error
-                        );
-                    });
-            }
         }
 
         const normalisedVolume =

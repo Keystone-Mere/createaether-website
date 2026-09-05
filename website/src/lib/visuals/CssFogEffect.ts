@@ -54,6 +54,9 @@ export class CssFogEffect
     private targetFogEnabled:
         boolean | null = null;
 
+    private currentPreset:
+        string | null = null;
+
     constructor(
         previewStage: Element | null,
         fogStatus: Element | null
@@ -152,6 +155,26 @@ export class CssFogEffect
     ): void {
         const fogEnabled =
             state.atmosphere.fog;
+
+        const nextPreset =
+            state.fog.preset;
+
+        if (
+            this.currentPreset !== null &&
+            this.currentPreset !== nextPreset
+        ) {
+            this.densityTransition.cancel();
+            this.durationTransition.cancel();
+            this.colourTransition.cancel();
+
+            this.currentDensity = null;
+            this.currentDriftDuration = null;
+            this.currentColour = null;
+            this.targetFogEnabled = null;
+        this.currentPreset = null;
+        }
+
+        this.currentPreset = nextPreset;
 
         this.targetFogEnabled =
             fogEnabled;
@@ -319,5 +342,6 @@ export class CssFogEffect
         this.currentDriftDuration = null;
         this.currentColour = null;
         this.targetFogEnabled = null;
+        this.currentPreset = null;
     }
 }

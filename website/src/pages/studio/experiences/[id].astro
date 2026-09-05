@@ -938,6 +938,15 @@ const selectedAudioTrack =
             (track) => track.id === selectedExperience.audio.track
         );
 
+        if (audioPlaybackToggle instanceof HTMLButtonElement) {
+            audioPlaybackToggle.textContent = "Play Soundscape";
+            audioPlaybackToggle.setAttribute("aria-pressed", "false");
+        }
+
+        if (audioPlaybackStatus instanceof HTMLElement) {
+            audioPlaybackStatus.textContent = "Ready to play";
+        }
+
         if (
             experienceNameControl
             instanceof HTMLInputElement
@@ -1306,9 +1315,30 @@ const selectedAudioTrack =
                             editableExperience
                         );
 
+                        if (audioElement instanceof HTMLAudioElement) {
+                            audioElement.pause();
+                            audioElement.currentTime = 0;
+                        }
+
                         synchroniseEditor(
                             editableExperience
                         );
+
+                        window.requestAnimationFrame(() => {
+                            if (audioElement instanceof HTMLAudioElement) {
+                                audioElement.pause();
+                                audioElement.currentTime = 0;
+                            }
+
+                            if (audioPlaybackToggle instanceof HTMLButtonElement) {
+                                audioPlaybackToggle.textContent = "Play Soundscape";
+                                audioPlaybackToggle.setAttribute("aria-pressed", "false");
+                            }
+
+                            if (audioPlaybackStatus instanceof HTMLElement) {
+                                audioPlaybackStatus.textContent = "Ready to play";
+                            }
+                        });
                     }
                 );
             });
