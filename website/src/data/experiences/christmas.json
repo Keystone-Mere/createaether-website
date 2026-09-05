@@ -14,6 +14,7 @@
     "fog": true
   },
   "particles": {
+    "preset": "christmas-snow",
     "count": 64,
     "colour": "#f8e7ae",
     "glow": 6,
@@ -26,5 +27,22 @@
     "maxOpacity": 0.8,
     "minLifetime": 7,
     "maxLifetime": 16
+  },
+  "lighting": {
+    "preset": "christmas-gold",
+    "colour": "#f6c453",
+    "intensity": 0.82,
+    "pulse": true,
+    "speed": 0.14
+  },
+  "fog": {
+    "preset": "winter-haze",
+    "colour": "#dce8f3",
+    "density": 0.18,
+    "speed": 0.12
+  },
+  "transition": {
+    "duration": 2200,
+    "easing": "ease-in-out"
   }
 }
