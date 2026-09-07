@@ -15,9 +15,3 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 });
-// Temporary verification: only runs when ?sentry-test is added to the URL.
-if (window.location.search.includes("sentry-test")) {
-  Sentry.captureException(
-    new Error("Aether Sentry verification test")
-  );
-}
