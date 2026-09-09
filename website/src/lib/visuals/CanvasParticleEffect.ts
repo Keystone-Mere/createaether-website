@@ -232,59 +232,67 @@ export class CanvasParticleEffect
         }
     }
 
-    private createParticle(
-        width: number,
-        height: number,
-        distributeAcrossScene = false
-    ): Particle {
-        const lifetime =
-            this.randomBetween(
-                this.settings.minLifetime,
-                this.settings.maxLifetime
-            );
+private createParticle(
+    width: number,
+    height: number,
+    distributeAcrossScene = false
+): Particle {
+    const lifetime =
+        this.randomBetween(
+            this.settings.minLifetime,
+            this.settings.maxLifetime
+        );
 
-        return {
-            x: this.randomBetween(
-                0,
-                width
-            ),
+    const isRain =
+        this.settings.preset === 'storm-rain';
 
-            y: distributeAcrossScene
-                ? this.randomBetween(0, height)
+    return {
+        x: this.randomBetween(
+            0,
+            width
+        ),
+
+        y: distributeAcrossScene
+            ? this.randomBetween(0, height)
+            : isRain
+                ? -this.randomBetween(4, 40)
                 : height + this.randomBetween(4, 40),
 
-            velocityX:
-                this.randomBetween(
-                    -this.settings.drift,
-                    this.settings.drift
-                ),
+        velocityX:
+            this.randomBetween(
+                -this.settings.drift,
+                this.settings.drift
+            ),
 
-            velocityY:
-                -this.randomBetween(
-                    this.settings.minSpeed,
-                    this.settings.maxSpeed
-                ),
+        velocityY: isRain
+            ? this.randomBetween(
+                this.settings.minSpeed,
+                this.settings.maxSpeed
+            )
+            : -this.randomBetween(
+                this.settings.minSpeed,
+                this.settings.maxSpeed
+            ),
 
-            radius:
-                this.randomBetween(
-                    this.settings.minRadius,
-                    this.settings.maxRadius
-                ),
+        radius:
+            this.randomBetween(
+                this.settings.minRadius,
+                this.settings.maxRadius
+            ),
 
-            opacity:
-                this.randomBetween(
-                    this.settings.minOpacity,
-                    this.settings.maxOpacity
-                ),
+        opacity:
+            this.randomBetween(
+                this.settings.minOpacity,
+                this.settings.maxOpacity
+            ),
 
-            age: distributeAcrossScene
-                ? this.randomBetween(0, lifetime)
-                : 0,
+        age: distributeAcrossScene
+            ? this.randomBetween(0, lifetime)
+            : 0,
 
-            lifetime
-        };
-    }
-
+        lifetime
+    };
+}
     private updateParticle(
         particle: Particle,
         deltaSeconds: number,
@@ -304,8 +312,13 @@ export class CanvasParticleEffect
         const expired =
             particle.age >= particle.lifetime;
 
+        const isRain =
+            this.settings.preset === 'storm-rain';
+
         const outsideScene =
-            particle.y < -40
+            (isRain
+                ? particle.y > height + 40
+                : particle.y < -40)
             || particle.x < -40
             || particle.x > width + 40;
 
@@ -319,7 +332,6 @@ export class CanvasParticleEffect
             );
         }
     }
-
     private drawParticle(
         context: CanvasRenderingContext2D,
         particle: Particle

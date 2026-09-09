@@ -1285,7 +1285,10 @@ const selectedAudioTrack =
 
                             return;
                         }
-
+if (audioElement instanceof HTMLAudioElement) {
+  audioElement.pause();
+  audioElement.currentTime = 0;
+}
                         editableExperience =
                             cloneExperience(
                                 selectedExperience
@@ -1608,15 +1611,20 @@ const selectedAudioTrack =
     let runtimeDestroyed = false;
 
     const destroyRuntime = (): void => {
-        if (runtimeDestroyed) {
-            return;
-        }
+  if (runtimeDestroyed) {
+    return;
+  }
 
-        runtimeDestroyed = true;
+  runtimeDestroyed = true;
 
-        experienceRuntime.stop();
-        experienceRuntime.destroy();
-    };
+  if (audioElement instanceof HTMLAudioElement) {
+    audioElement.pause();
+    audioElement.currentTime = 0;
+  }
+
+  experienceRuntime.stop();
+  experienceRuntime.destroy();
+};
 
     window.addEventListener(
         'pagehide',

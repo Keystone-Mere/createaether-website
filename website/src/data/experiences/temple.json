@@ -6,7 +6,7 @@
   "audio": {
     "enabled": true,
     "volume": 40,
-    "track": "om-so-hum"
+    "track": "temple-echoes"
   },
   "atmosphere": {
     "particles": true,
