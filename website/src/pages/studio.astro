@@ -22,16 +22,16 @@ import { experiences } from '../data/experiences';
         </p>
       </div>
 
-      <button type="button" class="studio-dashboard__action">
-        Create experience
-      </button>
+      <a href="#experience-library" class="studio-dashboard__action">
+  Choose an experience
+</a>
     </header>
 
     <section class="studio-dashboard__metrics" aria-label="Workspace overview">
       <MetricCard
         title="Experiences"
-        value="4"
-        description="Foundation presets"
+        value="5"
+description="Working MVP presets"
       />
 
       <MetricCard
@@ -90,14 +90,14 @@ import { experiences } from '../data/experiences';
       </div>
     </section>
 
-    <section class="studio-dashboard__experiences">
+    <section id="experience-library" class="studio-dashboard__experiences">
       <div class="studio-dashboard__section-heading">
         <div>
           <p class="studio-dashboard__workspace-label">Experience library</p>
           <h2>Recent experiences</h2>
         </div>
 
-        <a href="/studio/library">View all experiences</a>
+
       </div>
 
       <div class="studio-dashboard__experience-grid">
@@ -181,6 +181,7 @@ import { experiences } from '../data/experiences';
     background: linear-gradient(135deg, #0284c7, #2563eb);
     padding: 0.8rem 1rem;
     color: white;
+    text-decoration: none;
     cursor: pointer;
     font-size: 0.78rem;
     font-weight: 650;

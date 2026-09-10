@@ -9,13 +9,13 @@ const features = [
     number: '01',
     id: 'audio',
     eyebrow: 'Experience Audio',
-    title: 'Adaptive sound that responds to the experience.',
+    title: 'Ambient soundscapes you can control.',
     text: 'Aether coordinates ambient soundscapes, playback state, volume and user interaction through one consistent experience system.',
     items: [
-      'Adaptive soundscapes',
-      'Experience-aware playback',
-      'Persistent user controls',
-      'Smooth transitions',
+      'Experience soundscapes',
+  'Play and pause controls',
+  'Adjustable volume',
+  'Locally saved settings',
     ],
   },
   {
@@ -71,18 +71,18 @@ const features = [
     ],
   },
   {
-    number: '06',
-    id: 'developers',
-    eyebrow: 'Developer API',
-    title: 'Powerful architecture with a clear interface.',
-    text: 'Developers can extend Aether through predictable APIs instead of working around tightly coupled effects.',
-    items: [
-      'Readable configuration',
-      'Modular services',
-      'Lifecycle events',
-      'Extensible architecture',
-    ],
-  },
+  number: '06',
+  id: 'developers',
+  eyebrow: 'Configuration Foundation',
+  title: 'Readable, reusable experience configuration.',
+  text: 'Aether uses structured experience data and modular runtime systems as a foundation for future developer tooling.',
+  items: [
+    'JSON-based presets',
+    'Modular runtime systems',
+    'Lifecycle events',
+    'Extensible foundation',
+  ],
+},
 ];
 import SiteFooter from '../components/SiteFooter.astro';
 ---
@@ -141,7 +141,7 @@ import SiteFooter from '../components/SiteFooter.astro';
           <h1>Build immersive digital experiences.</h1>
 
           <p class="features-intro">
-            Aether combines adaptive audio, atmospheric visuals and an
+            Aether combines controllable audio, atmospheric visuals and an
             event-driven runtime into one unified experience platform.
           </p>
 
@@ -242,6 +242,54 @@ Aether.Events.on('experience:loaded', (experience) => {
 </html>
 
 <style>
+.site-header {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 34px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.brand-logo {
+  width: 52px;
+  height: 52px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.brand span {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.site-header nav {
+  display: flex;
+  gap: 28px;
+  color: #aaaeb8;
+  font-size: 0.92rem;
+}
+
+.site-header nav a:hover,
+.site-header nav a[aria-current="page"] {
+  color: #ffffff;
+}
   .features-hero {
     position: relative;
     min-height: 72vh;
