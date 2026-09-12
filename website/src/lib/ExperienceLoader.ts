@@ -48,10 +48,13 @@ export class ExperienceLoader {
         if (
             !experience.audio ||
             !experience.atmosphere ||
-            !experience.particles
+            !experience.lighting ||
+            !experience.fog ||
+            !experience.particles ||
+            !experience.transition
         ) {
             throw new TypeError(
-                'Experiences must provide audio, atmosphere and particle settings.'
+                'Experiences must provide audio, atmosphere, lighting, fog, particle and transition settings.'
             );
         }
     }
@@ -68,8 +71,20 @@ export class ExperienceLoader {
                 ...experience.atmosphere
             },
 
+            lighting: {
+                ...experience.lighting
+            },
+
+            fog: {
+                ...experience.fog
+            },
+
             particles: {
                 ...experience.particles
+            },
+
+            transition: {
+                ...experience.transition
             }
         };
     }
@@ -86,6 +101,22 @@ export class ExperienceLoader {
 
             atmosphere: {
                 ...experience.atmosphere
+            },
+
+            lighting: {
+                ...experience.lighting
+            },
+
+            fog: {
+                ...experience.fog
+            },
+
+            particles: {
+                ...experience.particles
+            },
+
+            transition: {
+                ...experience.transition
             }
         };
     }

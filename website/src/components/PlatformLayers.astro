@@ -1,0 +1,662 @@
+---
+const layers = [
+  {
+    id: 'audio',
+    code: 'WAV',
+    title: 'Audio',
+    description: 'Adaptive soundscapes',
+  },
+  {
+    id: 'particles',
+    code: 'FX',
+    title: 'Particles',
+    description: 'Atmospheric motion',
+  },
+  {
+    id: 'lighting',
+    code: 'LUX',
+    title: 'Lighting',
+    description: 'Responsive illumination',
+  },
+  {
+    id: 'settings',
+    code: 'CFG',
+    title: 'Settings',
+    description: 'Experience configuration',
+  },
+];
+---
+
+<section
+  class="platform-layers"
+  data-runtime-state="booting"
+  aria-label="Aether experience platform layers"
+>
+  <div class="platform-aura" aria-hidden="true"></div>
+
+  <div class="runtime-core">
+    <span class="runtime-status" aria-hidden="true"></span>
+
+    <span class="runtime-eyebrow">Aether</span>
+    <strong>Runtime Core</strong>
+    <small data-runtime-message>Initialising systems</small>
+  </div>
+
+  <div class="energy-spine" aria-hidden="true">
+    <span></span>
+  </div>
+
+  <div class="layer-stack">
+    {
+      layers.map((layer, index) => (
+        <button
+          class={`platform-layer platform-layer--${layer.id}`}
+          type="button"
+          data-platform-layer={layer.id}
+          data-runtime-status="standby"
+          style={`--layer-index: ${index};`}
+          aria-label={`${layer.title}: ${layer.description}`}
+        >
+          <span class="layer-surface" aria-hidden="true"></span>
+
+          <span class="layer-content">
+            <span class="layer-code">{layer.code}</span>
+
+            <span class="layer-copy">
+              <strong>{layer.title}</strong>
+              <small>{layer.description}</small>
+            </span>
+
+            <span class="layer-state">
+              <i aria-hidden="true"></i>
+              <span data-layer-state>Standby</span>
+            </span>
+          </span>
+        </button>
+      ))
+    }
+  </div>
+
+  <p class="platform-caption" data-runtime-caption aria-live="polite">
+    Runtime initialising...
+  </p>
+</section>
+
+<script>
+  const initialisePlatform = (platform: HTMLElement) => {
+    const layers =
+      platform.querySelectorAll<HTMLButtonElement>('[data-platform-layer]');
+
+    const runtimeMessage =
+      platform.querySelector<HTMLElement>('[data-runtime-message]');
+
+    const runtimeCaption =
+      platform.querySelector<HTMLElement>('[data-runtime-caption]');
+
+    const reducedMotion =
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const clearActiveLayer = () => {
+      delete platform.dataset.activeLayer;
+    };
+
+    const setRuntimeState = (
+      state: string,
+      message: string,
+      caption: string,
+    ) => {
+      platform.dataset.runtimeState = state;
+
+      if (runtimeMessage) {
+        runtimeMessage.textContent = message;
+      }
+
+      if (runtimeCaption) {
+        runtimeCaption.textContent = caption;
+      }
+    };
+
+    const setLayerState = (
+      layer: HTMLButtonElement,
+      state: string,
+      label: string,
+    ) => {
+      layer.dataset.runtimeStatus = state;
+
+      const stateLabel =
+        layer.querySelector<HTMLElement>('[data-layer-state]');
+
+      if (stateLabel) {
+        stateLabel.textContent = label;
+      }
+    };
+
+    const activateLayer = (layer: HTMLButtonElement) => {
+      setLayerState(layer, 'activating', 'Loading');
+
+      window.setTimeout(() => {
+        setLayerState(layer, 'active', 'Active');
+      }, reducedMotion ? 0 : 260);
+    };
+
+    layers.forEach((layer) => {
+      const showLayer = () => {
+        platform.dataset.activeLayer =
+          layer.dataset.platformLayer ?? '';
+      };
+
+      layer.addEventListener('mouseenter', showLayer);
+      layer.addEventListener('focus', showLayer);
+      layer.addEventListener('mouseleave', clearActiveLayer);
+      layer.addEventListener('blur', clearActiveLayer);
+    });
+
+    if (reducedMotion) {
+      layers.forEach((layer) => {
+        setLayerState(layer, 'active', 'Active');
+      });
+
+      setRuntimeState(
+        'ready',
+        'Experience orchestration',
+        'Runtime ready · Hover over a layer to explore',
+      );
+
+      return;
+    }
+
+    setRuntimeState(
+      'booting',
+      'Initialising systems',
+      'Runtime initialising...',
+    );
+
+    window.setTimeout(() => {
+      setRuntimeState(
+        'online',
+        'Registering modules',
+        'Runtime core online',
+      );
+    }, 300);
+
+    const activationTimes = [650, 1050, 1450, 1850];
+
+    layers.forEach((layer, index) => {
+      window.setTimeout(() => {
+        const layerName =
+          layer.dataset.platformLayer ?? 'module';
+
+        setRuntimeState(
+          'online',
+          `Registering ${layerName}`,
+          `Activating ${layerName} layer`,
+        );
+
+        activateLayer(layer);
+      }, activationTimes[index]);
+    });
+
+    window.setTimeout(() => {
+      setRuntimeState(
+        'ready',
+        'Experience orchestration',
+        'Runtime ready · Hover over a layer to explore',
+      );
+    }, 2450);
+  };
+
+  document
+    .querySelectorAll<HTMLElement>('.platform-layers')
+    .forEach(initialisePlatform);
+</script>
+
+<style>
+  .platform-layers {
+    position: relative;
+    width: min(620px, 100%);
+    min-height: 590px;
+    margin-inline: auto;
+    padding: 1.5rem 1rem 2rem;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    isolation: isolate;
+  }
+
+  .platform-aura {
+    position: absolute;
+    z-index: -2;
+    top: 4rem;
+    left: 50%;
+    width: min(34rem, 90%);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle,
+        rgba(83, 117, 255, 0.22),
+        rgba(50, 128, 255, 0.08) 38%,
+        transparent 70%
+      );
+    filter: blur(22px);
+    transform: translateX(-50%);
+    transition:
+      opacity 300ms ease,
+      transform 500ms ease;
+    pointer-events: none;
+  }
+
+  .runtime-core {
+    position: relative;
+    z-index: 10;
+    width: 168px;
+    aspect-ratio: 1;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.25rem;
+    text-align: center;
+    border: 1px solid rgba(152, 215, 255, 0.34);
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle at 45% 36%,
+        rgba(76, 104, 255, 0.38),
+        rgba(12, 23, 48, 0.96) 58%
+      );
+    box-shadow:
+      0 0 0 10px rgba(71, 111, 255, 0.035),
+      0 0 45px rgba(68, 111, 255, 0.34),
+      inset 0 0 34px rgba(125, 207, 255, 0.12);
+    animation: runtime-breathe 4.8s ease-in-out infinite;
+  }
+
+  .runtime-core::before,
+  .runtime-core::after {
+    content: '';
+    position: absolute;
+    inset: -15px;
+    border: 1px solid rgba(114, 190, 255, 0.12);
+    border-radius: inherit;
+  }
+
+  .runtime-core::after {
+    inset: -29px;
+    border-color: rgba(114, 190, 255, 0.06);
+  }
+
+  .runtime-status {
+    position: absolute;
+    top: 29px;
+    width: 6px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #79e1ff;
+    box-shadow: 0 0 14px rgba(121, 225, 255, 0.9);
+  }
+
+  .runtime-eyebrow {
+    color: rgba(177, 220, 255, 0.72);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .runtime-core strong {
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .runtime-core small {
+    max-width: 110px;
+    color: rgba(220, 231, 246, 0.58);
+    font-size: 0.62rem;
+    line-height: 1.45;
+  }
+
+  .energy-spine {
+    position: relative;
+    z-index: 8;
+    width: 1px;
+    height: 54px;
+    overflow: hidden;
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(121, 225, 255, 0.8),
+        rgba(88, 116, 255, 0.12)
+      );
+  }
+
+  .energy-spine span {
+    position: absolute;
+    top: -12px;
+    left: -2px;
+    width: 5px;
+    height: 18px;
+    border-radius: 999px;
+    background: #c8f4ff;
+    box-shadow: 0 0 12px rgba(121, 225, 255, 0.9);
+    animation: energy-flow 2.2s linear infinite;
+  }
+
+  .layer-stack {
+    position: relative;
+    width: min(510px, 100%);
+    display: grid;
+    justify-items: center;
+  }
+
+  .platform-layer {
+    --layer-shift: calc(var(--layer-index) * 7px);
+
+    position: relative;
+    width: calc(100% - (var(--layer-index) * 20px));
+    height: 92px;
+    margin-top: -11px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transform: translateX(var(--layer-shift));
+    transition:
+      transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 320ms ease;
+  }
+
+  .platform-layer:first-child {
+    margin-top: 0;
+  }
+
+  .layer-surface {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(126, 196, 255, 0.16);
+    border-radius: 24px;
+    background:
+      linear-gradient(
+        145deg,
+        rgba(32, 48, 79, 0.92),
+        rgba(9, 17, 34, 0.96)
+      );
+    box-shadow:
+      0 17px 38px rgba(0, 0, 0, 0.35),
+      inset 0 1px rgba(255, 255, 255, 0.045);
+    transform: perspective(620px) rotateX(57deg);
+    transform-origin: center;
+    transition:
+      border-color 280ms ease,
+      background 280ms ease,
+      box-shadow 280ms ease,
+      transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .layer-surface::before {
+    content: '';
+    position: absolute;
+    inset: 12px 24px;
+    border: 1px solid rgba(129, 205, 255, 0.08);
+    border-radius: 16px;
+  }
+
+  .layer-content {
+    position: absolute;
+    z-index: 2;
+    inset: 18px 36px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    text-align: left;
+  }
+
+  .layer-code {
+    width: 42px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(121, 225, 255, 0.24);
+    border-radius: 999px;
+    color: #9be9ff;
+    background: rgba(42, 154, 255, 0.08);
+    font-family: monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .layer-copy {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .layer-copy strong {
+    font-size: 0.88rem;
+    letter-spacing: 0.025em;
+  }
+
+  .layer-copy small {
+    color: rgba(218, 229, 244, 0.54);
+    font-size: 0.65rem;
+  }
+
+  .layer-state {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(201, 226, 242, 0.56);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .layer-state i {
+    width: 5px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #79e1ff;
+    box-shadow: 0 0 9px rgba(121, 225, 255, 0.74);
+  }
+
+  .platform-layer:hover,
+  .platform-layer:focus-visible {
+    z-index: 12;
+    outline: none;
+    transform:
+      translateX(calc(var(--layer-shift) + 14px))
+      translateY(-5px)
+      scale(1.025);
+  }
+
+  .platform-layer:hover .layer-surface,
+  .platform-layer:focus-visible .layer-surface {
+    border-color: rgba(121, 225, 255, 0.52);
+    background:
+      linear-gradient(
+        145deg,
+        rgba(42, 71, 126, 0.96),
+        rgba(10, 22, 48, 0.98)
+      );
+    box-shadow:
+      0 23px 54px rgba(0, 0, 0, 0.45),
+      0 0 34px rgba(65, 130, 255, 0.24),
+      inset 0 1px rgba(255, 255, 255, 0.07);
+    transform: perspective(620px) rotateX(52deg);
+  }
+
+  .platform-layers:has(.platform-layer:hover) .platform-layer:not(:hover),
+  .platform-layers:has(.platform-layer:focus-visible)
+    .platform-layer:not(:focus-visible) {
+    filter: brightness(0.7);
+  }
+
+  .platform-layers[data-active-layer] .runtime-core {
+    box-shadow:
+      0 0 0 10px rgba(71, 111, 255, 0.045),
+      0 0 62px rgba(74, 132, 255, 0.5),
+      inset 0 0 42px rgba(125, 207, 255, 0.18);
+  }
+
+  .platform-caption {
+    margin: 1.2rem 0 0;
+    color: rgba(196, 215, 235, 0.46);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .platform-layers[data-runtime-state='booting'] .runtime-core {
+    opacity: 0.72;
+    filter: saturate(0.7);
+    animation-duration: 2.2s;
+  }
+
+  .platform-layers[data-runtime-state='online'] .runtime-core {
+    opacity: 1;
+    filter: saturate(1);
+    box-shadow:
+      0 0 0 10px rgba(71, 111, 255, 0.045),
+      0 0 58px rgba(68, 111, 255, 0.48),
+      inset 0 0 42px rgba(125, 207, 255, 0.18);
+  }
+
+  .platform-layers[data-runtime-state='ready'] .runtime-core {
+    box-shadow:
+      0 0 0 10px rgba(71, 111, 255, 0.05),
+      0 0 68px rgba(68, 111, 255, 0.54),
+      inset 0 0 46px rgba(125, 207, 255, 0.22);
+  }
+
+  .platform-layers[data-runtime-state='booting'] .runtime-status {
+    background: rgba(155, 186, 216, 0.7);
+    box-shadow: 0 0 8px rgba(155, 186, 216, 0.45);
+  }
+
+  .platform-layers[data-runtime-state='online'] .runtime-status {
+    background: #ffd37a;
+    box-shadow: 0 0 14px rgba(255, 211, 122, 0.85);
+  }
+
+  .platform-layers[data-runtime-state='ready'] .runtime-status {
+    background: #79e1ff;
+    box-shadow: 0 0 16px rgba(121, 225, 255, 0.95);
+  }
+
+  .platform-layer[data-runtime-status='standby'] {
+    opacity: 0.46;
+    filter: saturate(0.45) brightness(0.78);
+  }
+
+  .platform-layer[data-runtime-status='activating'] {
+    z-index: 11;
+    opacity: 1;
+    filter: saturate(1.15) brightness(1.18);
+    transform:
+      translateX(calc(var(--layer-shift) + 8px))
+      translateY(-3px);
+  }
+
+  .platform-layer[data-runtime-status='activating'] .layer-surface {
+    border-color: rgba(255, 211, 122, 0.48);
+    box-shadow:
+      0 18px 42px rgba(0, 0, 0, 0.4),
+      0 0 34px rgba(255, 211, 122, 0.18),
+      inset 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  .platform-layer[data-runtime-status='activating']
+    .layer-state i {
+    background: #ffd37a;
+    box-shadow: 0 0 12px rgba(255, 211, 122, 0.9);
+  }
+
+  .platform-layer[data-runtime-status='active'] {
+    opacity: 1;
+    filter: none;
+  }
+
+  .platform-layer[data-runtime-status='active'] .layer-state {
+    color: rgba(201, 226, 242, 0.72);
+  }
+
+  .platform-layer[data-runtime-status='active'] .layer-state i {
+    animation: layer-status-pulse 2.8s ease-in-out infinite;
+  }
+
+  @keyframes layer-status-pulse {
+    0%,
+    100% {
+      opacity: 0.72;
+      transform: scale(0.9);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1.25);
+    }
+  }
+
+  @keyframes runtime-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.035);
+    }
+  }
+
+  @keyframes energy-flow {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(70px);
+    }
+  }
+
+  @media (max-width: 620px) {
+    .platform-layers {
+      min-height: 530px;
+      padding-inline: 0;
+    }
+
+    .runtime-core {
+      width: 145px;
+    }
+
+    .platform-layer {
+      height: 84px;
+    }
+
+    .layer-content {
+      inset-inline: 24px;
+      gap: 0.7rem;
+    }
+
+    .layer-state {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .runtime-core,
+    .energy-spine span,
+    .platform-layer[data-runtime-status='active'] .layer-state i {
+      animation: none;
+    }
+
+    .platform-layer,
+    .layer-surface,
+    .platform-aura {
+      transition: none;
+    }
+  }
+</style>

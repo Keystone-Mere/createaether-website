@@ -1,27 +1,16 @@
 # Aether Project Status
 
-**Project:** Create Aether  
-**Repository:** createaether-website  
-**Current Branch:** main
+## Project
 
----
+Create Aether
 
-# Current Sprint
+## Branch
 
-## Sprint 0
-Engineering Workflow
+feature/aether-design-system
 
----
+## Current Version
 
-# Current Version
-
-v0.14.0 (Development)
-
----
-
-# Latest Commit
-
-b3cbb2d — Add visual runtime system foundation
+v0.18.0 (Development)
 
 ---
 
@@ -33,107 +22,94 @@ b3cbb2d — Add visual runtime system foundation
 
 🟢 Runtime stable
 
-🟢 VisualSystem integrated
+🟢 Studio operational
+
+🟢 Lighting transitions complete
+
+🟢 Fog transitions complete
+
+🟢 Canvas particle renderer integrated
+
+🟢 Personal Experience Library complete
 
 ---
 
-# Current Architecture
+# Runtime Systems
 
-The Experience Runtime owns all runtime systems.
-
-Current registered systems:
-
-- PreviewController
 - AudioSystem
-- ParticleSystem
 - VisualSystem
-
-VisualSystem is currently a foundation and does not yet render visual effects.
-
-The Studio preview currently uses CSS for:
-
-- lighting
-- particles
-- fog
-- glow
-- orb animation
+- ParticleSystem
+- PreviewController
 
 ---
 
-# Current Objective
+# Registered Visual Effects
 
-Transform VisualSystem into the visual orchestration layer for Aether.
+- CssLightingEffect
+- CssFogEffect
+- CssParticleEffect
+- CanvasParticleEffect
+
+---
+
+# Runtime Features
+
+- Experience Runtime
+- Runtime Events
+- Transition Controller
+- Colour Interpolator
+- Visual Effect Manager
+- Dynamic Effect Registration
+- Dynamic Lifecycle
+- Canvas Renderer
+- Canvas Particle Renderer
+- Experience Library
+- Experience Rename
+- Experience Duplicate
+- Experience Delete
+
+---
+
+# Current Sprint
+
+Engineering Consolidation
+
+## Objectives
+
+- Synchronise documentation
+- Modularise Studio architecture
+- Reduce Experience page complexity
+- Preserve existing behaviour
+- Improve maintainability
 
 ---
 
 # Next Sprint
 
-Visual Effects API
+Studio Refactor
 
-Goals:
+## Goals
 
-- create reusable visual effects
-- register effects with VisualSystem
-- preserve existing CSS renderer
-- prepare for Canvas/WebGL in the future
-
----
-
-# Do Not Change
-
-Do not replace the CSS renderer.
-
-Do not build Canvas yet.
-
-Do not duplicate ParticleSystem responsibilities.
+- Split Studio runtime into controllers
+- Separate UI bindings
+- Separate editor logic
+- Introduce diagnostics
+- Prepare stable runtime API
 
 ---
 
-# Session Notes
+# Long-term Direction
 
-This file is updated at the end of every development session.
+Aether is now an engine rather than a website feature.
+
+Future work:
+
+- Camera System
+- WebGL Renderer
+- Plugin SDK
+- Marketplace
+- AI Experience Generator
 
 ---
 
-# Resume
-
-When starting a new ChatGPT session:
-
-1. Read this document.
-2. Run:
-
-git status
-
-git log --oneline -5
-
-3. Continue with the Next Sprint.
-
-# Current Status
-
-## Version
-
-v0.16.0
-
-## Completed
-
-- ✅ Visual Effects Framework
-- ✅ CssLightingEffect
-- ✅ CssFogEffect
-- ✅ VisualEffect metadata
-- ✅ Visual Effect Manager
-- ✅ Dynamic registration
-- ✅ Dynamic lifecycle management
-- ✅ Effect enable / disable
-- ✅ Effect discovery API
-
-## Next Sprint (v0.17.0)
-
-Goal:
-Introduce the first Canvas renderer.
-
-Planned work:
-
-- CanvasRenderer
-- CanvasParticleEffect
-- Mixed CSS + Canvas rendering
-- Foundation for future WebGL effects
+Updated: August 2026

@@ -1,7 +1,8 @@
 ---
-import ExperiencePanel from '../components/ExperiencePanel.astro';
 import CapabilityCard from '../components/CapabilityCard.astro';
 import ArchitectureFlow from '../components/ArchitectureFlow.astro';
+import PlatformLayers from '../components/PlatformLayers.astro';
+import PostHog from '../components/posthog.astro';
 
 const capabilities = [
   {
@@ -33,6 +34,10 @@ const capabilities = [
     status: 'Works now',
   },
 ];
+import '../styles/design-system.css';
+import '../styles/animations.css';
+import '../styles/components.css';
+import SiteFooter from '../components/SiteFooter.astro';
 ---
 
 <!doctype html>
@@ -49,6 +54,7 @@ const capabilities = [
     />
     <title>Aether — Create digital atmospheres people can shape</title>
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <PostHog />
   </head>
 
   <body>
@@ -56,18 +62,18 @@ const capabilities = [
       <a class="brand" href="/" aria-label="Aether home">
         <img
           src="/brand/aether-mark.svg"
-          alt="Create Aether"
+          alt="Aether"
           class="brand-logo"
-          width="52"
-          height="52"
+          width="80"
+          height="80"
         />
-        <span>Create Aether</span>
+        <span>Aether</span>
       </a>
 
       <nav aria-label="Primary navigation">
         <a href="#platform">Platform</a>
         <a href="/studio/">Studio</a>
-        <a href="#capabilities">Capabilities</a>
+        <a href="/features/">Features</a>
         <a
           href="https://github.com/Benchelt/createaether-website"
           target="_blank"
@@ -110,7 +116,7 @@ const capabilities = [
             </a>
 
             <a class="button secondary" href="#platform">
-              Explore Platform
+              See How It Works
             </a>
           </div>
 
@@ -142,16 +148,9 @@ const capabilities = [
 
             <div class="energy-line"></div>
 
-            <img
-              src="/brand/aether-mark.svg"
-              alt=""
-              class="hero-mark"
-              width="320"
-              height="320"
-            />
+            <PlatformLayers />
           </div>
 
-          <ExperiencePanel />
         </div>
       </section>
 
@@ -266,9 +265,7 @@ const capabilities = [
       <ArchitectureFlow />
     </main>
 
-    <footer>
-      <p>© 2026 Aether. Built with Astro.</p>
-    </footer>
+    <SiteFooter />
   </body>
 </html>
 
@@ -408,10 +405,10 @@ const capabilities = [
     animation: aether-pulse 7s ease-in-out infinite;
   }
 
-  .hero-mark {
+  .hero-platform-artwork {
     position: relative;
     z-index: 3;
-    width: min(62%, 320px);
+    width: min(95%, 500px);
     height: auto;
     filter:
       drop-shadow(0 0 18px rgba(102, 227, 255, 0.28))
@@ -803,13 +800,13 @@ const capabilities = [
       min-height: 330px;
     }
 
-    .hero-mark {
-      width: min(58%, 230px);
+    .hero-platform-artwork {
+      width: min(90%, 380px);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero-mark,
+    .hero-platform-artwork,
     .field-glow,
     .field-rings span {
       animation: none;
@@ -989,7 +986,7 @@ const capabilities = [
       background 650ms ease;
   }
 
-  .hero-mark {
+  .hero-platform-artwork {
     filter:
       drop-shadow(
         0 0 calc(12px + var(--aether-power) * 18px)
@@ -1155,5 +1152,153 @@ const capabilities = [
       display: none;
     }
   }
+
+
+  /* AETHER PLATFORM ARTWORK BLEND FIX */
+
+  .aether-field {
+    width: min(100%, 520px);
+    margin-bottom: -20px;
+    background: transparent;
+  }
+
+  .hero-platform-artwork {
+    width: min(94%, 500px);
+    height: auto;
+    object-fit: contain;
+    animation: none;
+    transform: none;
+    transition: none;
+    filter: none;
+    box-shadow: none;
+    opacity: 1;
+  }
+
+  .hero-platform-artwork:hover,
+  .hero-platform-artwork:focus {
+    animation: none;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+  }
+
+  .field-glow,
+  .field-rings,
+  .energy-line {
+    display: none;
+  }
+
+  @media (max-width: 980px) {
+    .aether-field {
+      width: min(100%, 500px);
+    }
+
+    .hero-platform-artwork {
+      width: min(92%, 460px);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .aether-field {
+      width: min(100%, 420px);
+      margin-bottom: -8px;
+    }
+
+    .hero-platform-artwork {
+      width: min(96%, 390px);
+    }
+  }
+
+  /* END AETHER PLATFORM ARTWORK BLEND FIX */
+
+
+/* HEADER LOGO POSITION V2 */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    /* Move logo slightly lower than navigation */
+    margin-top: 10px;
+}
+
+.brand-logo {
+    width: 104px;
+    height: 104px;
+    flex: 0 0 104px;
+
+    animation: none;
+    transform: none;
+    filter: none;
+}
+
+.brand:hover .brand-logo,
+.brand:focus-visible .brand-logo {
+    animation: none;
+    transform: none;
+    filter: none;
+}
+
+.brand span {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+/* END HEADER LOGO POSITION V2 */
+
+
+  /* AETHER WORDMARK AND HERO ALIGNMENT V3 */
+
+  /*
+   * Leave the logo mark unchanged.
+   * Increase only the Aether wordmark.
+   */
+  .brand span {
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+
+  /*
+   * Position the hero copy from the top of the grid rather than
+   * vertically centring it within the tall hero area.
+   */
+  .hero {
+    align-items: start;
+  }
+
+  .hero-content {
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 0;
+    padding-top: 86px;
+    margin-top: 0;
+  }
+
+  @media (max-width: 980px) {
+    .brand span {
+      font-size: 2.15rem;
+    }
+
+    .hero-content {
+      padding-top: 24px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .brand span {
+      font-size: 1.7rem;
+    }
+
+    .hero-content {
+      padding-top: 12px;
+    }
+  }
+
+  /* END AETHER WORDMARK AND HERO ALIGNMENT V3 */
 
 </style>

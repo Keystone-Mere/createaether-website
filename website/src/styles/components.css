@@ -1,0 +1,45 @@
+.aether-container {
+  width: min(
+    calc(100% - (var(--aether-gutter) * 2)),
+    var(--aether-container)
+  );
+  margin-inline: auto;
+}
+
+.aether-surface {
+  border: 1px solid var(--aether-border);
+  border-radius: var(--aether-radius-md);
+  background: var(--aether-surface);
+  box-shadow: var(--aether-glow-sm);
+  backdrop-filter: blur(18px);
+}
+
+.aether-eyebrow {
+  color: var(--aether-blue-bright);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.aether-button {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--aether-border-strong);
+  border-radius: var(--aether-radius-pill);
+  text-decoration: none;
+  transition:
+    transform var(--aether-duration-fast) var(--aether-ease),
+    border-color var(--aether-duration-fast) var(--aether-ease),
+    box-shadow var(--aether-duration-fast) var(--aether-ease);
+}
+
+.aether-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--aether-blue);
+  box-shadow: var(--aether-glow-sm);
+}

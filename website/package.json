@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@sentry/astro": "^10.73.0",
     "astro": "^7.1.3"
   }
 }

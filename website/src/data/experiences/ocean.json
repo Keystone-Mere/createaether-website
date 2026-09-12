@@ -14,6 +14,7 @@
     "fog": true
   },
   "particles": {
+    "preset": "ocean-drift",
     "count": 34,
     "colour": "#bae6fd",
     "glow": 7,
@@ -26,5 +27,22 @@
     "maxOpacity": 0.65,
     "minLifetime": 8,
     "maxLifetime": 18
+  },
+  "lighting": {
+    "preset": "ocean-blue",
+    "colour": "#7dd3fc",
+    "intensity": 0.74,
+    "pulse": true,
+    "speed": 0.1
+  },
+  "fog": {
+    "preset": "coastal-mist",
+    "colour": "#c8e7f2",
+    "density": 0.4,
+    "speed": 0.14
+  },
+  "transition": {
+    "duration": 2400,
+    "easing": "ease-in-out"
   }
 }

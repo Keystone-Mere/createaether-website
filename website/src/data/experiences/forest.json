@@ -14,6 +14,7 @@
     "fog": true
   },
   "particles": {
+    "preset": "forest-pollen",
     "count": 58,
     "colour": "#bbf7d0",
     "glow": 4,
@@ -26,5 +27,22 @@
     "maxOpacity": 0.75,
     "minLifetime": 7,
     "maxLifetime": 15
+  },
+  "lighting": {
+    "preset": "forest-canopy",
+    "colour": "#86c995",
+    "intensity": 0.68,
+    "pulse": true,
+    "speed": 0.16
+  },
+  "fog": {
+    "preset": "woodland-mist",
+    "colour": "#b7d8c0",
+    "density": 0.32,
+    "speed": 0.18
+  },
+  "transition": {
+    "duration": 2200,
+    "easing": "ease-in-out"
   }
 }

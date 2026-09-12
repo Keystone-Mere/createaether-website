@@ -1,0 +1,580 @@
+---
+const year = new Date().getFullYear();
+
+const platformLinks = [
+  { label: 'Features', href: '/features/' },
+  { label: 'Studio', href: '/studio/' },
+];
+
+const developerLinks = [
+  {
+    label: 'GitHub',
+    href: 'https://github.com/Benchelt/createaether-website',
+    external: true,
+  },
+];
+
+const comingSoonLinks = [
+  'Documentation',
+  'Playground',
+  'LinkedIn',
+  'YouTube',
+];
+---
+
+<footer class="site-footer">
+  <div class="footer-grid" aria-hidden="true"></div>
+  <div class="footer-glow" aria-hidden="true"></div>
+
+  <div class="footer-main">
+    <div class="footer-brand">
+      <a class="footer-logo" href="/" aria-label="Aether home">
+        <span class="footer-symbol" aria-hidden="true">
+          <img
+            src="/brand/aether-mark.svg"
+            alt=""
+            width="96"
+            height="96"
+            loading="lazy"
+          />
+        </span>
+
+        <span class="footer-wordmark">Aether</span>
+      </a>
+
+      <p class="footer-product-name">
+        Experience Operating System
+      </p>
+
+      <p class="footer-description">
+        Design, orchestrate and deploy immersive digital experiences.
+      </p>
+
+      <div class="runtime-card" aria-label="Aether runtime status">
+        <div class="runtime-card-status">
+          <span class="runtime-dot" aria-hidden="true"></span>
+
+          <span>
+            <strong>Runtime online</strong>
+            <small>Experience engine active</small>
+          </span>
+        </div>
+
+        <span class="runtime-version">Web Platform</span>
+      </div>
+    </div>
+
+    <nav
+      class="footer-column"
+      aria-labelledby="footer-platform-title"
+    >
+      <h2 id="footer-platform-title">Platform</h2>
+
+      <ul>
+        {
+          platformLinks.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav
+      class="footer-column"
+      aria-labelledby="footer-developers-title"
+    >
+      <h2 id="footer-developers-title">Developers</h2>
+
+      <ul>
+        {
+          developerLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external
+                  ? 'noopener noreferrer'
+                  : undefined}
+              >
+                {link.label}
+                {link.external && (
+                  <span class="external-arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                )}
+              </a>
+            </li>
+          ))
+        }
+
+        <li>
+          <span class="future-link">
+            SDK
+            <small>Coming soon</small>
+          </span>
+        </li>
+
+        <li>
+          <span class="future-link">
+            API
+            <small>Coming soon</small>
+          </span>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="footer-column">
+      <h2>Coming next</h2>
+
+      <ul>
+        {
+          comingSoonLinks.map((label) => (
+            <li>
+              <span class="future-link">
+                {label}
+                <small>Coming soon</small>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-statement">
+    <span class="statement-line" aria-hidden="true"></span>
+
+    <p>
+      Experience Operating System
+      <strong>for the Web</strong>
+    </p>
+
+    <span class="statement-line" aria-hidden="true"></span>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© {year} Aether</p>
+
+    <div class="footer-meta">
+      <span>Designed and built in the UK</span>
+      <span aria-hidden="true">·</span>
+      <span>Powered by the Aether Runtime</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    width: min(1180px, calc(100% - 3rem));
+    margin: clamp(5rem, 10vw, 9rem) auto 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(142, 177, 215, 0.18);
+    color: rgba(225, 234, 246, 0.72);
+    isolation: isolate;
+  }
+
+  .footer-grid {
+    position: absolute;
+    z-index: -3;
+    inset: 0;
+    opacity: 0.14;
+    background-image:
+      linear-gradient(
+        rgba(121, 225, 255, 0.055) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(121, 225, 255, 0.055) 1px,
+        transparent 1px
+      );
+    background-size: 52px 52px;
+    mask-image:
+      linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.9),
+        transparent 82%
+      );
+    pointer-events: none;
+  }
+
+  .footer-glow {
+    position: absolute;
+    z-index: -2;
+    top: -15rem;
+    left: -9rem;
+    width: 36rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle,
+        rgba(63, 139, 255, 0.15),
+        rgba(59, 105, 255, 0.05) 40%,
+        transparent 70%
+      );
+    filter: blur(22px);
+    pointer-events: none;
+  }
+
+  .footer-main {
+    display: grid;
+    grid-template-columns:
+      minmax(320px, 1.9fr)
+      repeat(3, minmax(140px, 1fr));
+    gap: clamp(2.5rem, 5vw, 5rem);
+    padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+  }
+
+  .footer-brand {
+    max-width: 390px;
+  }
+
+  .footer-logo {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    color: #f7f9fc;
+    text-decoration: none;
+  }
+
+  .footer-symbol {
+    position: relative;
+    width: 78px;
+    height: 78px;
+    display: grid;
+    place-items: center;
+    filter:
+      drop-shadow(0 0 18px rgba(66, 118, 255, 0.2));
+  }
+
+  .footer-symbol::after {
+    content: '';
+    position: absolute;
+    inset: 20%;
+    z-index: -1;
+    border-radius: 50%;
+    background: rgba(80, 117, 255, 0.18);
+    filter: blur(18px);
+    animation: logo-glow 4.8s ease-in-out infinite;
+  }
+
+  .footer-symbol img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: logo-float 5.2s ease-in-out infinite;
+  }
+
+  .footer-wordmark {
+    color: #ffffff;
+    font-size: clamp(2rem, 3vw, 2.75rem);
+    font-weight: 750;
+    letter-spacing: -0.055em;
+    line-height: 1;
+    text-shadow: 0 0 24px rgba(87, 135, 255, 0.08);
+  }
+
+  .footer-product-name {
+    margin: 1.2rem 0 0;
+    color: rgba(148, 188, 228, 0.65);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+  }
+
+  .footer-description {
+    max-width: 350px;
+    margin: 1rem 0 1.6rem;
+    color: rgba(203, 217, 235, 0.58);
+    font-size: 0.82rem;
+    line-height: 1.75;
+  }
+
+  .runtime-card {
+    width: min(100%, 330px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid rgba(70, 221, 164, 0.17);
+    border-radius: 14px;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(39, 186, 128, 0.07),
+        rgba(13, 26, 35, 0.38)
+      );
+    box-shadow:
+      inset 0 1px rgba(255, 255, 255, 0.025),
+      0 14px 34px rgba(0, 0, 0, 0.13);
+  }
+
+  .runtime-card-status {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .runtime-card-status > span:last-child {
+    display: grid;
+    gap: 0.18rem;
+  }
+
+  .runtime-card-status strong {
+    color: rgba(158, 232, 202, 0.82);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .runtime-card-status small {
+    color: rgba(151, 181, 194, 0.46);
+    font-size: 0.52rem;
+  }
+
+  .runtime-dot {
+    width: 7px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #48dc9b;
+    box-shadow: 0 0 11px rgba(72, 220, 155, 0.9);
+    animation: footer-status-pulse 2.8s ease-in-out infinite;
+  }
+
+  .runtime-version {
+    color: rgba(145, 173, 194, 0.4);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.47rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .footer-column h2 {
+    margin: 0 0 1.3rem;
+    color: rgba(240, 245, 251, 0.86);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .footer-column ul {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-column a,
+  .future-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .footer-column a {
+    color: rgba(193, 209, 228, 0.6);
+    text-decoration: none;
+    transition:
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .footer-column a:hover,
+  .footer-column a:focus-visible {
+    color: #9be9ff;
+    outline: none;
+    transform: translateX(3px);
+  }
+
+  .external-arrow {
+    color: rgba(121, 225, 255, 0.52);
+  }
+
+  .future-link {
+    color: rgba(151, 170, 195, 0.4);
+  }
+
+  .future-link small {
+    padding: 0.22rem 0.42rem;
+    border: 1px solid rgba(141, 161, 190, 0.13);
+    border-radius: 999px;
+    color: rgba(160, 181, 207, 0.44);
+    font-size: 0.4rem;
+    font-weight: 700;
+    letter-spacing: 0.065em;
+    text-transform: uppercase;
+  }
+
+  .footer-statement {
+    display: grid;
+    grid-template-columns: minmax(2rem, 1fr) auto minmax(2rem, 1fr);
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+  }
+
+  .statement-line {
+    height: 1px;
+    background:
+      linear-gradient(
+        to right,
+        transparent,
+        rgba(126, 173, 218, 0.16),
+        transparent
+      );
+  }
+
+  .footer-statement p {
+    margin: 0;
+    color: rgba(167, 191, 218, 0.4);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .footer-statement strong {
+    color: rgba(137, 218, 255, 0.66);
+    font-weight: 700;
+  }
+
+  .footer-bottom {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    border-top: 1px solid rgba(142, 177, 215, 0.12);
+    color: rgba(163, 184, 208, 0.42);
+    font-size: 0.62rem;
+  }
+
+  .footer-bottom p {
+    margin: 0;
+  }
+
+  .footer-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  @keyframes logo-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+
+  @keyframes logo-glow {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(0.92);
+    }
+
+    50% {
+      opacity: 0.85;
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes footer-status-pulse {
+    0%,
+    100% {
+      opacity: 0.65;
+      transform: scale(0.9);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  @media (max-width: 960px) {
+    .footer-main {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .footer-brand {
+      max-width: none;
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .site-footer {
+      width: min(100% - 2rem, 1180px);
+    }
+
+    .footer-main {
+      grid-template-columns: 1fr;
+      gap: 2.6rem;
+    }
+
+    .footer-brand {
+      grid-column: auto;
+    }
+
+    .footer-symbol {
+      width: 64px;
+      height: 64px;
+    }
+
+    .footer-wordmark {
+      font-size: 2.1rem;
+    }
+
+    .footer-statement {
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+
+    .statement-line {
+      display: none;
+    }
+
+    .footer-bottom {
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.55rem;
+      padding-block: 1.3rem;
+    }
+
+    .footer-meta {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-symbol img,
+    .footer-symbol::after,
+    .runtime-dot {
+      animation: none;
+    }
+
+    .footer-column a {
+      transition: none;
+    }
+  }
+</style>

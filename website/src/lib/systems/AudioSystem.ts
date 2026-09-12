@@ -148,12 +148,20 @@ export class AudioSystem
                     3
                 );
 
-            audioElement.volume =
+            const interpolatedVolume =
                 startVolume +
                 (
                     volumeDifference *
                     easedProgress
                 );
+
+            audioElement.volume = Math.min(
+                1,
+                Math.max(
+                    0,
+                    interpolatedVolume
+                )
+            );
 
             if (progress < 1) {
                 this.fadeFrame =

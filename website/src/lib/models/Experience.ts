@@ -10,7 +10,24 @@ export interface AtmosphereSettings {
     fog: boolean;
 }
 
+export interface LightingSettings {
+    preset: string;
+    colour: string;
+    intensity: number;
+    pulse: boolean;
+    speed: number;
+}
+
+export interface FogSettings {
+    preset: string;
+    colour: string;
+    density: number;
+    speed: number;
+}
+
 export interface ParticleSettings {
+    preset: string;
+
     count: number;
     colour: string;
     glow: number;
@@ -30,6 +47,11 @@ export interface ParticleSettings {
     maxLifetime: number;
 }
 
+export interface TransitionSettings {
+    duration: number;
+    easing: string;
+}
+
 export interface Experience {
     id: string;
     name: string;
@@ -38,5 +60,10 @@ export interface Experience {
 
     audio: AudioSettings;
     atmosphere: AtmosphereSettings;
+
+    lighting: LightingSettings;
+    fog: FogSettings;
     particles: ParticleSettings;
+
+    transition: TransitionSettings;
 }

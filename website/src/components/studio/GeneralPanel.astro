@@ -13,7 +13,8 @@ const { experience } = Astro.props;
         id="experience-name"
         type="text"
         value={experience.name}
-    />
+    readonly
+/>
 
     <label for="experience-description">
         Description
@@ -22,6 +23,7 @@ const { experience } = Astro.props;
     <textarea
         id="experience-description"
         rows="3"
+        readonly
     >{experience.description}</textarea>
 </div>
 

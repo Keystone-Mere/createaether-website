@@ -6,7 +6,7 @@
   "audio": {
     "enabled": true,
     "volume": 40,
-    "track": "om-so-hum"
+    "track": "temple-echoes"
   },
   "atmosphere": {
     "particles": true,
@@ -14,6 +14,7 @@
     "fog": false
   },
   "particles": {
+    "preset": "temple-embers",
     "count": 42,
     "colour": "#bfdbfe",
     "glow": 5,
@@ -26,5 +27,22 @@
     "maxOpacity": 0.9,
     "minLifetime": 5,
     "maxLifetime": 12
+  },
+  "lighting": {
+    "preset": "temple-gold",
+    "colour": "#e7c67a",
+    "intensity": 0.82,
+    "pulse": true,
+    "speed": 0.22
+  },
+  "fog": {
+    "preset": "ritual-haze",
+    "colour": "#c9b58a",
+    "density": 0.18,
+    "speed": 0.12
+  },
+  "transition": {
+    "duration": 1800,
+    "easing": "ease-in-out"
   }
 }

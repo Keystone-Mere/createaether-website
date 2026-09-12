@@ -1,0 +1,47 @@
+:root {
+  /* Core surfaces */
+  --aether-bg: #05070d;
+  --aether-bg-soft: #090c15;
+  --aether-surface: rgba(15, 20, 36, 0.72);
+  --aether-surface-strong: rgba(20, 27, 49, 0.9);
+
+  /* Text */
+  --aether-text: #f5f3ee;
+  --aether-text-soft: #b6bac6;
+  --aether-text-muted: #7f8798;
+
+  /* Brand */
+  --aether-blue: #4d8dff;
+  --aether-blue-bright: #66b8ff;
+  --aether-violet: #8c7cff;
+
+  /* Borders */
+  --aether-border: rgba(126, 151, 212, 0.18);
+  --aether-border-strong: rgba(126, 151, 212, 0.34);
+
+  /* Glows */
+  --aether-glow-sm: 0 0 18px rgba(77, 141, 255, 0.22);
+  --aether-glow-md: 0 0 42px rgba(77, 141, 255, 0.28);
+  --aether-glow-lg: 0 0 90px rgba(77, 141, 255, 0.34);
+
+  /* Radius */
+  --aether-radius-sm: 10px;
+  --aether-radius-md: 18px;
+  --aether-radius-lg: 28px;
+  --aether-radius-pill: 999px;
+
+  /* Layout */
+  --aether-container: 1440px;
+  --aether-gutter: clamp(1.25rem, 4vw, 4rem);
+  --aether-section-space: clamp(5rem, 10vw, 10rem);
+
+  /* Type */
+  --aether-font-display: Inter, ui-sans-serif, system-ui, sans-serif;
+  --aether-font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+
+  /* Motion */
+  --aether-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --aether-duration-fast: 180ms;
+  --aether-duration-base: 320ms;
+  --aether-duration-slow: 900ms;
+}

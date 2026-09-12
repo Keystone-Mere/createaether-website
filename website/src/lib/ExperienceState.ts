@@ -2,7 +2,12 @@ import type { Experience } from './models/Experience';
 
 export type ExperienceStateData = Pick<
     Experience,
-    'audio' | 'atmosphere'
+    'audio' |
+    'atmosphere' |
+    'lighting' |
+    'fog' |
+    'particles' |
+    'transition'
 >;
 
 export interface ExperienceControls {
@@ -42,6 +47,42 @@ export class ExperienceState {
                 particles: true,
                 lighting: true,
                 fog: false
+            },
+
+            lighting: {
+                preset: "default",
+                colour: "#ffffff",
+                intensity: 1,
+                pulse: false,
+                speed: 0
+            },
+
+            fog: {
+                preset: "default",
+                colour: "#ffffff",
+                density: 0,
+                speed: 0
+            },
+
+            particles: {
+                preset: "default",
+                count: 40,
+                colour: "#ffffff",
+                glow: 4,
+                minRadius: 1,
+                maxRadius: 3,
+                minSpeed: 4,
+                maxSpeed: 10,
+                drift: 5,
+                minOpacity: 0.3,
+                maxOpacity: 0.8,
+                minLifetime: 5,
+                maxLifetime: 10
+            },
+
+            transition: {
+                duration: 1000,
+                easing: "ease"
             }
         };
     }
@@ -129,6 +170,22 @@ export class ExperienceState {
 
         this.data.atmosphere = {
             ...state.atmosphere
+        };
+
+        this.data.lighting = {
+            ...state.lighting
+        };
+
+        this.data.fog = {
+            ...state.fog
+        };
+
+        this.data.particles = {
+            ...state.particles
+        };
+
+        this.data.transition = {
+            ...state.transition
         };
 
         this.writeControls();

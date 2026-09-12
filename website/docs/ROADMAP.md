@@ -1,31 +1,55 @@
 # Create Aether Roadmap
 
-## Version 0.2 — Dashboard Foundation
-- [x] Studio layout
-- [x] Sidebar navigation
-- [x] Metric card component
-- [x] Dashboard foundation
-- [x] Workspace status panel
+## v0.x Foundation
 
-## Version 0.3 — Interactive Dashboard
-- [ ] Status cards
-- [ ] Recent activity
-- [ ] Quick actions
-- [ ] Responsive improvements
+- [x] Runtime Architecture
+- [x] Experience Runtime
+- [x] Runtime Systems
+- [x] Experience Library
+- [x] Visual Effects Framework
+- [x] CSS Lighting
+- [x] CSS Fog
+- [x] CSS Particles
+- [x] Canvas Particles
+- [x] Experience Editing
 
-## Version 0.4 — Experience Management
-- [ ] Experience library
-- [ ] Create experience wizard
-- [ ] Duplicate experiences
-- [ ] Delete experiences
+---
 
-## Version 0.5 — Runtime
-- [ ] Runtime manager
-- [ ] Runtime diagnostics
-- [ ] Performance monitor
+## v1.0 Alpha
+
+- [ ] Studio Refactor
+- [ ] Runtime Diagnostics
+- [ ] Stable Runtime API
+- [ ] Documentation Complete
+
+---
+
+## v1.1
+
+- [ ] Camera System
+- [ ] Camera Animations
+- [ ] Camera Presets
+
+---
+
+## v1.2
+
+- [ ] WebGL Renderer
+- [ ] GPU Effects
+- [ ] Post Processing
+
+---
+
+## v1.3
+
+- [ ] Plugin SDK
+- [ ] Marketplace
+- [ ] Experience Packages
+
+---
 
 ## Future
-- [ ] Marketplace
-- [ ] AI Assistant
-- [ ] Plugin SDK
-- [ ] Team collaboration
+
+- [ ] AI Experience Designer
+- [ ] Multiplayer Studio
+- [ ] Cloud Experience Library
