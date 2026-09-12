@@ -1,63 +1,55 @@
 # Aether
 
-Aether is a modular experience engine for creating and shaping immersive digital atmospheres through controllable audio, lighting, particles, fog and environmental effects.
+> Build immersive digital experiences.
 
-The project is developed by [Keystone Mere Ltd](https://keystonemere.com).
+Welcome to the official repository for the Create Aether platform.
 
-## Current status
+Aether is a modular experience engine for building immersive digital environments, bringing together visual, audio and environmental systems within a reusable architecture.
 
-🟢 **Working MVP**
+---
 
-The browser-based Studio currently supports:
+## Current Status
 
-- Five experience presets: Temple, Forest, Ocean, Christmas and Storm
-- Live atmosphere previews
-- Controllable soundscapes and volume
-- Lighting, fog and particle controls
-- Local saving and importing of experience configurations
-- Reusable JSON-based presets
-- A modular TypeScript runtime
+🚧 Foundation Phase
 
-Try the current showcase at [createaether.com](https://createaether.com).
+---
 
-## MVP purpose
+## Mission
 
-The current MVP is designed to prove that users can:
+Create elegant software that helps developers build atmospheric, interactive and emotionally engaging web experiences.
 
-1. Choose an atmosphere preset.
-2. Adjust its audio and visual systems.
-3. Preview their changes immediately.
-4. Save the resulting configuration locally.
-5. Return to refine the experience.
+---
 
-Marketplace distribution, publishing, account services and a public SDK remain planned rather than current features.
+## Core Projects
 
-## Experience presets
+- Aether Engine
+- Create Aether Website
+- Future Python API
+- Documentation
+- Examples
 
-| Experience | Atmosphere |
-|---|---|
-| Temple | Meditative ambience, subtle lighting and ritual atmosphere |
-| Forest | Layered woodland audio, particles and responsive ambience |
-| Ocean | Waves, wind and slow cinematic movement |
-| Christmas | Warm seasonal lighting, snowfall and winter ambience |
-| Storm | Rainfall, thunder, shifting light and atmospheric audio |
+---
 
-## Technology
-
-The current application uses:
+## Technology Stack
 
 - Astro
-- TypeScript
-- HTML Canvas
-- CSS
-- Browser local storage
-- Cloudflare Pages
-- Auth0
-- PostHog
-- Sentry
+- Docker
+- Caddy
+- Python
+- FastAPI
+- PostgreSQL
+- GitHub Actions
 
-## Repository structure
+---
 
-```text
-docs/       Project documentation
-website/    Public website and Aether Studio MVP
+## Engineering Principles
+
+- Documentation first
+- Modular architecture
+- Security by design
+- Performance by default
+- Long-term maintainability
+
+---
+
+© Aether
