@@ -26,5 +26,22 @@
     "maxOpacity": 0.8,
     "minLifetime": 7,
     "maxLifetime": 16
+  },
+  "lighting": {
+    "preset": "christmas-gold",
+    "colour": "#f4c96b",
+    "intensity": 0.72,
+    "pulse": true,
+    "speed": 0.14
+  },
+  "fog": {
+    "preset": "winter-haze",
+    "colour": "#dbeafe",
+    "density": 0.24,
+    "speed": 0.12
+  },
+  "transition": {
+    "duration": 2000,
+    "easing": "ease-in-out"
   }
 }
