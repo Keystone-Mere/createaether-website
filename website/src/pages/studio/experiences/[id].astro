@@ -1285,10 +1285,6 @@ const selectedAudioTrack =
 
                             return;
                         }
-if (audioElement instanceof HTMLAudioElement) {
-  audioElement.pause();
-  audioElement.currentTime = 0;
-}
                         editableExperience =
                             cloneExperience(
                                 selectedExperience
@@ -1297,6 +1293,35 @@ if (audioElement instanceof HTMLAudioElement) {
                         experienceLoader.load(
                             editableExperience
                         );
+
+                        if (
+                            audioElement
+                            instanceof HTMLAudioElement
+                        ) {
+                            audioElement.pause();
+                            audioElement.currentTime = 0;
+                        }
+
+                        if (
+                            audioPlaybackToggle
+                            instanceof HTMLButtonElement
+                        ) {
+                            audioPlaybackToggle.textContent =
+                                'Play Soundscape';
+
+                            audioPlaybackToggle.setAttribute(
+                                'aria-pressed',
+                                'false'
+                            );
+                        }
+
+                        if (
+                            audioPlaybackStatus
+                            instanceof HTMLElement
+                        ) {
+                            audioPlaybackStatus.textContent =
+                                'Ready to play';
+                        }
 
                         synchroniseEditor(
                             editableExperience
