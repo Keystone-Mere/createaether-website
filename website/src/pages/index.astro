@@ -3,6 +3,7 @@ import CapabilityCard from '../components/CapabilityCard.astro';
 import ArchitectureFlow from '../components/ArchitectureFlow.astro';
 import PlatformLayers from '../components/PlatformLayers.astro';
 import PostHog from '../components/posthog.astro';
+import ExperienceShowcase from '../components/ExperienceShowcase.astro';
 
 const capabilities = [
   {
@@ -15,7 +16,7 @@ const capabilities = [
   {
     number: '02',
     title: 'Visual Systems',
-    text: 'Live particles, responsive lighting, fog and atmospheric effects connected directly to the runtime preview.',
+    text: 'Reusable visual systems create configurable rain, snowfall, sparks, fog, lighting and atmospheric particle effects.',
     icon: 'visual',
     status: 'Runtime ready',
   },
@@ -125,9 +126,9 @@ import SiteFooter from '../components/SiteFooter.astro';
               <i aria-hidden="true"></i>
               Working MVP
             </span>
-            <span>Browser preview</span>
-            <span>Local saves</span>
-            <span>Atmosphere editing</span>
+            <span>Playable experiences</span>
+            <span>Live atmosphere controls</span>
+            <span>Reusable visual systems</span>
           </div>
         </div>
 
@@ -192,7 +193,7 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>01</span>
             <h3>Create</h3>
             <p>
-              Start with a Temple, Forest, Ocean or Christmas foundation.
+              Start with a ready-made experience preset, then shape its atmosphere and behaviour.
             </p>
           </article>
 
@@ -225,6 +226,8 @@ import SiteFooter from '../components/SiteFooter.astro';
           Open Atmosphere Composer →
         </a>
       </section>
+
+      <ExperienceShowcase />
 
       <section
         id="capabilities"
