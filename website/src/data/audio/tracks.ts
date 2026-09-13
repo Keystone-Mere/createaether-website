@@ -37,6 +37,13 @@ export const audioTracks: AudioTrack[] = [
     loop: true,
   },
   {
+  id: 'festival',
+  title: 'Carnival',
+  description: 'An energetic celebratory soundscape for the Festival experience.',
+  src: '/audio/carnival.mp3',
+  loop: true,
+  },
+  {
     id: 'storm',
     title: 'Rain and Thunder',
     description: 'Rainfall and distant thunder for the Storm experience.',

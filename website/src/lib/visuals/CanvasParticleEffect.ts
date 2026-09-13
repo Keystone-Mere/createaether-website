@@ -246,6 +246,9 @@ private createParticle(
     const isRain =
         this.settings.preset === 'storm-rain';
 
+    const isFloat =
+        this.settings.preset === 'festival-float';
+
     return {
         x: this.randomBetween(
             0,
@@ -254,9 +257,11 @@ private createParticle(
 
         y: distributeAcrossScene
             ? this.randomBetween(0, height)
-            : isRain
-                ? -this.randomBetween(4, 40)
-                : height + this.randomBetween(4, 40),
+            : isFloat
+                ? this.randomBetween(0, height)
+                : isRain
+                    ? -this.randomBetween(4, 40)
+                    : height + this.randomBetween(4, 40),
 
         velocityX:
             this.randomBetween(
@@ -264,15 +269,20 @@ private createParticle(
                 this.settings.drift
             ),
 
-        velocityY: isRain
+        velocityY: isFloat
             ? this.randomBetween(
-                this.settings.minSpeed,
+                -this.settings.maxSpeed,
                 this.settings.maxSpeed
             )
-            : -this.randomBetween(
-                this.settings.minSpeed,
-                this.settings.maxSpeed
-            ),
+            : isRain
+                ? this.randomBetween(
+                    this.settings.minSpeed,
+                    this.settings.maxSpeed
+                )
+                : -this.randomBetween(
+                    this.settings.minSpeed,
+                    this.settings.maxSpeed
+                ),
 
         radius:
             this.randomBetween(
@@ -315,12 +325,20 @@ private createParticle(
         const isRain =
             this.settings.preset === 'storm-rain';
 
+    const isFloat =
+        this.settings.preset === 'festival-float';
+
         const outsideScene =
-            (isRain
-                ? particle.y > height + 40
-                : particle.y < -40)
-            || particle.x < -40
-            || particle.x > width + 40;
+            isFloat
+                ? particle.y < -40
+                    || particle.y > height + 40
+                    || particle.x < -40
+                    || particle.x > width + 40
+                : (isRain
+                    ? particle.y > height + 40
+                    : particle.y < -40)
+                    || particle.x < -40
+                    || particle.x > width + 40;
 
         if (expired || outsideScene) {
             Object.assign(
@@ -392,3 +410,17 @@ private createParticle(
             * (maximum - minimum);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
