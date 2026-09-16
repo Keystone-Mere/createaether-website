@@ -1,13 +1,14 @@
 ---
 interface Props { visitor?: boolean; }
 const { visitor = false } = Astro.props;
+const showTestDuration = import.meta.env.DEV;
 ---
 
 <section class="temple-journey" id="temple-journey" aria-labelledby="temple-journey-title">
   <div class="journey-intro">
     <p class="journey-kicker">{visitor ? 'Temple experience' : 'Guided experience pilot'}</p>
     <h2 id="temple-journey-title">A moment in the Temple</h2>
-    <p>Check in, choose a practice, and spend a few minutes with the Temple soundscape. Your answers stay on this page.</p>
+    <p>Check in, choose a practice, and spend a few minutes with the Temple soundscape. {visitor ? 'Your answers stay on this page.' : 'Your choices shape this session.'}</p>
   </div>
 
   <div id="journey-question" class="journey-step">
@@ -29,6 +30,7 @@ const { visitor = false } = Astro.props;
     </div>
     <p class="journey-kicker">Choose a duration</p>
     <div class="journey-durations" aria-label="Choose session duration">
+      {showTestDuration && <button type="button" data-duration="10">10 sec (test)</button>}
       <button type="button" data-duration="300">5 min</button>
       <button type="button" data-duration="600">10 min</button>
       <button type="button" data-duration="900">15 min</button>
@@ -172,12 +174,13 @@ const { visitor = false } = Astro.props;
       get<HTMLButtonElement>('#journey-back').hidden=index===0;
     };
     const complete=()=>{
+      if(finished)return;
       stopClock();stopAudio();remaining=0;finished=true;showTime();
       status.textContent='Session complete.';toggle.textContent='Begin again';finish.hidden=false;
-      window.posthog?.capture('temple_session_completed',{duration_seconds:duration});
+      window.posthog?.capture('temple_session_completed',{duration_seconds:duration,test_session:duration===10});
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=false);
     };
-    const tick=()=>{remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));showTime();if(remaining===0)complete();};
+    const tick=()=>{remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));if(remaining===0){complete();return;}showTime();};
     const begin=async()=>{
       if(finished){remaining=duration;finished=false;finish.hidden=true;showTime();}
       if(!audio){status.textContent='Temple audio is unavailable. You can still use the timer.';}
@@ -188,9 +191,8 @@ const { visitor = false } = Astro.props;
       if(audioTransport)audioTransport.disabled=true;
       toggle.textContent='Pause session';
       if(audio && !audio.paused)status.textContent='Session in progress with Temple soundscape.';
-      if(remaining===duration)window.posthog?.capture('temple_session_started',{duration_seconds:duration});
+      if(remaining===duration)window.posthog?.capture('temple_session_started',{duration_seconds:duration,test_session:duration===10});
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=true);
-      document.querySelector<HTMLElement>('#experience-preview-stage')?.scrollIntoView({behavior:'smooth',block:'center'});
     };
     get<HTMLButtonElement>('#journey-back').addEventListener('click',()=>{if(index>0){index--;answers.length=index;showQuestion();}});
     root.querySelectorAll<HTMLButtonElement>('[data-practice]').forEach(b=>b.addEventListener('click',()=>{if(!running)setPractice(b.dataset.practice as Practice);}));
@@ -200,7 +202,7 @@ const { visitor = false } = Astro.props;
       toggle.textContent='Begin session';status.textContent='Ready when you are.';
     }));
     get<HTMLButtonElement>('#journey-toggle').addEventListener('click',()=>{
-      if(running){remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));stopClock();audio?.pause();showTime();toggle.textContent='Resume session';status.textContent='Paused.';return;}
+      if(running){remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));if(remaining===0){complete();return;}stopClock();audio?.pause();showTime();toggle.textContent='Resume session';status.textContent='Paused.';return;}
       void begin();
     });
     get<HTMLButtonElement>('#journey-reset').addEventListener('click',reset);

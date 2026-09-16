@@ -30,7 +30,7 @@ const selectedAudioTrack =
     ) ?? defaultAudioTrack;
 ---
 
-<StudioLayout title={`${experience.name} Experience`}>
+<StudioLayout title={`${experience.name} Experience`} privacyMode={experience.id === 'temple'}>
 
 <section class="editor">
 

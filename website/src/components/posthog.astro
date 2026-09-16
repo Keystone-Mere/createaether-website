@@ -1,9 +1,15 @@
+---
+interface Props { privacyMode?: boolean; }
+const { privacyMode = false } = Astro.props;
+---
+
 <script
   is:inline
   define:vars={{
     apiKey: import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN,
     apiHost: import.meta.env.PUBLIC_POSTHOG_HOST,
     isDevelopment: import.meta.env.DEV,
+    privacyMode,
   }}
 >
   if (!apiKey || !apiHost) {
@@ -20,6 +26,11 @@
     window.posthog.init(apiKey, {
       api_host: apiHost,
       defaults: '2026-01-30',
+      // The Temple check-in asks about feelings. Keep only deliberate session events.
+      autocapture: !privacyMode,
+      capture_dead_clicks: !privacyMode,
+      capture_heatmaps: !privacyMode,
+      disable_session_recording: privacyMode,
       capture_exceptions: {
         capture_unhandled_errors: true,
         capture_unhandled_rejections: true,
