@@ -10,6 +10,7 @@ import {
     defaultAudioTrack
 } from '../../../data/audio/tracks';
 import ExperienceSwitcher from '../../../components/studio/ExperienceSwitcher.astro';
+import TempleJourney from '../../../components/studio/TempleJourney.astro';
 export function getStaticPaths() {
     return experiences.map((experience) => ({
         params: {
@@ -165,6 +166,8 @@ const selectedAudioTrack =
                 </button>
             </div>
         </div>
+
+        {experience.id === 'temple' && <TempleJourney />}
 
     </div>
 
@@ -1304,6 +1307,11 @@ const selectedAudioTrack =
 
                             return;
                         }
+                        document.dispatchEvent(
+                            new CustomEvent('aether:experience-changed', {
+                                detail: { id: selectedExperience.id }
+                            })
+                        );
                         editableExperience =
                             cloneExperience(
                                 selectedExperience

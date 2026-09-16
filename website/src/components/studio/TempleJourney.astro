@@ -1,0 +1,214 @@
+<section class="temple-journey" id="temple-journey" aria-labelledby="temple-journey-title">
+  <div class="journey-intro">
+    <p class="journey-kicker">Guided experience pilot</p>
+    <h2 id="temple-journey-title">A moment in the Temple</h2>
+    <p>Check in, choose a practice, and spend a few minutes with the Temple soundscape. Your answers stay on this page.</p>
+  </div>
+
+  <div id="journey-question" class="journey-step">
+    <p id="journey-progress" class="journey-kicker" aria-live="polite"></p>
+    <h3 id="journey-prompt"></h3>
+    <div id="journey-options" class="journey-options"></div>
+    <button type="button" id="journey-back" class="journey-secondary" hidden>Back</button>
+  </div>
+
+  <div id="journey-session" class="journey-step" hidden>
+    <p class="journey-kicker">Your suggested practice</p>
+    <h3 id="journey-practice"></h3>
+    <p id="journey-guidance"></p>
+    <p class="journey-note">This suggestion is for reflection. You can choose a different practice.</p>
+    <div class="journey-practices" aria-label="Choose a practice">
+      <button type="button" data-practice="ground">Ground</button>
+      <button type="button" data-practice="clarity">Find clarity</button>
+      <button type="button" data-practice="reflect">Reflect</button>
+    </div>
+    <p class="journey-kicker">Choose a duration</p>
+    <div class="journey-durations" aria-label="Choose session duration">
+      <button type="button" data-duration="300">5 min</button>
+      <button type="button" data-duration="600">10 min</button>
+      <button type="button" data-duration="900">15 min</button>
+      <button type="button" data-duration="1200">20 min</button>
+    </div>
+    <div id="journey-clock" class="journey-clock" role="timer" aria-label="Time remaining">05:00</div>
+    <p id="journey-status" role="status" aria-live="polite">Ready when you are.</p>
+    <div class="journey-actions">
+      <button type="button" id="journey-toggle">Begin session</button>
+      <button type="button" id="journey-reset" class="journey-secondary">Reset</button>
+      <button type="button" id="journey-start-over" class="journey-secondary">Change answers</button>
+    </div>
+    <div id="journey-finish" class="journey-finish" hidden>
+      <h3>Return slowly</h3>
+      <p id="journey-reflection"></p>
+      <p>Take a moment before returning to the rest of your day.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .temple-journey{grid-column:1/-1;background:#10182c;border:1px solid rgba(125,189,245,.26);border-radius:18px;padding:clamp(1.25rem,3vw,2rem);color:#f4f8ff}
+  .temple-journey[hidden]{display:none}
+  .temple-journey [hidden]{display:none!important}
+  .journey-intro{max-width:65ch;margin-bottom:1.5rem}
+  .journey-intro h2{font-size:clamp(1.6rem,3vw,2.2rem);margin:.2rem 0 .5rem}
+  .journey-intro p,.journey-step p{line-height:1.6;color:#d0dcef}
+  .journey-kicker{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:#79c8ff!important;font-weight:700}
+  .journey-step{max-width:780px}
+  .journey-step h3{font-size:1.3rem;margin:.6rem 0 1rem}
+  .journey-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+  .temple-journey button{min-height:44px;padding:.7rem 1rem;border:1px solid #6388b6;border-radius:10px;background:#1a2b46;color:#f4f8ff;cursor:pointer;text-align:left;font:inherit}
+  .temple-journey button:hover,.temple-journey button:focus-visible{border-color:#9cdaff;background:#24446a}
+  .temple-journey button[aria-pressed="true"]{border-color:#80d7ff;background:#145b84}
+  .temple-journey button:disabled{opacity:.55;cursor:not-allowed}
+  .temple-journey .journey-secondary{background:transparent}
+  .journey-options button small{display:block;color:#cbd8e8;font-size:.85rem;margin-top:.25rem}
+  .journey-practices,.journey-durations,.journey-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0 1.4rem}
+  .journey-clock{font-variant-numeric:tabular-nums;font-size:clamp(2.5rem,7vw,4rem);font-weight:700;letter-spacing:.05em}
+  .journey-note{font-size:.9rem}
+  .journey-finish{padding:1rem 1.25rem;border-left:3px solid #80d7ff;background:#172b45;margin-top:1.5rem}
+  @media(max-width:650px){.journey-options{grid-template-columns:1fr}.temple-journey button{width:100%}}
+</style>
+
+<script>
+  type Practice = 'ground' | 'clarity' | 'reflect';
+  const root = document.querySelector<HTMLElement>('#temple-journey');
+  if (root) {
+    const questions: { prompt: string; options: { label: string; detail: string; practice: Practice }[] }[] = [
+      {prompt:'How do you feel in your body today?',options:[
+        {label:'Unsettled',detail:'I would like to feel steadier.',practice:'ground'},
+        {label:'Heavy',detail:'I would like a gentler moment.',practice:'reflect'},
+        {label:'Flat',detail:'I would like to reconnect with myself.',practice:'reflect'},
+        {label:'Foggy',detail:'I would like some mental space.',practice:'clarity'}]},
+      {prompt:'What feels most present right now?',options:[
+        {label:'Worry',detail:'I need a sense of safety.',practice:'ground'},
+        {label:'Tenderness',detail:'I need kindness and space.',practice:'reflect'},
+        {label:'Frustration',detail:'I need to slow down.',practice:'ground'},
+        {label:'Too many thoughts',detail:'I need quiet.',practice:'clarity'}]},
+      {prompt:'How are you relating to your direction?',options:[
+        {label:'Rushed',detail:'It is hard to pause.',practice:'ground'},
+        {label:'Doubtful',detail:'I would like perspective.',practice:'clarity'},
+        {label:'Quiet',detail:'I need space to listen.',practice:'reflect'},
+        {label:'Disconnected',detail:'I would like to return to the present.',practice:'ground'}]},
+      {prompt:'What kind of support would help?',options:[
+        {label:'Steadiness',detail:'A simple place to land.',practice:'ground'},
+        {label:'Softness',detail:'Room for how I feel.',practice:'reflect'},
+        {label:'Clarity',detail:'A calmer mind.',practice:'clarity'},
+        {label:'Meaning',detail:'Time to reflect.',practice:'reflect'}]},
+      {prompt:'What would you like from this session?',options:[
+        {label:'Feel grounded',detail:'Notice my breath and surroundings.',practice:'ground'},
+        {label:'Make space',detail:'Let my thoughts settle.',practice:'clarity'},
+        {label:'Reflect gently',detail:'Notice what matters to me.',practice:'reflect'},
+        {label:'Just rest',detail:'Take a quiet pause.',practice:'ground'}]}
+    ];
+    const practices: Record<Practice,{title:string;guidance:string;reflection:string}> = {
+      ground:{title:'Ground in the present',guidance:'Notice where your body meets the chair or floor. Let the Temple soundscape give you a steady point of focus.',reflection:'What helped you feel present during this session?'},
+      clarity:{title:'Make room for clarity',guidance:'Let thoughts come and go without needing to solve them. Return your attention to one sound whenever you choose.',reflection:'What feels a little clearer, or what could wait until later?'},
+      reflect:{title:'Pause and reflect',guidance:'Make room for what you feel. There is no answer to reach; return gently to the sound when you need to.',reflection:'What would you like to carry forward from this quiet moment?'}
+    };
+    const get = <T extends HTMLElement>(selector:string) => root.querySelector<T>(selector)!;
+    const audio = document.querySelector<HTMLAudioElement>('#experience-audio');
+    const audioTransport = document.querySelector<HTMLButtonElement>('#audio-playback-toggle');
+    const questionStage=get<HTMLElement>('#journey-question');
+    const sessionStage=get<HTMLElement>('#journey-session');
+    const options=get<HTMLElement>('#journey-options');
+    const clock=get<HTMLElement>('#journey-clock');
+    const status=get<HTMLElement>('#journey-status');
+    const toggle=get<HTMLButtonElement>('#journey-toggle');
+    const finish=get<HTMLElement>('#journey-finish');
+    const answers: Practice[]=[];
+    let index=0;
+    let practice: Practice='ground';
+    let duration=300;
+    let remaining=duration;
+    let deadline=0;
+    let interval:number|undefined;
+    let running=false;
+    let finished=false;
+    let disposed=false;
+    const format=(s:number)=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+    const stopClock=()=>{window.clearInterval(interval);interval=undefined;running=false;if(audioTransport)audioTransport.disabled=false;};
+    const stopAudio=()=>{if(audio){audio.pause();audio.currentTime=0;}};
+    const showTime=()=>{clock.textContent=format(remaining);};
+    const setPractice=(next:Practice)=>{
+      practice=next;
+      get<HTMLElement>('#journey-practice').textContent=practices[next].title;
+      get<HTMLElement>('#journey-guidance').textContent=practices[next].guidance;
+      get<HTMLElement>('#journey-reflection').textContent=practices[next].reflection;
+      root.querySelectorAll<HTMLButtonElement>('[data-practice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.practice===next)));
+    };
+    const reset=()=>{
+      stopClock();stopAudio();remaining=duration;finished=false;finish.hidden=true;
+      toggle.textContent='Begin session';status.textContent='Ready when you are.';
+      root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=false);
+      showTime();
+    };
+    const showQuestion=()=>{
+      const q=questions[index];
+      get<HTMLElement>('#journey-progress').textContent=`Question ${index+1} of ${questions.length}`;
+      get<HTMLElement>('#journey-prompt').textContent=q.prompt;
+      options.replaceChildren();
+      q.options.forEach(o=>{
+        const button=document.createElement('button');button.type='button';
+        const label=document.createElement('strong');label.textContent=o.label;
+        const detail=document.createElement('small');detail.textContent=o.detail;
+        button.append(label,detail);
+        button.addEventListener('click',()=>{
+          answers[index]=o.practice;index++;
+          if(index<questions.length){showQuestion();return;}
+          const counts:Record<Practice,number>={ground:0,clarity:0,reflect:0};
+          answers.forEach(a=>counts[a]++);
+          const best=Math.max(...Object.values(counts));
+          // The last answer breaks a tie; the visitor can also override the result.
+          setPractice(counts[answers[4]]===best?answers[4]:(Object.keys(counts) as Practice[]).find(k=>counts[k]===best)!);
+          questionStage.hidden=true;sessionStage.hidden=false;
+          get<HTMLElement>('#journey-practice').focus();
+        });
+        options.appendChild(button);
+      });
+      get<HTMLButtonElement>('#journey-back').hidden=index===0;
+    };
+    const complete=()=>{
+      stopClock();stopAudio();remaining=0;finished=true;showTime();
+      status.textContent='Session complete.';toggle.textContent='Begin again';finish.hidden=false;
+      window.posthog?.capture('temple_session_completed',{duration_seconds:duration});
+      root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=false);
+    };
+    const tick=()=>{remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));showTime();if(remaining===0)complete();};
+    const begin=async()=>{
+      if(finished){remaining=duration;finished=false;finish.hidden=true;showTime();}
+      if(!audio){status.textContent='Temple audio is unavailable. You can still use the timer.';}
+      else {try {await audio.play();}catch {status.textContent='Audio could not start. You can still use the timer.';}}
+      if(disposed || running || sessionStage.hidden)return;
+      running=true;deadline=Date.now()+remaining*1000;
+      interval=window.setInterval(tick,250);
+      if(audioTransport)audioTransport.disabled=true;
+      toggle.textContent='Pause session';
+      if(audio && !audio.paused)status.textContent='Session in progress with Temple soundscape.';
+      if(remaining===duration)window.posthog?.capture('temple_session_started',{duration_seconds:duration});
+      root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=true);
+      document.querySelector<HTMLElement>('#experience-preview-stage')?.scrollIntoView({behavior:'smooth',block:'center'});
+    };
+    get<HTMLButtonElement>('#journey-back').addEventListener('click',()=>{if(index>0){index--;answers.length=index;showQuestion();}});
+    root.querySelectorAll<HTMLButtonElement>('[data-practice]').forEach(b=>b.addEventListener('click',()=>{if(!running)setPractice(b.dataset.practice as Practice);}));
+    root.querySelectorAll<HTMLButtonElement>('[data-duration]').forEach(b=>b.addEventListener('click',()=>{
+      if(running)return;duration=Number(b.dataset.duration);remaining=duration;finished=false;finish.hidden=true;showTime();
+      root.querySelectorAll<HTMLButtonElement>('[data-duration]').forEach(item=>item.setAttribute('aria-pressed',String(item===b)));
+      toggle.textContent='Begin session';status.textContent='Ready when you are.';
+    }));
+    get<HTMLButtonElement>('#journey-toggle').addEventListener('click',()=>{
+      if(running){remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));stopClock();audio?.pause();showTime();toggle.textContent='Resume session';status.textContent='Paused.';return;}
+      void begin();
+    });
+    get<HTMLButtonElement>('#journey-reset').addEventListener('click',reset);
+    get<HTMLButtonElement>('#journey-start-over').addEventListener('click',()=>{reset();answers.length=0;index=0;sessionStage.hidden=true;questionStage.hidden=false;showQuestion();});
+    const dispose=()=>{disposed=true;stopClock();stopAudio();};
+    window.addEventListener('pagehide',dispose,{once:true});
+    document.addEventListener('astro:before-swap',dispose,{once:true});
+    document.addEventListener('aether:experience-changed',(event)=>{
+      reset();sessionStage.hidden=true;questionStage.hidden=false;answers.length=0;index=0;showQuestion();
+      root.hidden=(event as CustomEvent<{id:string}>).detail.id!=='temple';
+    });
+    root.querySelector<HTMLButtonElement>('[data-duration="300"]')?.setAttribute('aria-pressed','true');
+    get<HTMLElement>('#journey-practice').tabIndex=-1;
+    showQuestion();showTime();
+  }
+</script>
