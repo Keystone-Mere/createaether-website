@@ -1,6 +1,11 @@
+---
+interface Props { visitor?: boolean; }
+const { visitor = false } = Astro.props;
+---
+
 <section class="temple-journey" id="temple-journey" aria-labelledby="temple-journey-title">
   <div class="journey-intro">
-    <p class="journey-kicker">Guided experience pilot</p>
+    <p class="journey-kicker">{visitor ? 'Temple experience' : 'Guided experience pilot'}</p>
     <h2 id="temple-journey-title">A moment in the Temple</h2>
     <p>Check in, choose a practice, and spend a few minutes with the Temple soundscape. Your answers stay on this page.</p>
   </div>
