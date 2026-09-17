@@ -4,7 +4,7 @@ const { visitor = false } = Astro.props;
 const showTestDuration = import.meta.env.DEV;
 ---
 
-<section class="temple-journey" id="temple-journey" aria-labelledby="temple-journey-title">
+<section class:list={['temple-journey', visitor && 'temple-journey--visitor']} id="temple-journey" aria-labelledby="temple-journey-title">
   <div class="journey-intro">
     <p class="journey-kicker">{visitor ? 'Temple experience' : 'Guided experience pilot'}</p>
     <h2 id="temple-journey-title">A moment in the Temple</h2>
@@ -58,6 +58,8 @@ const showTestDuration = import.meta.env.DEV;
 
 <style>
   .temple-journey{grid-column:1/-1;background:#10182c;border:1px solid rgba(125,189,245,.26);border-radius:18px;padding:clamp(1.25rem,3vw,2rem);color:#f4f8ff}
+  .temple-journey--visitor{background:linear-gradient(150deg,#1b2539,#10182c 52%);border-color:rgba(231,198,122,.55)}
+  .temple-journey--visitor .journey-kicker{color:#e7c67a!important}
   .temple-journey[hidden]{display:none}
   .temple-journey [hidden]{display:none!important}
   .journey-intro{max-width:65ch;margin-bottom:1.5rem}
@@ -67,12 +69,17 @@ const showTestDuration = import.meta.env.DEV;
   .journey-step{max-width:780px}
   .journey-step h3{font-size:1.3rem;margin:.6rem 0 1rem}
   .journey-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+  #journey-skip{margin-top:1rem}
+  .journey-options :global(button){display:flex;flex-direction:column;justify-content:center;min-height:94px;padding:1rem 1.15rem;border:1px solid #597396;border-radius:12px;background:#1a2b46;color:#f4f8ff;line-height:1.4;text-align:left;white-space:normal}
+  .journey-options :global(button strong){display:block;font-size:1.07rem;line-height:1.35}
+  .journey-options :global(button small){display:block;color:#d2deeb;font-size:.93rem;line-height:1.4;margin-top:.3rem}
+  .temple-journey--visitor .journey-options :global(button){border-color:#796d58;background:#27313f}
+  .temple-journey--visitor .journey-options :global(button:hover),.temple-journey--visitor .journey-options :global(button:focus-visible){border-color:#e7c67a;background:#36404b;outline:2px solid #e7c67a;outline-offset:2px}
   .temple-journey button{min-height:44px;padding:.7rem 1rem;border:1px solid #6388b6;border-radius:10px;background:#1a2b46;color:#f4f8ff;cursor:pointer;text-align:left;font:inherit}
   .temple-journey button:hover,.temple-journey button:focus-visible{border-color:#9cdaff;background:#24446a}
   .temple-journey button[aria-pressed="true"]{border-color:#80d7ff;background:#145b84}
   .temple-journey button:disabled{opacity:.55;cursor:not-allowed}
   .temple-journey .journey-secondary{background:transparent}
-  .journey-options button small{display:block;color:#cbd8e8;font-size:.85rem;margin-top:.25rem}
   .journey-practices,.journey-durations,.journey-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0 1.4rem}
   .journey-clock{font-variant-numeric:tabular-nums;font-size:clamp(2.5rem,7vw,4rem);font-weight:700;letter-spacing:.05em}
   .journey-cue{border-left:3px solid #80d7ff;padding:.15rem 1rem;background:#172b45;margin:1rem 0;max-width:60ch}
