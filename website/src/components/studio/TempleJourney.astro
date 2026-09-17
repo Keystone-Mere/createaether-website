@@ -16,6 +16,7 @@ const showTestDuration = import.meta.env.DEV;
     <h3 id="journey-prompt"></h3>
     <div id="journey-options" class="journey-options"></div>
     <button type="button" id="journey-back" class="journey-secondary" hidden>Back</button>
+    <button type="button" id="journey-skip" class="journey-secondary">Choose a practice directly</button>
   </div>
 
   <div id="journey-session" class="journey-step" hidden>
@@ -37,6 +38,10 @@ const showTestDuration = import.meta.env.DEV;
       <button type="button" data-duration="1200">20 min</button>
     </div>
     <div id="journey-clock" class="journey-clock" role="timer" aria-label="Time remaining">05:00</div>
+    <div class="journey-cue" aria-live="off">
+      <p id="journey-phase" class="journey-kicker">Before you begin</p>
+      <p id="journey-cue">Settle in and start whenever you are ready.</p>
+    </div>
     <p id="journey-status" role="status" aria-live="polite">Ready when you are.</p>
     <div class="journey-actions">
       <button type="button" id="journey-toggle">Begin session</button>
@@ -70,6 +75,8 @@ const showTestDuration = import.meta.env.DEV;
   .journey-options button small{display:block;color:#cbd8e8;font-size:.85rem;margin-top:.25rem}
   .journey-practices,.journey-durations,.journey-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0 1.4rem}
   .journey-clock{font-variant-numeric:tabular-nums;font-size:clamp(2.5rem,7vw,4rem);font-weight:700;letter-spacing:.05em}
+  .journey-cue{border-left:3px solid #80d7ff;padding:.15rem 1rem;background:#172b45;margin:1rem 0;max-width:60ch}
+  .journey-cue p{margin:.5rem 0}
   .journey-note{font-size:.9rem}
   .journey-finish{padding:1rem 1.25rem;border-left:3px solid #80d7ff;background:#172b45;margin-top:1.5rem}
   @media(max-width:650px){.journey-options{grid-template-columns:1fr}.temple-journey button{width:100%}}
@@ -106,10 +113,10 @@ const showTestDuration = import.meta.env.DEV;
         {label:'Reflect gently',detail:'Notice what matters to me.',practice:'reflect'},
         {label:'Just rest',detail:'Take a quiet pause.',practice:'ground'}]}
     ];
-    const practices: Record<Practice,{title:string;guidance:string;reflection:string}> = {
-      ground:{title:'Ground in the present',guidance:'Notice where your body meets the chair or floor. Let the Temple soundscape give you a steady point of focus.',reflection:'What helped you feel present during this session?'},
-      clarity:{title:'Make room for clarity',guidance:'Let thoughts come and go without needing to solve them. Return your attention to one sound whenever you choose.',reflection:'What feels a little clearer, or what could wait until later?'},
-      reflect:{title:'Pause and reflect',guidance:'Make room for what you feel. There is no answer to reach; return gently to the sound when you need to.',reflection:'What would you like to carry forward from this quiet moment?'}
+    const practices: Record<Practice,{title:string;guidance:string;reflection:string;cues:[string,string,string]}> = {
+      ground:{title:'Ground in the present',guidance:'Notice where your body meets the chair or floor. Let the Temple soundscape give you a steady point of focus.',reflection:'What helped you feel present during this session?',cues:['Feel the support beneath you. Notice one sound in the Temple. There is nothing else to do right now.','Let your attention rest on the sound. When it wanders, return to what you can hear.','Notice the room around you again. Take your time before moving on.']},
+      clarity:{title:'Make room for clarity',guidance:'Let thoughts come and go without needing to solve them. Return your attention to one sound whenever you choose.',reflection:'What feels a little clearer, or what could wait until later?',cues:['Listen for a sound in the distance. Let it give your attention somewhere gentle to land.','Thoughts can come and go. You can return to the sound whenever you like.','Notice what is here now. You do not need to settle every thought today.']},
+      reflect:{title:'Pause and reflect',guidance:'Make room for what you feel. There is no answer to reach; return gently to the sound when you need to.',reflection:'What would you like to carry forward from this quiet moment?',cues:['Take a moment to notice how you feel, without needing to change it.','Give yourself space to listen. If it helps, follow the sound as it fades.','Before you leave, notice what you would like to carry with you.']}
     };
     const get = <T extends HTMLElement>(selector:string) => root.querySelector<T>(selector)!;
     const audio = document.querySelector<HTMLAudioElement>('#experience-audio');
@@ -119,6 +126,10 @@ const showTestDuration = import.meta.env.DEV;
     const options=get<HTMLElement>('#journey-options');
     const clock=get<HTMLElement>('#journey-clock');
     const status=get<HTMLElement>('#journey-status');
+    const phase=get<HTMLElement>('#journey-phase');
+    const cue=get<HTMLElement>('#journey-cue');
+    const stageClock=document.querySelector<HTMLElement>('#temple-stage-clock');
+    const stageCue=document.querySelector<HTMLElement>('#temple-stage-cue');
     const toggle=get<HTMLButtonElement>('#journey-toggle');
     const finish=get<HTMLElement>('#journey-finish');
     const answers: Practice[]=[];
@@ -134,18 +145,28 @@ const showTestDuration = import.meta.env.DEV;
     const format=(s:number)=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
     const stopClock=()=>{window.clearInterval(interval);interval=undefined;running=false;if(audioTransport)audioTransport.disabled=false;};
     const stopAudio=()=>{if(audio){audio.pause();audio.currentTime=0;}};
-    const showTime=()=>{clock.textContent=format(remaining);};
+    const showTime=()=>{clock.textContent=format(remaining);if(stageClock)stageClock.textContent=format(remaining);};
+    const showCue=()=>{
+      const elapsed=duration-remaining;
+      const part=elapsed>=duration*.8?2:elapsed>=duration*.25?1:0;
+      phase.textContent=['Arrive','Stay a while','Return gently'][part];
+      cue.textContent=practices[practice].cues[part];
+      if(stageCue)stageCue.textContent=cue.textContent;
+    };
     const setPractice=(next:Practice)=>{
       practice=next;
       get<HTMLElement>('#journey-practice').textContent=practices[next].title;
       get<HTMLElement>('#journey-guidance').textContent=practices[next].guidance;
       get<HTMLElement>('#journey-reflection').textContent=practices[next].reflection;
       root.querySelectorAll<HTMLButtonElement>('[data-practice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.practice===next)));
+      if(!running)showCue();
     };
     const reset=()=>{
       stopClock();stopAudio();remaining=duration;finished=false;finish.hidden=true;
       toggle.textContent='Begin session';status.textContent='Ready when you are.';
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=false);
+      phase.textContent='Before you begin';cue.textContent='Settle in and start whenever you are ready.';
+      if(stageCue)stageCue.textContent='Sound and atmosphere begin with your session.';
       showTime();
     };
     const showQuestion=()=>{
@@ -176,17 +197,20 @@ const showTestDuration = import.meta.env.DEV;
     const complete=()=>{
       if(finished)return;
       stopClock();stopAudio();remaining=0;finished=true;showTime();
+      phase.textContent='Session complete';cue.textContent='Take your time. The Temple will be here when you return.';
+      if(stageCue)stageCue.textContent=cue.textContent;
       status.textContent='Session complete.';toggle.textContent='Begin again';finish.hidden=false;
       window.posthog?.capture('temple_session_completed',{duration_seconds:duration,test_session:duration===10});
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=false);
     };
-    const tick=()=>{remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));if(remaining===0){complete();return;}showTime();};
+    const tick=()=>{remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));if(remaining===0){complete();return;}showTime();showCue();};
     const begin=async()=>{
       if(finished){remaining=duration;finished=false;finish.hidden=true;showTime();}
       if(!audio){status.textContent='Temple audio is unavailable. You can still use the timer.';}
       else {try {await audio.play();}catch {status.textContent='Audio could not start. You can still use the timer.';}}
       if(disposed || running || sessionStage.hidden)return;
       running=true;deadline=Date.now()+remaining*1000;
+      showCue();
       interval=window.setInterval(tick,250);
       if(audioTransport)audioTransport.disabled=true;
       toggle.textContent='Pause session';
@@ -195,9 +219,15 @@ const showTestDuration = import.meta.env.DEV;
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=true);
     };
     get<HTMLButtonElement>('#journey-back').addEventListener('click',()=>{if(index>0){index--;answers.length=index;showQuestion();}});
+    get<HTMLButtonElement>('#journey-skip').addEventListener('click',()=>{
+      setPractice('ground');questionStage.hidden=true;sessionStage.hidden=false;
+      get<HTMLElement>('#journey-practice').focus();
+    });
     root.querySelectorAll<HTMLButtonElement>('[data-practice]').forEach(b=>b.addEventListener('click',()=>{if(!running)setPractice(b.dataset.practice as Practice);}));
     root.querySelectorAll<HTMLButtonElement>('[data-duration]').forEach(b=>b.addEventListener('click',()=>{
       if(running)return;duration=Number(b.dataset.duration);remaining=duration;finished=false;finish.hidden=true;showTime();
+      phase.textContent='Before you begin';cue.textContent='Settle in and start whenever you are ready.';
+      if(stageCue)stageCue.textContent='Sound and atmosphere begin with your session.';
       root.querySelectorAll<HTMLButtonElement>('[data-duration]').forEach(item=>item.setAttribute('aria-pressed',String(item===b)));
       toggle.textContent='Begin session';status.textContent='Ready when you are.';
     }));
