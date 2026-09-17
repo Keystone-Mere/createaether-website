@@ -28,14 +28,18 @@ const track = audioTracks.find((item) => item.id === temple.audio.track);
         <p>Enter a quiet atmosphere, choose what you need, and follow a short practice at your own pace.</p>
       </div>
 
-      <div class="preview-stage" id="experience-preview-stage" role="img" aria-label="Temple atmosphere with warm light and drifting particles">
+      <div class="preview-stage" id="experience-preview-stage" role="group" aria-label="Temple atmosphere with warm light and drifting particles">
         <div class="preview-glow" aria-hidden="true"></div>
         <canvas class="preview-canvas" aria-hidden="true"></canvas>
         <div class="preview-orb" aria-hidden="true"></div>
         <div class="preview-fog preview-fog--one" aria-hidden="true"></div>
         <div class="preview-fog preview-fog--two" aria-hidden="true"></div>
         <div class="stage-caption"><strong>Temple</strong><span id="temple-stage-cue">Sound and atmosphere begin with your session.</span></div>
-        <div class="stage-clock" id="temple-stage-clock" aria-hidden="true">05:00</div>
+        <div class="stage-clock" id="temple-stage-clock" role="timer" aria-label="Time remaining" aria-hidden="true">05:00</div>
+        <div class="stage-controls" id="temple-stage-controls" hidden>
+          <button type="button" id="temple-stage-toggle">Pause session</button>
+          <button type="button" id="temple-stage-exit">End session</button>
+        </div>
       </div>
 
       <div class="volume-row">
@@ -114,12 +118,20 @@ const track = audioTracks.find((item) => item.id === temple.audio.track);
   .stage-caption{position:absolute;z-index:4;bottom:1.4rem;left:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.25rem;text-shadow:0 1px 9px #051020}
   .stage-caption strong{font-size:1.1rem}.stage-caption span{font-size:.85rem;color:#d5e0ee}
   .stage-clock{position:absolute;z-index:4;right:1.5rem;top:1.25rem;padding:.35rem .75rem;border:1px solid #b6d9ef88;border-radius:10px;background:#08182ab8;color:#f4f8ff;font-size:clamp(1.25rem,3vw,2rem);font-variant-numeric:tabular-nums;letter-spacing:.08em}
+  .stage-controls{position:absolute;z-index:5;bottom:1.2rem;right:1.5rem;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end}
+  .stage-controls[hidden]{display:none}
+  .stage-controls button{min-height:44px;padding:.6rem .9rem;border:1px solid #b6d9ef;border-radius:10px;background:#0c1d34ed;color:white;cursor:pointer}
+  .stage-controls button:hover,.stage-controls button:focus-visible{background:#24446a;outline-color:#80d7ff}
+  :global(body.temple-session-active) .hero-copy,:global(body.temple-session-active .temple-journey),:global(body.temple-session-active) .page-footer{display:none}
+  :global(body.temple-session-active) .visitor-page{padding-top:.6rem;padding-bottom:1rem}
+  :global(body.temple-session-active) .preview-stage{min-height:max(420px,70vh)}
+  :global(body.temple-session-active) .stage-caption{bottom:5rem;max-width:65ch}
   .volume-row{display:flex;align-items:center;gap:1rem;padding:1rem 0 1.4rem;color:#cbd8e8;font-size:.9rem}
   .volume-row input{accent-color:#80d7ff;width:min(230px,45vw)}.volume-row output{min-width:3em;font-variant-numeric:tabular-nums}
   .page-footer{text-align:center;margin:2rem 0}.page-footer a{color:#9bdcff}
   @keyframes float{50%{transform:translate(-50%,-58%)}}
   @keyframes glow{50%{opacity:.7;transform:translate(-50%,-50%) scale(1.1)}}
   @keyframes fog{50%{transform:translateX(4%)}}
-  @media(max-width:600px){.volume-row{flex-wrap:wrap}.site-header span{display:none}}
+  @media(max-width:600px){.volume-row{flex-wrap:wrap}.site-header span{display:none}.stage-controls{left:1rem;right:1rem;bottom:1rem;justify-content:flex-start}.stage-caption{left:1rem;right:1rem}:global(body.temple-session-active) .stage-caption{bottom:6.5rem}}
   @media(prefers-reduced-motion:reduce){.preview-glow,.preview-orb,.preview-fog{animation:none}}
 </style>

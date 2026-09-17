@@ -130,6 +130,9 @@ const showTestDuration = import.meta.env.DEV;
     const cue=get<HTMLElement>('#journey-cue');
     const stageClock=document.querySelector<HTMLElement>('#temple-stage-clock');
     const stageCue=document.querySelector<HTMLElement>('#temple-stage-cue');
+    const stageControls=document.querySelector<HTMLElement>('#temple-stage-controls');
+    const stageToggle=document.querySelector<HTMLButtonElement>('#temple-stage-toggle');
+    const stageExit=document.querySelector<HTMLButtonElement>('#temple-stage-exit');
     const toggle=get<HTMLButtonElement>('#journey-toggle');
     const finish=get<HTMLElement>('#journey-finish');
     const answers: Practice[]=[];
@@ -145,6 +148,12 @@ const showTestDuration = import.meta.env.DEV;
     const format=(s:number)=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
     const stopClock=()=>{window.clearInterval(interval);interval=undefined;running=false;if(audioTransport)audioTransport.disabled=false;};
     const stopAudio=()=>{if(audio){audio.pause();audio.currentTime=0;}};
+    const focusScene=(active:boolean)=>{
+      if(!stageControls)return;
+      document.body.classList.toggle('temple-session-active',active);
+      stageControls.hidden=!active;
+      if(stageClock)stageClock.setAttribute('aria-hidden',String(!active));
+    };
     const showTime=()=>{clock.textContent=format(remaining);if(stageClock)stageClock.textContent=format(remaining);};
     const showCue=()=>{
       const elapsed=duration-remaining;
@@ -163,6 +172,7 @@ const showTestDuration = import.meta.env.DEV;
     };
     const reset=()=>{
       stopClock();stopAudio();remaining=duration;finished=false;finish.hidden=true;
+      focusScene(false);
       toggle.textContent='Begin session';status.textContent='Ready when you are.';
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=false);
       phase.textContent='Before you begin';cue.textContent='Settle in and start whenever you are ready.';
@@ -197,9 +207,11 @@ const showTestDuration = import.meta.env.DEV;
     const complete=()=>{
       if(finished)return;
       stopClock();stopAudio();remaining=0;finished=true;showTime();
+      focusScene(false);
       phase.textContent='Session complete';cue.textContent='Take your time. The Temple will be here when you return.';
       if(stageCue)stageCue.textContent=cue.textContent;
       status.textContent='Session complete.';toggle.textContent='Begin again';finish.hidden=false;
+      get<HTMLElement>('#journey-finish').scrollIntoView({block:'nearest',behavior:'smooth'});
       window.posthog?.capture('temple_session_completed',{duration_seconds:duration,test_session:duration===10});
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=false);
     };
@@ -214,6 +226,9 @@ const showTestDuration = import.meta.env.DEV;
       interval=window.setInterval(tick,250);
       if(audioTransport)audioTransport.disabled=true;
       toggle.textContent='Pause session';
+      if(stageToggle)stageToggle.textContent='Pause session';
+      focusScene(true);
+      stageToggle?.focus();
       if(audio && !audio.paused)status.textContent='Session in progress with Temple soundscape.';
       if(remaining===duration)window.posthog?.capture('temple_session_started',{duration_seconds:duration,test_session:duration===10});
       root.querySelectorAll<HTMLButtonElement>('[data-duration],[data-practice]').forEach(b=>b.disabled=true);
@@ -232,12 +247,14 @@ const showTestDuration = import.meta.env.DEV;
       toggle.textContent='Begin session';status.textContent='Ready when you are.';
     }));
     get<HTMLButtonElement>('#journey-toggle').addEventListener('click',()=>{
-      if(running){remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));if(remaining===0){complete();return;}stopClock();audio?.pause();showTime();toggle.textContent='Resume session';status.textContent='Paused.';return;}
+      if(running){remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));if(remaining===0){complete();return;}stopClock();audio?.pause();showTime();toggle.textContent='Resume session';if(stageToggle)stageToggle.textContent='Resume session';status.textContent='Paused.';return;}
       void begin();
     });
+    stageToggle?.addEventListener('click',()=>toggle.click());
+    stageExit?.addEventListener('click',()=>{reset();toggle.focus();});
     get<HTMLButtonElement>('#journey-reset').addEventListener('click',reset);
     get<HTMLButtonElement>('#journey-start-over').addEventListener('click',()=>{reset();answers.length=0;index=0;sessionStage.hidden=true;questionStage.hidden=false;showQuestion();});
-    const dispose=()=>{disposed=true;stopClock();stopAudio();};
+    const dispose=()=>{disposed=true;stopClock();stopAudio();focusScene(false);};
     window.addEventListener('pagehide',dispose,{once:true});
     document.addEventListener('astro:before-swap',dispose,{once:true});
     document.addEventListener('aether:experience-changed',(event)=>{
