@@ -1,0 +1,99 @@
+<section class="planned-projects" aria-labelledby="planned-projects-title">
+  <div class="planned-projects__heading">
+    <div>
+      <p class="planned-projects__eyebrow">In development</p>
+      <h2 id="planned-projects-title">Planned projects</h2>
+    </div>
+    <p>Early explorations of where Aether experiences could go next.</p>
+  </div>
+
+  <div class="planned-projects__grid">
+    <article class="planned-project">
+      <span class="planned-project__status">Prototype</span>
+      <h3>Temple experience</h3>
+      <p>A focused prototype building on the existing Temple experience.</p>
+    </article>
+    <article class="planned-project">
+      <span class="planned-project__status">Exploration</span>
+      <h3>Interactive learning</h3>
+      <p>Exploring how immersive environments could support discovery and education.</p>
+    </article>
+  </div>
+</section>
+
+<style>
+  .planned-projects {
+    padding: 6.5rem 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+  }
+  .planned-projects__heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+    gap: 4rem;
+    align-items: end;
+    margin-bottom: 2rem;
+  }
+  .planned-projects__eyebrow {
+    margin: 0 0 1rem;
+    color: #818cf8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  h2 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: clamp(2.4rem, 5vw, 4.5rem);
+    font-weight: 500;
+    letter-spacing: -0.055em;
+    line-height: 1.05;
+  }
+  .planned-projects__heading > p {
+    margin: 0;
+    color: #aebdcb;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  .planned-projects__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .planned-project {
+    min-height: 12.5rem;
+    padding: 1.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 1rem;
+    background: rgba(10, 15, 26, 0.72);
+  }
+  .planned-project__status {
+    display: inline-block;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid rgba(129, 140, 248, 0.45);
+    border-radius: 999px;
+    color: #c7d2fe;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  h3 {
+    margin: 1.5rem 0 0.5rem;
+    color: #f8fafc;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+  .planned-project p {
+    max-width: 43ch;
+    margin: 0;
+    color: #aebdcb;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  @media (max-width: 800px) {
+    .planned-projects__heading { grid-template-columns: 1fr; gap: 1rem; }
+  }
+  @media (max-width: 600px) {
+    .planned-projects { padding: 4.5rem 0; }
+    .planned-projects__grid { grid-template-columns: 1fr; }
+  }
+</style>
