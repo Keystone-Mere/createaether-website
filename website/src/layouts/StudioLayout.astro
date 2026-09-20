@@ -5,11 +5,13 @@ import Sidebar from '../components/studio/Sidebar.astro';
 interface Props {
   title?: string;
   description?: string;
+  privacyMode?: boolean;
 }
 
 const {
   title = 'Aether Atmosphere Composer',
   description = 'Build and shape immersive atmospheres in a local MVP workspace.',
+  privacyMode = false,
 } = Astro.props;
 ---
 
@@ -23,7 +25,7 @@ const {
     />
     <meta name="description" content={description} />
     <title>{title} | Create Aether</title>
-    <PostHog />
+    <PostHog privacyMode={privacyMode} />
   </head>
 
   <body>
