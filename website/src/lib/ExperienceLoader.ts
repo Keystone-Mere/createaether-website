@@ -71,6 +71,12 @@ export class ExperienceLoader {
                 ...experience.atmosphere
             },
 
+            environment: {
+                colour:
+                    experience.environment?.colour
+                    ?? experience.lighting.colour
+            },
+
             lighting: {
                 ...experience.lighting
             },
@@ -101,6 +107,12 @@ export class ExperienceLoader {
 
             atmosphere: {
                 ...experience.atmosphere
+            },
+
+            environment: {
+                colour:
+                    experience.environment?.colour
+                    ?? experience.lighting.colour
             },
 
             lighting: {

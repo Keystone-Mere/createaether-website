@@ -1,0 +1,170 @@
+---
+const { experience } = Astro.props;
+
+const colours = [
+    {
+        id: 'environment',
+        label: 'Environment',
+        description: 'The background tone of the scene.',
+        value: experience.environment?.colour ?? experience.lighting.colour
+    },
+    {
+        id: 'lighting',
+        label: 'Lighting',
+        description: 'The orb and ambient illumination.',
+        value: experience.lighting.colour
+    },
+    {
+        id: 'particles',
+        label: 'Particles',
+        description: 'Embers, fireflies, rain, snow or fireworks.',
+        value: experience.particles.colour
+    },
+    {
+        id: 'fog',
+        label: 'Fog',
+        description: 'The colour of mist and atmospheric haze.',
+        value: experience.fog.colour
+    }
+];
+---
+
+<div class="panel colours-panel">
+    <div class="panel-heading">
+        <div>
+            <h2>Colours</h2>
+            <p>Shape each visual layer independently.</p>
+        </div>
+        <span>Live</span>
+    </div>
+
+    <div class="colour-grid">
+        {colours.map((colour) => (
+            <label class="colour-control" for={`${colour.id}-colour-control`}>
+                <span class="colour-copy">
+                    <strong>{colour.label}</strong>
+                    <small>{colour.description}</small>
+                </span>
+
+                <span class="colour-picker">
+                    <input
+                        id={`${colour.id}-colour-control`}
+                        type="color"
+                        value={colour.value}
+                        aria-label={`${colour.label} colour`}
+                    />
+                    <output id={`${colour.id}-colour-value`}>
+                        {colour.value.toUpperCase()}
+                    </output>
+                </span>
+            </label>
+        ))}
+    </div>
+</div>
+
+<style>
+.panel{
+    background:#10182c;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:1.5rem;
+}
+
+.panel-heading{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:1rem;
+    margin-bottom:1rem;
+}
+
+.panel-heading h2{
+    margin:0;
+}
+
+.panel-heading p{
+    margin:.35rem 0 0;
+    color:#94a3b8;
+    font-size:.82rem;
+}
+
+.panel-heading > span{
+    padding:.3rem .55rem;
+    border:1px solid rgba(56,189,248,.25);
+    border-radius:999px;
+    color:#7dd3fc;
+    font-size:.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+.colour-grid{
+    display:grid;
+    gap:.75rem;
+}
+
+.colour-control{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    margin:0;
+    padding:.8rem;
+    border:1px solid rgba(148,163,184,.13);
+    border-radius:12px;
+    background:rgba(15,23,42,.52);
+}
+
+.colour-copy{
+    display:flex;
+    flex-direction:column;
+    gap:.2rem;
+}
+
+.colour-copy strong{
+    font-size:.92rem;
+}
+
+.colour-copy small{
+    color:#94a3b8;
+    font-size:.72rem;
+    line-height:1.35;
+}
+
+.colour-picker{
+    display:flex;
+    align-items:center;
+    gap:.65rem;
+    flex:0 0 auto;
+}
+
+.colour-picker input[type="color"]{
+    width:48px;
+    height:38px;
+    padding:3px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:9px;
+    background:#172036;
+    cursor:pointer;
+}
+
+.colour-picker output{
+    min-width:4.6rem;
+    color:#b9c9e5;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:.72rem;
+    text-align:right;
+}
+
+@media (max-width:460px){
+    .colour-control{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .colour-picker{
+        width:100%;
+        justify-content:space-between;
+    }
+}
+</style>

@@ -8,6 +8,7 @@ import type {
 
 export interface PreviewElements {
     volumeValue: Element | null;
+    previewStage: Element | null;
 }
 
 export class PreviewController
@@ -33,9 +34,23 @@ export class PreviewController
         }
     }
 
+    private updateEnvironment(
+        state: ExperienceStateData
+    ): void {
+        const { previewStage } = this.elements;
+
+        if (previewStage instanceof HTMLElement) {
+            previewStage.style.setProperty(
+                '--aether-environment-colour',
+                state.environment.colour
+            );
+        }
+    }
+
     public update(
         state: ExperienceStateData
     ): void {
         this.updateVolume(state);
+        this.updateEnvironment(state);
     }
 }

@@ -1,4 +1,5 @@
 ---
+import PlannedFeatures from './PlannedFeatures.astro';
 const { experience } = Astro.props;
 ---
 
@@ -25,6 +26,8 @@ const { experience } = Astro.props;
         rows="3"
         readonly
     >{experience.description}</textarea>
+
+    <PlannedFeatures features={['Cover image', 'Experience tags', 'Visibility settings']} />
 </div>
 
 <style>

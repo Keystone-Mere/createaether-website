@@ -1,4 +1,7 @@
-import type { Experience } from './models/Experience';
+import type {
+    Experience,
+    EnvironmentSettings
+} from './models/Experience';
 
 export type ExperienceStateData = Pick<
     Experience,
@@ -8,7 +11,9 @@ export type ExperienceStateData = Pick<
     'fog' |
     'particles' |
     'transition'
->;
+> & {
+    environment: EnvironmentSettings;
+};
 
 export interface ExperienceControls {
     audioEnabledToggle: Element | null;
@@ -47,6 +52,10 @@ export class ExperienceState {
                 particles: true,
                 lighting: true,
                 fog: false
+            },
+
+            environment: {
+                colour: '#0b1427'
             },
 
             lighting: {
@@ -170,6 +179,10 @@ export class ExperienceState {
 
         this.data.atmosphere = {
             ...state.atmosphere
+        };
+
+        this.data.environment = {
+            ...state.environment
         };
 
         this.data.lighting = {

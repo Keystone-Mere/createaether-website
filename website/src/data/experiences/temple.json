@@ -13,24 +13,28 @@
     "lighting": true,
     "fog": false
   },
+  "environment": {
+    "colour": "#3a1f16"
+  },
   "particles": {
     "preset": "temple-embers",
-    "count": 42,
-    "colour": "#bfdbfe",
-    "glow": 5,
-    "minRadius": 1,
-    "maxRadius": 3.5,
-    "minSpeed": 5,
-    "maxSpeed": 15,
+    "motion": "rise",
+    "count": 48,
+    "colour": "#c65d24",
+    "glow": 8,
+    "minRadius": 1.5,
+    "maxRadius": 2.5,
+    "minSpeed": 8,
+    "maxSpeed": 18,
     "drift": 4,
-    "minOpacity": 0.35,
-    "maxOpacity": 0.9,
-    "minLifetime": 5,
-    "maxLifetime": 12
+    "minOpacity": 0.25,
+    "maxOpacity": 0.85,
+    "minLifetime": 7,
+    "maxLifetime": 14
   },
   "lighting": {
     "preset": "temple-gold",
-    "colour": "#e7c67a",
+    "colour": "#d98a45",
     "intensity": 0.82,
     "pulse": true,
     "speed": 0.22

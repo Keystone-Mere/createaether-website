@@ -53,7 +53,8 @@ export const createStudioRuntime = (
 
     const previewController =
         new PreviewController({
-            volumeValue
+            volumeValue,
+            previewStage
         });
 
     const audioSystem =

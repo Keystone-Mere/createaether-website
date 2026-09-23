@@ -13,24 +13,28 @@
     "lighting": true,
     "fog": true
   },
+  "environment": {
+    "colour": "#123524"
+  },
   "particles": {
-    "preset": "forest-pollen",
-    "count": 58,
-    "colour": "#bbf7d0",
-    "glow": 4,
-    "minRadius": 0.8,
-    "maxRadius": 2.8,
-    "minSpeed": 3,
-    "maxSpeed": 10,
+    "preset": "forest-fireflies",
+    "motion": "wander",
+    "count": 30,
+    "colour": "#b7e66b",
+    "glow": 8,
+    "minRadius": 1,
+    "maxRadius": 3,
+    "minSpeed": 1,
+    "maxSpeed": 4,
     "drift": 7,
-    "minOpacity": 0.25,
-    "maxOpacity": 0.75,
-    "minLifetime": 7,
-    "maxLifetime": 15
+    "minOpacity": 0.15,
+    "maxOpacity": 0.8,
+    "minLifetime": 6,
+    "maxLifetime": 14
   },
   "lighting": {
     "preset": "forest-canopy",
-    "colour": "#86c995",
+    "colour": "#63a35c",
     "intensity": 0.68,
     "pulse": true,
     "speed": 0.16
@@ -38,7 +42,7 @@
   "fog": {
     "preset": "woodland-mist",
     "colour": "#b7d8c0",
-    "density": 0.32,
+    "density": 0.24,
     "speed": 0.18
   },
   "transition": {
