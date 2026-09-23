@@ -227,8 +227,9 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
     } else if (motion === "rain" || motion === "snow") {
       velocityY = speed;
     } else if (motion === "burst") {
-      x = width * 0.5 + this.randomBetween(-18, 18);
-      y = height * 0.42 + this.randomBetween(-14, 14);
+      // Fireworks begin across the sky, clear of the central lighting orb.
+      x = this.randomBetween(width * 0.15, width * 0.85);
+      y = this.randomBetween(height * 0.08, height * 0.2);
       velocityX = Math.cos(angle) * speed;
       velocityY = Math.sin(angle) * speed;
     }
@@ -301,7 +302,9 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       particle.x < -40 ||
       particle.x > width + 40;
 
-    if (expired || outsideScene) {
+    const outsideFireworkSky = motion === "burst" && particle.y > height * 0.27;
+
+    if (expired || outsideScene || outsideFireworkSky) {
       Object.assign(particle, this.createParticle(width, height));
     }
   }
