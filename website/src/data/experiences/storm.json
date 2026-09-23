@@ -13,16 +13,20 @@
     "lighting": true,
     "fog": true
   },
+  "environment": {
+    "colour": "#07152f"
+  },
   "particles": {
     "preset": "storm-rain",
+    "motion": "rain",
     "count": 110,
     "colour": "#9bb8d1",
     "glow": 0.25,
     "minRadius": 0.35,
     "maxRadius": 0.9,
-    "minSpeed": 9,
-    "maxSpeed": 18,
-    "drift": 3,
+    "minSpeed": 36,
+    "maxSpeed": 50,
+    "drift": 6,
     "minOpacity": 0.25,
     "maxOpacity": 0.7,
     "minLifetime": 2,
@@ -30,7 +34,7 @@
   },
   "lighting": {
     "preset": "storm-dark",
-    "colour": "#35506b",
+    "colour": "#182848",
     "intensity": 0.28,
     "pulse": true,
     "speed": 0.08

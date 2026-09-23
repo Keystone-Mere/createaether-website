@@ -4,6 +4,7 @@ import GeneralPanel from '../../../components/studio/GeneralPanel.astro';
 import AudioPanel from '../../../components/studio/AudioPanel.astro';
 import AtmospherePanel from '../../../components/studio/AtmospherePanel.astro';
 import ParticlesPanel from '../../../components/studio/ParticlesPanel.astro';
+import ColoursPanel from '../../../components/studio/ColoursPanel.astro';
 import { experiences } from '../../../data/experiences';
 import {
     audioTracks,
@@ -52,6 +53,8 @@ const selectedAudioTrack =
         <AudioPanel experience={experience} />
 
         <AtmospherePanel experience={experience} />
+
+        <ColoursPanel experience={experience} />
 
         <ParticlesPanel experience={experience} />
 
@@ -318,6 +321,7 @@ const selectedAudioTrack =
 .preview-stage{
     --aether-lighting-colour:#3b82f6;
     --aether-stage-ambient:#3b82f6;
+    --aether-environment-colour:#0b1427;
     --aether-lighting-intensity:1;
     --aether-lighting-glow-strength:18%;
     --aether-lighting-orb-strength:55%;
@@ -350,9 +354,9 @@ const selectedAudioTrack =
         ),
         linear-gradient(
             180deg,
-            #07101f 0%,
-            #0b1427 58%,
-            #111a2e 100%
+            color-mix(in srgb, var(--aether-environment-colour) 72%, #020617) 0%,
+            var(--aether-environment-colour) 58%,
+            color-mix(in srgb, var(--aether-environment-colour) 70%, #1e293b) 100%
         );
 }
 
@@ -737,6 +741,15 @@ const selectedAudioTrack =
     const particleColourControl =
         document.querySelector('#particle-colour-control');
 
+    const environmentColourControl =
+        document.querySelector('#environment-colour-control');
+
+    const lightingColourControl =
+        document.querySelector('#lighting-colour-control');
+
+    const fogColourControl =
+        document.querySelector('#fog-colour-control');
+
     const particleGlowControl =
         document.querySelector('#particle-glow-control');
 
@@ -883,6 +896,30 @@ const selectedAudioTrack =
 
     let editableExperience: Experience | null = null;
 
+    const canonicalExperienceIds = new Set([
+        'temple',
+        'forest',
+        'ocean',
+        'christmas',
+        'storm',
+        'festival'
+    ]);
+
+    const isCanonicalExperience = (
+        experience: Experience
+    ): boolean => canonicalExperienceIds.has(experience.id);
+
+    const updateSaveButtonLabel = (
+        experience: Experience
+    ): void => {
+        if (saveExperienceButton instanceof HTMLButtonElement) {
+            saveExperienceButton.textContent =
+                isCanonicalExperience(experience)
+                    ? 'Save as Copy'
+                    : 'Save Changes';
+        }
+    };
+
     const cloneExperience = (
         source: Experience
     ): Experience => ({
@@ -894,6 +931,12 @@ const selectedAudioTrack =
 
         atmosphere: {
             ...source.atmosphere
+        },
+
+        environment: {
+            colour:
+                source.environment?.colour
+                ?? source.lighting.colour
         },
 
         lighting: {
@@ -955,6 +998,8 @@ const selectedAudioTrack =
     const synchroniseEditor = (
         selectedExperience: Experience
     ): void => {
+        updateSaveButtonLabel(selectedExperience);
+
         if (
             experienceNameControl
             instanceof HTMLInputElement
@@ -1023,18 +1068,28 @@ const selectedAudioTrack =
             selectedExperience.particles.count
         );
 
-        const colourControl =
-            document.querySelector(
-                '#particle-colour-control'
-            );
+        const colourValues = {
+            environment:
+                selectedExperience.environment?.colour
+                ?? selectedExperience.lighting.colour,
+            lighting: selectedExperience.lighting.colour,
+            particles: selectedExperience.particles.colour,
+            fog: selectedExperience.fog.colour
+        };
 
-        if (
-            colourControl
-            instanceof HTMLInputElement
-        ) {
-            colourControl.value =
-                selectedExperience.particles.colour;
-        }
+        Object.entries(colourValues).forEach(
+            ([layer, colour]) => {
+                setInputValue(
+                    `#${layer}-colour-control`,
+                    colour
+                );
+
+                setOutputValue(
+                    `#${layer}-colour-value`,
+                    colour.toUpperCase()
+                );
+            }
+        );
 
         setInputValue(
             '#particle-glow-control',
@@ -1112,6 +1167,75 @@ const selectedAudioTrack =
                 settings: {
                     ...editableExperience.particles
                 }
+            }
+        );
+    };
+
+    type ColourLayer =
+        | 'environment'
+        | 'lighting'
+        | 'particles'
+        | 'fog';
+
+    const bindColourControl = (
+        control: Element | null,
+        layer: ColourLayer
+    ): void => {
+        if (!(control instanceof HTMLInputElement)) {
+            return;
+        }
+
+        control.addEventListener(
+            'input',
+            () => {
+                if (!editableExperience) {
+                    return;
+                }
+
+                const colour = control.value;
+
+                setOutputValue(
+                    `#${layer}-colour-value`,
+                    colour.toUpperCase()
+                );
+
+                if (layer === 'environment') {
+                    editableExperience.environment = {
+                        colour
+                    };
+                    experienceState.data.environment.colour =
+                        colour;
+                    experienceRuntime.update(
+                        experienceState.data
+                    );
+                    return;
+                }
+
+                if (layer === 'lighting') {
+                    editableExperience.lighting.colour =
+                        colour;
+                    experienceState.data.lighting.colour =
+                        colour;
+                    experienceRuntime.update(
+                        experienceState.data
+                    );
+                    return;
+                }
+
+                if (layer === 'fog') {
+                    editableExperience.fog.colour = colour;
+                    experienceState.data.fog.colour = colour;
+                    experienceRuntime.update(
+                        experienceState.data
+                    );
+                    return;
+                }
+
+                editableExperience.particles.colour =
+                    colour;
+                experienceState.data.particles.colour =
+                    colour;
+                emitParticleSettings();
             }
         );
     };
@@ -1525,10 +1649,28 @@ const selectedAudioTrack =
                 saveExperienceButton.textContent =
                     'Saving...';
 
+                editableExperience.audio = {
+                    ...editableExperience.audio,
+                    enabled: experienceState.data.audio.enabled,
+                    volume: experienceState.data.audio.volume
+                };
+
+                editableExperience.atmosphere = {
+                    ...experienceState.data.atmosphere
+                };
+
                 const experienceToSave =
                     cloneExperience(
                         editableExperience
                     );
+
+                if (isCanonicalExperience(experienceToSave)) {
+                    experienceToSave.id =
+                        `${experienceToSave.id}-custom-${Date.now()}`;
+                    experienceToSave.name =
+                        `${experienceToSave.name} Copy`;
+                    experienceToSave.status = 'Custom';
+                }
 
                 const savedToLibrary =
                     experienceLibrary.save(
@@ -1555,6 +1697,10 @@ const selectedAudioTrack =
                     experienceToSave
                 );
 
+                editableExperience = cloneExperience(
+                    experienceToSave
+                );
+
                 window.posthog?.capture('experience_saved');
 
                 saveExperienceButton.textContent =
@@ -1563,8 +1709,9 @@ const selectedAudioTrack =
                 window.setTimeout(
                     () => {
                         saveExperienceButton.disabled = false;
-                        saveExperienceButton.textContent =
-                            'Save';
+                        updateSaveButtonLabel(
+                            editableExperience ?? experienceToSave
+                        );
                     },
                     1600
                 );
@@ -1728,7 +1875,7 @@ const selectedAudioTrack =
                 const count = Math.max(
                     0,
                     Math.min(
-                        100,
+                        150,
                         Math.round(
                             Number(particleCountControl.value)
                         )
@@ -1749,23 +1896,25 @@ const selectedAudioTrack =
         );
     }
 
-    if (
-        particleColourControl instanceof HTMLInputElement
-    ) {
-        particleColourControl.addEventListener(
-            'input',
-            () => {
-                if (!editableExperience) {
-                    return;
-                }
+    bindColourControl(
+        environmentColourControl,
+        'environment'
+    );
 
-                editableExperience.particles.colour =
-                    particleColourControl.value;
+    bindColourControl(
+        lightingColourControl,
+        'lighting'
+    );
 
-                emitParticleSettings();
-            }
-        );
-    }
+    bindColourControl(
+        particleColourControl,
+        'particles'
+    );
+
+    bindColourControl(
+        fogColourControl,
+        'fog'
+    );
 
     if (
         particleGlowControl instanceof HTMLInputElement
