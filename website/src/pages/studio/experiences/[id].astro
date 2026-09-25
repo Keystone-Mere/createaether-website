@@ -1014,6 +1014,8 @@ const selectedAudioTrack =
         ) {
             experienceDescriptionControl.value =
                 selectedExperience.description;
+            experienceDescriptionControl.readOnly =
+                isCanonicalExperience(selectedExperience);
         }
 
         if (
@@ -1386,6 +1388,34 @@ const selectedAudioTrack =
         experienceState.initialise();
     }
 
+    if (
+        experienceDescriptionControl
+        instanceof HTMLTextAreaElement
+    ) {
+        experienceDescriptionControl.addEventListener(
+            'input',
+            () => {
+                if (
+                    !editableExperience
+                    || isCanonicalExperience(editableExperience)
+                ) {
+                    return;
+                }
+
+                editableExperience.description =
+                    experienceDescriptionControl.value;
+
+                if (
+                    previewExperienceDescription
+                    instanceof HTMLElement
+                ) {
+                    previewExperienceDescription.textContent =
+                        editableExperience.description;
+                }
+            }
+        );
+    }
+
 
     if (
         experienceLibraryConfiguration
@@ -1700,6 +1730,8 @@ const selectedAudioTrack =
                 editableExperience = cloneExperience(
                     experienceToSave
                 );
+
+                synchroniseEditor(editableExperience);
 
                 window.posthog?.capture('experience_saved');
 
