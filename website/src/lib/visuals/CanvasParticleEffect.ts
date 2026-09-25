@@ -340,8 +340,8 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       context.beginPath();
       context.moveTo(particle.x, particle.y);
       context.lineTo(
-        particle.x - particle.velocityX * 0.45,
-        particle.y - particle.velocityY * 1.8,
+        particle.x - particle.velocityX * 0.1,
+        particle.y - particle.velocityY * 0.4,
       );
       context.stroke();
     } else if (motion === "burst") {
