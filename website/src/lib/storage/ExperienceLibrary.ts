@@ -50,7 +50,10 @@ function isRecord(
     );
 }
 
-function isExperience(
+const isFiniteNumber = (value: unknown): value is number =>
+    typeof value === 'number' && Number.isFinite(value);
+
+export function isExperience(
     value: unknown
 ): value is Experience {
     if (!isRecord(value)) {
@@ -69,7 +72,38 @@ function isExperience(
         isRecord(value.lighting) &&
         isRecord(value.fog) &&
         isRecord(value.particles) &&
-        isRecord(value.transition)
+        isRecord(value.transition) &&
+        typeof value.audio.enabled === 'boolean' &&
+        isFiniteNumber(value.audio.volume) &&
+        typeof value.audio.track === 'string' &&
+        typeof value.atmosphere.particles === 'boolean' &&
+        typeof value.atmosphere.lighting === 'boolean' &&
+        typeof value.atmosphere.fog === 'boolean' &&
+        (value.environment === undefined ||
+            (isRecord(value.environment) &&
+                typeof value.environment.colour === 'string')) &&
+        typeof value.lighting.preset === 'string' &&
+        typeof value.lighting.colour === 'string' &&
+        isFiniteNumber(value.lighting.intensity) &&
+        typeof value.lighting.pulse === 'boolean' &&
+        isFiniteNumber(value.lighting.speed) &&
+        typeof value.fog.preset === 'string' &&
+        typeof value.fog.colour === 'string' &&
+        isFiniteNumber(value.fog.density) &&
+        isFiniteNumber(value.fog.speed) &&
+        typeof value.particles.preset === 'string' &&
+        (value.particles.motion === undefined ||
+            ['rise', 'wander', 'flow', 'rain', 'snow', 'burst'].includes(
+                String(value.particles.motion)
+            )) &&
+        typeof value.particles.colour === 'string' &&
+        [
+            'count', 'glow', 'minRadius', 'maxRadius',
+            'minSpeed', 'maxSpeed', 'drift', 'minOpacity',
+            'maxOpacity', 'minLifetime', 'maxLifetime'
+        ].every((key) => isFiniteNumber(value.particles[key])) &&
+        isFiniteNumber(value.transition.duration) &&
+        typeof value.transition.easing === 'string'
     );
 }
 
