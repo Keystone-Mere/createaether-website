@@ -2,6 +2,8 @@ export interface AudioSettings {
   enabled: boolean;
   volume: number;
   track: string;
+  /** Optional atmosphere layer; older saved experiences remain valid. */
+  layerVolume?: number;
 }
 
 export interface AtmosphereSettings {

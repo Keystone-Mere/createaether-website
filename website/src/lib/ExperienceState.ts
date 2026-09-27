@@ -19,6 +19,7 @@ export interface ExperienceControls {
     audioEnabledToggle: Element | null;
     audioTrack: string;
     volumeControl: Element | null;
+    layerVolumeControl: Element | null;
     particlesToggle: Element | null;
     lightingToggle: Element | null;
     fogToggle: Element | null;
@@ -100,6 +101,7 @@ export class ExperienceState {
         const {
             audioEnabledToggle,
             volumeControl,
+            layerVolumeControl,
             particlesToggle,
             lightingToggle,
             fogToggle
@@ -116,6 +118,9 @@ export class ExperienceState {
         if (volumeControl instanceof HTMLInputElement) {
             volumeControl.value =
                 String(this.data.audio.volume);
+        }
+        if (layerVolumeControl instanceof HTMLInputElement) {
+            layerVolumeControl.value = String(this.data.audio.layerVolume ?? 0);
         }
 
         if (particlesToggle instanceof HTMLInputElement) {
@@ -138,6 +143,7 @@ export class ExperienceState {
         const {
             audioEnabledToggle,
             volumeControl,
+            layerVolumeControl,
             particlesToggle,
             lightingToggle,
             fogToggle
@@ -153,6 +159,9 @@ export class ExperienceState {
 
         if (volumeControl instanceof HTMLInputElement) {
             this.data.audio.volume = Number(volumeControl.value);
+        }
+        if (layerVolumeControl instanceof HTMLInputElement) {
+            this.data.audio.layerVolume = Number(layerVolumeControl.value);
         }
 
         if (particlesToggle instanceof HTMLInputElement) {

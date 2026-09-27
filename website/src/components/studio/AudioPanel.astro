@@ -1,6 +1,9 @@
 ---
 import PlannedFeatures from './PlannedFeatures.astro';
+import { audioTracks } from '../../data/audio/tracks';
 const { experience } = Astro.props;
+const selectedTrack = audioTracks.find((track) => track.id === experience.audio.track);
+const hasLayer = Boolean(selectedTrack?.layerSrc);
 ---
 
 <div class="panel">
@@ -18,7 +21,7 @@ const { experience } = Astro.props;
 
     <div class="volume-heading">
         <label for="volume-control">
-            Volume
+            Main sound <span id="main-sound-name">{selectedTrack ? `— ${selectedTrack.title}` : ''}</span>
         </label>
 
         <output
@@ -37,7 +40,17 @@ const { experience } = Astro.props;
         value={experience.audio.volume}
     />
 
-    <PlannedFeatures features={['Layered soundscapes', 'Fade in and out']} />
+    <div id="audio-layer-controls" hidden={!hasLayer}>
+        <div class="volume-heading">
+            <label for="layer-volume-control" id="audio-layer-label">Atmosphere — {selectedTrack?.layerTitle ?? ""}</label>
+            <output id="layer-volume-value" for="layer-volume-control">
+                {experience.audio.layerVolume ?? 0}%
+            </output>
+        </div>
+        <input id="layer-volume-control" type="range" min="0" max="100" value={experience.audio.layerVolume ?? 0} />
+    </div>
+
+    <PlannedFeatures features={['Fade in and out']} />
 </div>
 
 <style>
@@ -85,4 +98,8 @@ const { experience } = Astro.props;
     font-size:.8rem;
     font-weight:700;
 }
+</style>
+
+<style>
+#audio-layer-controls[hidden]{display:none}
 </style>

@@ -4,4 +4,6 @@ export interface AudioTrack {
     description: string;
     src: string;
     loop: boolean;
+    layerSrc?: string;
+    layerTitle?: string;
 }

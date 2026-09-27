@@ -6,6 +6,7 @@
   "audio": {
     "enabled": true,
     "volume": 45,
+    "layerVolume": 0,
     "track": "ocean-waves"
   },
   "atmosphere": {
