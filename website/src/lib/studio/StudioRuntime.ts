@@ -16,6 +16,7 @@ export interface StudioRuntimeElements {
     audioElement: Element | null;
     audioEnabledToggle: Element | null;
     volumeControl: Element | null;
+    layerVolumeControl: Element | null;
     volumeValue: Element | null;
     particlesToggle: Element | null;
     lightingToggle: Element | null;
@@ -34,6 +35,7 @@ export const createStudioRuntime = (
         audioElement,
         audioEnabledToggle,
         volumeControl,
+        layerVolumeControl,
         volumeValue,
         particlesToggle,
         lightingToggle,
@@ -126,6 +128,7 @@ export const createStudioRuntime = (
                         ? audioElement.dataset.trackId ?? ''
                         : '',
                 volumeControl,
+                layerVolumeControl,
                 particlesToggle,
                 lightingToggle,
                 fogToggle

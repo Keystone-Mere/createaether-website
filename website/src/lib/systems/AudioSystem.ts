@@ -23,6 +23,7 @@ export class AudioSystem
 
     private readonly audioElement:
         HTMLAudioElement | null;
+    private readonly layerElement: HTMLAudioElement | null;
 
     private readonly tracks:
         Map<string, AudioTrack>;
@@ -50,6 +51,13 @@ export class AudioSystem
             audioElement instanceof HTMLAudioElement
                 ? audioElement
                 : null;
+        this.layerElement = this.audioElement ? new Audio() : null;
+        if (this.audioElement && this.layerElement) {
+            this.layerElement.loop = true;
+            this.layerElement.preload = 'metadata';
+            this.audioElement.addEventListener('play', this.playLayer);
+            this.audioElement.addEventListener('pause', this.pauseLayer);
+        }
 
         this.tracks = new Map(
             tracks.map((track) => [
@@ -74,6 +82,26 @@ export class AudioSystem
         );
 
         this.fadeFrame = null;
+    }
+
+    private readonly playLayer = (): void => {
+        if (!this.layerElement || !this.layerElement.src || this.layerElement.volume === 0) return;
+        void this.layerElement.play().catch((error) => console.error('Unable to play atmosphere layer.', error));
+    };
+
+    private readonly pauseLayer = (): void => {
+        this.layerElement?.pause();
+    };
+
+    public destroy(): void {
+        this.cancelFade();
+        this.audioElement?.removeEventListener('play', this.playLayer);
+        this.audioElement?.removeEventListener('pause', this.pauseLayer);
+        if (this.layerElement) {
+            this.layerElement.pause();
+            this.layerElement.removeAttribute('src');
+            this.layerElement.load();
+        }
     }
 
     private fadeTo(
@@ -209,6 +237,26 @@ export class AudioSystem
             requestedTrack ??
             this.fallbackTrack;
 
+        if (this.layerElement) {
+            const layerSrc = resolvedTrack?.layerSrc;
+            if (layerSrc && this.layerElement.getAttribute('src') !== layerSrc) {
+                this.layerElement.pause();
+                this.layerElement.src = layerSrc;
+                this.layerElement.load();
+            } else if (!layerSrc && this.layerElement.getAttribute('src')) {
+                this.layerElement.pause();
+                this.layerElement.removeAttribute('src');
+                this.layerElement.load();
+            }
+            this.layerElement.volume = Math.min(1, Math.max(0, (state.audio.layerVolume ?? 0) / 100)) *
+                Math.min(1, Math.max(0, state.audio.volume / 100));
+            if (!state.audio.enabled || this.layerElement.volume === 0) {
+                this.layerElement.pause();
+            } else if (!this.audioElement.paused && this.layerElement.paused) {
+                this.playLayer();
+            }
+        }
+
         if (
             resolvedTrack &&
             resolvedTrack.id !==
@@ -275,6 +323,7 @@ export class AudioSystem
         this.audioElement.muted = false;
 
         if (!state.audio.enabled) {
+            this.layerElement?.pause();
             if (this.audioElement.paused) {
                 this.cancelFade();
                 this.audioElement.volume = 0;

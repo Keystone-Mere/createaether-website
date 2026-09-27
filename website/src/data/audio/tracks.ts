@@ -13,13 +13,17 @@ export const audioTracks: AudioTrack[] = [
     title: 'Temple Echoes',
     description: 'A meditative temple soundscape.',
     src: '/audio/temple-echoes.mp3',
+    layerSrc: '/audio/wind.mp3',
+    layerTitle: 'Wind',
     loop: true,
   },
   {
     id: 'forest-ambience',
-    title: 'Deep Forest',
-    description: 'A layered woodland soundscape.',
-    src: '/audio/deep-forest.mp3',
+    title: 'Forest Wind',
+    description: 'Woodland wind with optional gentle rain.',
+    src: '/audio/forest_wind.mp3',
+    layerSrc: '/audio/forest_rain.mp3',
+    layerTitle: 'Rain',
     loop: true,
   },
   {
@@ -27,6 +31,8 @@ export const audioTracks: AudioTrack[] = [
     title: 'Ocean Ambient',
     description: 'A spacious coastal soundscape.',
     src: '/audio/ocean-ambient.mp3',
+    layerSrc: '/audio/seagulls.mp3',
+    layerTitle: 'Seagulls',
     loop: true,
   },
   {
@@ -34,6 +40,8 @@ export const audioTracks: AudioTrack[] = [
     title: 'Ambient Christmas',
     description: 'A warm seasonal soundscape.',
     src: '/audio/ambient-christmas.mp3',
+    layerSrc: '/audio/fireplace.mp3',
+    layerTitle: 'Fireplace',
     loop: true,
   },
   {
@@ -41,6 +49,8 @@ export const audioTracks: AudioTrack[] = [
   title: 'Carnival',
   description: 'An energetic celebratory soundscape for the Festival experience.',
   src: '/audio/carnival.mp3',
+  layerSrc: '/audio/crowd.mp3',
+  layerTitle: 'Crowd',
   loop: true,
   },
   {
@@ -48,6 +58,8 @@ export const audioTracks: AudioTrack[] = [
     title: 'Rain and Thunder',
     description: 'Rainfall and distant thunder for the Storm experience.',
     src: '/audio/rain-thunder.mp3',
+    layerSrc: '/audio/thunder.mp3',
+    layerTitle: 'Thunder',
     loop: true,
   },
 ];

@@ -727,6 +727,8 @@ const selectedAudioTrack =
 
     const volumeControl = document.querySelector('#volume-control');
     const volumeValue = document.querySelector('#volume-value');
+    const layerVolumeControl = document.querySelector('#layer-volume-control');
+    const layerVolumeValue = document.querySelector('#layer-volume-value');
 
     const particlesToggle = document.querySelector('#particles-toggle');
     const lightingToggle = document.querySelector('#lighting-toggle');
@@ -884,6 +886,7 @@ const selectedAudioTrack =
         audioEnabledToggle,
         volumeControl,
         volumeValue,
+        layerVolumeControl,
         particlesToggle,
         lightingToggle,
         fogToggle,
@@ -959,6 +962,14 @@ const selectedAudioTrack =
     const formatTrackName = (
         trackId: string
     ): string => {
+        const titles: Record<string, string> = {
+            'temple-echoes': 'Temple Echoes',
+            'forest-ambience': 'Forest Wind',
+            'ocean-waves': 'Ocean Ambient',
+            'christmas-ambient': 'Ambient Christmas',
+            'festival': 'Carnival'
+        };
+        if (titles[trackId]) return titles[trackId];
         return trackId
             .split('-')
             .filter(Boolean)
@@ -1050,6 +1061,11 @@ const selectedAudioTrack =
                 selectedExperience.description;
         }
 
+        const mainSoundName = document.querySelector('#main-sound-name');
+        if (mainSoundName instanceof HTMLElement) {
+            mainSoundName.textContent = `— ${formatTrackName(selectedExperience.audio.track)}`;
+        }
+
         if (
             audioTrackTitle
             instanceof HTMLElement
@@ -1058,6 +1074,27 @@ const selectedAudioTrack =
                 formatTrackName(
                     selectedExperience.audio.track
                 );
+        }
+
+        const layerTitles: Record<string, string> = {
+            'temple-echoes': 'Wind',
+            'forest-ambience': 'Rain',
+            'ocean-waves': 'Seagulls',
+            'christmas-ambient': 'Fireplace',
+            'storm': 'Thunder',
+            'festival': 'Crowd'
+        };
+        const layerTitle = layerTitles[selectedExperience.audio.track];
+        const layerControls = document.querySelector('#audio-layer-controls');
+        const layerLabel = document.querySelector('#audio-layer-label');
+        if (layerControls instanceof HTMLElement) {
+            layerControls.hidden = !layerTitle;
+        }
+        if (layerLabel instanceof HTMLLabelElement) {
+            layerLabel.textContent = `Atmosphere — ${layerTitle ?? ''}`;
+        }
+        if (layerVolumeValue instanceof HTMLOutputElement) {
+            layerVolumeValue.value = `${selectedExperience.audio.layerVolume ?? 0}%`;
         }
 
         setInputValue(
@@ -1682,7 +1719,8 @@ const selectedAudioTrack =
                 editableExperience.audio = {
                     ...editableExperience.audio,
                     enabled: experienceState.data.audio.enabled,
-                    volume: experienceState.data.audio.volume
+                    volume: experienceState.data.audio.volume,
+                    layerVolume: experienceState.data.audio.layerVolume
                 };
 
                 editableExperience.atmosphere = {
@@ -1883,6 +1921,14 @@ const selectedAudioTrack =
 
     if (volumeControl instanceof HTMLInputElement) {
         volumeControl.addEventListener('input', () => {
+            experienceState.update();
+        });
+    }
+    if (layerVolumeControl instanceof HTMLInputElement) {
+        layerVolumeControl.addEventListener('input', () => {
+            if (layerVolumeValue instanceof HTMLOutputElement) {
+                layerVolumeValue.value = `${layerVolumeControl.value}%`;
+            }
             experienceState.update();
         });
     }
