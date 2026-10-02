@@ -7,7 +7,7 @@ const { experience } = Astro.props;
     <h2>General</h2>
 
     <label for="experience-name">
-        Experience Name
+        Experience
     </label>
 
     <input
@@ -27,7 +27,8 @@ const { experience } = Astro.props;
         readonly
     >{experience.description}</textarea>
 
-    <PlannedFeatures features={['Cover image', 'Experience tags', 'Visibility settings']} />
+    <img id="experience-cover" src={`/images/experience-covers/${experience.id}.jpg`} alt={`${experience.name} experience cover`} width="1024" height="576" />
+    <PlannedFeatures features={['Experience tags', 'Visibility settings']} />
 </div>
 
 <style>
@@ -58,4 +59,5 @@ const { experience } = Astro.props;
     background:#172036;
     color:white;
 }
+#experience-cover {display:block; width:100%; height:auto; aspect-ratio:16/9; object-fit:cover; border:1px solid #475569; border-radius:8px; margin-top:24px;}
 </style>

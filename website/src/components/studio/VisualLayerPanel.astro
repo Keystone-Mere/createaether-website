@@ -1,0 +1,14 @@
+---
+import PlannedFeatures from './PlannedFeatures.astro';
+const { layer, experience } = Astro.props;
+const title = layer.charAt(0).toUpperCase() + layer.slice(1);
+const colour = layer === 'environment' ? (experience.environment?.colour ?? experience.lighting.colour) : experience[layer].colour;
+---
+<section class="panel">
+    <h2>{title}</h2>
+    {layer !== 'environment' && <label class="toggle-row"><input id={`${layer}-toggle`} type="checkbox" checked={experience.atmosphere[layer]} /> {title} On</label>}
+    <label for={`${layer}-colour-control`}>{layer === 'environment' ? 'Background colour' : 'Colour'}</label>
+    <div class="colour-picker"><input id={`${layer}-colour-control`} type="color" value={colour} aria-label={`${title} colour`} /><output id={`${layer}-colour-value`}>{colour.toUpperCase()}</output></div>
+    {layer === 'lighting' && <PlannedFeatures features={['Lighting presets']} />}
+    {layer === 'fog' && <PlannedFeatures features={['Fog intensity']} />}
+</section>

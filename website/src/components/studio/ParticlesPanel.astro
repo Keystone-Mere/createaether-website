@@ -1,4 +1,5 @@
 ---
+import { experiences } from '../../data/experiences';
 const { experience } = Astro.props;
 const particles = experience.particles;
 ---
@@ -7,129 +8,26 @@ const particles = experience.particles;
 
 <h2>Particles</h2>
 
-<div class="control-row">
-<label>Enabled</label>
-
-<input
-type="checkbox"
-checked={experience.atmosphere.particles}
-/>
-</div>
-
+<label class="toggle-row"><input id="particles-toggle" type="checkbox" checked={experience.atmosphere.particles} /> Particles On</label>
+<label for="particle-preset-select">Preset</label><select id="particle-preset-select">{experiences.map(item => <option value={item.particles.preset} selected={item.particles.preset === particles.preset}>{item.particles.preset.replaceAll('-', ' ')}</option>)}</select>
 <label>
-Count
+Particle count
 <output id="particle-count-value">{particles.count}</output>
 </label>
 
 <input
 id="particle-count-control"
 type="range"
+aria-label="count"
 min="0"
-max="150"
+max="300"
 step="1"
 value={particles.count}
 />
 
-<label>
-Glow
-<output id="particle-glow-value">{particles.glow}</output>
-</label>
-
-<input
-id="particle-glow-control"
-type="range"
-min="0"
-max="20"
-step="0.5"
-value={particles.glow}
-/>
-
-<label>Radius</label>
-
-<div class="range-pair">
-    <div>
-        <span>Minimum</span>
-        <output id="particle-min-radius-value">
-            {particles.minRadius}
-        </output>
-
-        <input
-            id="particle-min-radius-control"
-            type="range"
-            min="0.5"
-            max="10"
-            step="0.5"
-            value={particles.minRadius}
-        />
-    </div>
-
-    <div>
-        <span>Maximum</span>
-        <output id="particle-max-radius-value">
-            {particles.maxRadius}
-        </output>
-
-        <input
-            id="particle-max-radius-control"
-            type="range"
-            min="0.5"
-            max="10"
-            step="0.5"
-            value={particles.maxRadius}
-        />
-    </div>
-</div>
-
-<label>Speed</label>
-
-<div class="range-pair">
-    <div>
-        <span>Minimum</span>
-        <output id="particle-min-speed-value">
-            {particles.minSpeed}
-        </output>
-
-        <input
-            id="particle-min-speed-control"
-            type="range"
-            min="0"
-            max="50"
-            step="1"
-            value={particles.minSpeed}
-        />
-    </div>
-
-    <div>
-        <span>Maximum</span>
-        <output id="particle-max-speed-value">
-            {particles.maxSpeed}
-        </output>
-
-        <input
-            id="particle-max-speed-control"
-            type="range"
-            min="0"
-            max="50"
-            step="1"
-            value={particles.maxSpeed}
-        />
-    </div>
-</div>
-
-<label>
-Drift
-<output id="particle-drift-value">{particles.drift}</output>
-</label>
-
-<input
-id="particle-drift-control"
-type="range"
-min="0"
-max="20"
-step="0.5"
-value={particles.drift}
-/>
-
+<h3 class="particle-heading">Appearance</h3>
+<label for="particles-colour-control">Colour</label>
+<div class="colour-picker"><input id="particles-colour-control" type="color" value={particles.colour} aria-label="Particle colour" /><output id="particles-colour-value">{particles.colour.toUpperCase()}</output></div>
 <label>Opacity</label>
 
 <div class="range-pair">
@@ -142,6 +40,7 @@ value={particles.drift}
         <input
             id="particle-min-opacity-control"
             type="range"
+aria-label="min opacity"
             min="0"
             max="1"
             step="0.05"
@@ -158,6 +57,7 @@ value={particles.drift}
         <input
             id="particle-max-opacity-control"
             type="range"
+aria-label="max opacity"
             min="0"
             max="1"
             step="0.05"
@@ -166,7 +66,114 @@ value={particles.drift}
     </div>
 </div>
 
-<label>Lifetime</label>
+<label>
+Glow
+<output id="particle-glow-value">{particles.glow}</output>
+</label>
+
+<input
+id="particle-glow-control"
+type="range"
+aria-label="glow"
+min="0"
+max="20"
+step="0.5"
+value={particles.glow}
+/>
+
+<label>Size</label>
+
+<div class="range-pair">
+    <div>
+        <span>Minimum</span>
+        <output id="particle-min-radius-value">
+            {particles.minRadius}
+        </output>
+
+        <input
+            id="particle-min-radius-control"
+            type="range"
+aria-label="min radius"
+            min="0.5"
+            max="10"
+            step="0.5"
+            value={particles.minRadius}
+        />
+    </div>
+
+    <div>
+        <span>Maximum</span>
+        <output id="particle-max-radius-value">
+            {particles.maxRadius}
+        </output>
+
+        <input
+            id="particle-max-radius-control"
+            type="range"
+aria-label="max radius"
+            min="0.5"
+            max="10"
+            step="0.5"
+            value={particles.maxRadius}
+        />
+    </div>
+</div>
+
+<h3 class="particle-heading">Movement</h3>
+<label>
+Drift
+<output id="particle-drift-value">{particles.drift}</output>
+</label>
+
+<input
+id="particle-drift-control"
+type="range"
+aria-label="drift"
+min="0"
+max="20"
+step="0.5"
+value={particles.drift}
+/>
+
+<label>Speed</label>
+
+<div class="range-pair">
+    <div>
+        <span>Minimum</span>
+        <output id="particle-min-speed-value">
+            {particles.minSpeed}
+        </output>
+
+        <input
+            id="particle-min-speed-control"
+            type="range"
+aria-label="min speed"
+            min="0"
+            max="50"
+            step="1"
+            value={particles.minSpeed}
+        />
+    </div>
+
+    <div>
+        <span>Maximum</span>
+        <output id="particle-max-speed-value">
+            {particles.maxSpeed}
+        </output>
+
+        <input
+            id="particle-max-speed-control"
+            type="range"
+aria-label="max speed"
+            min="0"
+            max="50"
+            step="1"
+            value={particles.maxSpeed}
+        />
+    </div>
+</div>
+
+<h3 class="particle-heading">Particle lifetime</h3>
 
 <div class="range-pair">
     <div>
@@ -178,6 +185,7 @@ value={particles.drift}
         <input
             id="particle-min-lifetime-control"
             type="range"
+aria-label="min lifetime"
             min="1"
             max="30"
             step="1"
@@ -194,6 +202,7 @@ value={particles.drift}
         <input
             id="particle-max-lifetime-control"
             type="range"
+aria-label="max lifetime"
             min="1"
             max="30"
             step="1"
