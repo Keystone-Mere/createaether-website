@@ -1,5 +1,6 @@
 ---
 interface Props {
+  cover?: string;
   title: string;
   description: string;
   status: string;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const {
+  cover,
   title,
   description,
   status,
@@ -15,6 +17,7 @@ const {
 ---
 
 <div class="experience-card">
+    {cover && <img class="experience-card__cover" src={cover} alt="" width="1024" height="576" loading="lazy" />}
     <div class="experience-card__content">
         <h3>{title}</h3>
 
@@ -29,11 +32,11 @@ const {
         {
             href ? (
                 <a class="experience-card__button" href={href}>
-                    Open
+                    Open in Studio
                 </a>
             ) : (
                 <button type="button" disabled>
-                    Open
+                    Open in Studio
                 </button>
             )
         }
@@ -47,7 +50,8 @@ const {
     justify-content:space-between;
     gap:1.5rem;
 
-    padding:24px;
+    padding:0 0 24px;
+    overflow:hidden;
 
     background:#10182c;
 
@@ -57,6 +61,11 @@ const {
 
     transition:.25s ease;
 }
+
+.experience-card__cover { width:100%; aspect-ratio:16 / 9; object-fit:cover; display:block; }
+.experience-card__content, .experience-card__footer { margin-inline:24px; }
+.experience-card__content { flex:1; }
+.experience-card__button:focus-visible { outline:2px solid #7dd3fc; outline-offset:4px; }
 
 .experience-card:hover{
     transform:translateY(-4px);
