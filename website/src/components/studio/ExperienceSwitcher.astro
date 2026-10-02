@@ -1,79 +1,22 @@
 ---
-interface ExperienceItem {
-    id: string;
-    name: string;
-    description: string;
-}
-
-interface Props {
-    experiences: ExperienceItem[];
-    activeExperience: string;
-}
-
-const {
-    experiences,
-    activeExperience
-} = Astro.props;
+const { experiences, activeExperience } = Astro.props;
 ---
-
-<div class="panel">
-    <h2>Experiences</h2>
-
-    <div class="experience-switcher">
-        {
-            experiences.map((experience) => (
-                <button
-                    type="button"
-                    class:list={[
-                        "experience-card",
-                        experience.id === activeExperience &&
-                            "experience-card--active"
-                    ]}
-                    data-experience-id={experience.id}
-                >
-                    <strong>{experience.name}</strong>
-                    <small>{experience.description}</small>
-                </button>
-            ))
-        }
-    </div>
+<div class="experience-switcher">
+    <label for="experience-selector">Choose experience</label>
+    <select id="experience-selector">{experiences.map(experience => <option value={experience.id} selected={experience.id === activeExperience}>{experience.name}</option>)}</select>
+    <div hidden>{experiences.map(experience => <button type="button" data-experience-id={experience.id}>{experience.name}</button>)}</div>
 </div>
-
+<script>
+const selector = document.querySelector('#experience-selector');
+selector?.addEventListener('change', () => {
+    if (!(selector instanceof HTMLSelectElement)) return;
+    const button = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-experience-id]')).find(button => button.dataset.experienceId === selector.value);
+    button?.click();
+});
+</script>
 <style>
-.experience-switcher{
-    display:flex;
-    flex-direction:column;
-    gap:.75rem;
-}
-
-.experience-card{
-    width:100%;
-    padding:1rem;
-    text-align:left;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.08);
-    background:#172036;
-    color:#fff;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.experience-card:hover{
-    border-color:#38bdf8;
-}
-
-.experience-card--active{
-    border-color:#22c55e;
-    box-shadow:0 0 14px rgba(34,197,94,.25);
-}
-
-.experience-card strong{
-    display:block;
-    margin-bottom:.35rem;
-}
-
-.experience-card small{
-    color:#94a3b8;
-    line-height:1.4;
-}
+.experience-switcher {min-width:200px;max-width:100%;}
+label {display:block; font-size:13px; font-weight:600; margin-bottom:8px;}
+select {width:100%; min-height:44px; padding:10px 14px; background:#192537; border:1px solid #475569; border-radius:8px; color:white;}
+@media(max-width:700px){.experience-switcher{width:200px;}}
 </style>
