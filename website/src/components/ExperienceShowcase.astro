@@ -3,6 +3,7 @@ import { experiences } from '../data/experiences';
 ---
 
 <section
+  id="experiences"
   class="experience-showcase"
   aria-labelledby="experience-showcase-title"
 >
@@ -10,7 +11,7 @@ import { experiences } from '../data/experiences';
     <div>
       <p class="experience-showcase__eyebrow">Playable experiences</p>
       <h2 id="experience-showcase-title">
-        Explore Aether in action.
+        Choose your atmosphere.
       </h2>
     </div>
 
@@ -24,6 +25,8 @@ import { experiences } from '../data/experiences';
     {
       experiences.map((experience, index) => (
         <a class="experience-card" href={experience.href}>
+          <img class="experience-card__cover" src={`/images/experience-covers/${experience.id}.jpg`} alt="" width="1024" height="576" loading="lazy" />
+          <div class="experience-card__body">
           <div class="experience-card__top">
             <span class="experience-card__number">
               {String(index + 1).padStart(2, '0')}
@@ -35,21 +38,22 @@ import { experiences } from '../data/experiences';
           <p>{experience.description}</p>
 
           <span class="experience-card__link">
-            Open experience <span aria-hidden="true">→</span>
+            Open in Studio <span aria-hidden="true">→</span>
           </span>
+          </div>
         </a>
       ))
     }
   </div>
 
   <a class="experience-showcase__action" href="/studio/">
-    Open the Atmosphere Composer <span aria-hidden="true">→</span>
+    Open Aether Studio <span aria-hidden="true">→</span>
   </a>
 </section>
 
 <style>
   .experience-showcase {
-    padding: 7rem 0;
+    padding: 5rem 0;
     border-top: 1px solid rgba(148, 163, 184, 0.12);
   }
 
@@ -96,7 +100,8 @@ import { experiences } from '../data/experiences';
 
   .experience-card {
     min-height: 15rem;
-    padding: 1.4rem;
+    padding: 0;
+    overflow: hidden;
     border: 1px solid rgba(148, 163, 184, 0.14);
     border-radius: 1rem;
     background:
@@ -129,7 +134,7 @@ import { experiences } from '../data/experiences';
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2.75rem;
+    margin-bottom: 1.25rem;
   }
 
   .experience-card__number {
@@ -212,4 +217,9 @@ import { experiences } from '../data/experiences';
       min-height: auto;
     }
   }
+  .experience-card { display: flex; flex-direction: column; }
+  .experience-card__cover { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+  .experience-card__body { padding: 1.4rem; display: flex; flex-direction: column; flex: 1; }
+  .experience-card__link { margin-top: auto; padding-top: 1.5rem; }
+  @media (prefers-reduced-motion: reduce) { .experience-card { transition: none; } .experience-card:hover { transform: none; } }
 </style>

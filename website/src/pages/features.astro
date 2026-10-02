@@ -1,4 +1,6 @@
 ---
+import PlatformLayers from "../components/PlatformLayers.astro";
+import ArchitectureFlow from "../components/ArchitectureFlow.astro";
 import '../styles/design-system.css';
 import '../styles/animations.css';
 import '../styles/components.css';
@@ -235,6 +237,8 @@ Aether.Events.on('experience:loaded', (experience) => {
           </a>
         </div>
       </section>
+      <section class="engine-layers" aria-label="Aether runtime layers"><h2>Inside the atmosphere engine.</h2><PlatformLayers /></section>
+      <ArchitectureFlow />
     </main>
 
     <SiteFooter />
@@ -491,4 +495,5 @@ Aether.Events.on('experience:loaded', (experience) => {
       min-height: auto;
     }
   }
+.engine-layers { padding:64px 0; }
 </style>

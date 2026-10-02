@@ -1,0 +1,60 @@
+---
+const scenes = [
+  { id: 'temple', name: 'Temple', mood: 'Warm light. A moment of stillness.' },
+  { id: 'forest', name: 'Forest', mood: 'Soft sunlight. Space to breathe.' },
+  { id: 'ocean', name: 'Ocean', mood: 'Open horizons. A slower rhythm.' },
+];
+---
+<div class="atmosphere" data-hero-atmosphere>
+  <div class="scene" data-scene="temple">
+    {scenes.map((scene, index) => <img src={`/images/experience-covers/${scene.id}.jpg`} alt={`${scene.name} atmosphere`} width="1024" height="576" hidden={index !== 0} data-scene-image={scene.id} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} />)}
+    <div class="haze" aria-hidden="true"></div>
+    <div class="motes" aria-hidden="true">{Array.from({length: 12}, (_,i) => <i style={`--x:${(i*23+7)%100}%;--delay:-${i*1.7}s;--duration:${10+i%5}s`}></i>)}</div>
+    <span class="preview-label">Atmosphere preview</span>
+    <div class="scene-caption" aria-live="polite"><h2 data-scene-name>Temple</h2><p data-scene-mood>Warm light. A moment of stillness.</p></div>
+  </div>
+  <div class="scene-controls" role="group" aria-label="Choose an atmosphere preview">
+    {scenes.map((scene,index) => <button type="button" aria-pressed={index === 0 ? 'true' : 'false'} data-scene-choice={scene.id} data-mood={scene.mood}>{scene.name}</button>)}
+    <a href="/studio/experiences/temple/" data-scene-link>Make it yours →</a>
+  </div>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-hero-atmosphere]').forEach(root => {
+    root.querySelectorAll<HTMLButtonElement>('[data-scene-choice]').forEach(button => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.sceneChoice!;
+        root.querySelectorAll<HTMLImageElement>('[data-scene-image]').forEach(img => { img.hidden = img.dataset.sceneImage !== id; });
+        root.querySelectorAll<HTMLButtonElement>('[data-scene-choice]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+        root.querySelector<HTMLElement>('[data-scene]')!.dataset.scene = id;
+        root.querySelector<HTMLElement>('[data-scene-name]')!.textContent = button.textContent;
+        root.querySelector<HTMLElement>('[data-scene-mood]')!.textContent = button.dataset.mood!;
+        root.querySelector<HTMLAnchorElement>('[data-scene-link]')!.href = `/studio/experiences/${id}/`;
+      });
+    });
+  });
+</script>
+<style>
+  .atmosphere { width:100%; border:1px solid #ffffff24; border-radius:20px; overflow:hidden; background:#10151f; box-shadow:0 24px 80px #0004; }
+  .scene { position:relative; height:350px; overflow:hidden; --accent:#ffbb65; }
+  .scene[data-scene="forest"] { --accent:#c7ed9a; }
+  .scene[data-scene="ocean"] { --accent:#a3eaff; }
+  .scene img { width:100%; height:100%; object-fit:cover; display:block; }
+  .scene img[hidden] { display:none; }
+  .scene::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,#0004,transparent 35%,#050912d9); pointer-events:none; }
+  .preview-label { position:absolute; z-index:2; top:20px; left:22px; font-size:10px; text-transform:uppercase; letter-spacing:.14em; color:#fff; background:#07101d88; padding:8px 10px; border-radius:20px; }
+  .scene-caption { position:absolute; z-index:2; bottom:24px; left:24px; right:24px; }
+  .scene-caption h2 { margin:0 0 8px; font-size:32px; line-height:1.1; color:#fff; letter-spacing:-.03em; }
+  .scene-caption p { margin:0; font-size:14px; color:#e2e8f0; line-height:1.5; }
+  .haze { position:absolute; inset:0; background:radial-gradient(ellipse at 65% 40%,var(--accent),transparent 65%); opacity:.12; animation:breathe 8s ease-in-out infinite alternate; }
+  .motes { position:absolute; inset:0; }
+  .motes i { position:absolute; left:var(--x); bottom:-10px; width:3px; height:3px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent); animation:float var(--duration) var(--delay) linear infinite; }
+  .scene-controls { display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:14px; }
+  button { border:1px solid transparent; background:transparent; color:#aebccc; font:inherit; font-size:12px; padding:9px 12px; border-radius:9px; cursor:pointer; }
+  button[aria-pressed="true"] { background:#26364d; border-color:#6888aa66; color:white; }
+  .scene-controls a { margin-left:auto; padding:9px 4px; font-size:12px; color:#8bdcfb; text-decoration:none; }
+  button:focus-visible, a:focus-visible { outline:2px solid #7dd3fc; outline-offset:3px; }
+  @keyframes float { from { transform:translate(0,0); opacity:0; } 15% { opacity:.8; } 85% { opacity:.5; } to { transform:translate(20px,-380px); opacity:0; } }
+  @keyframes breathe { to { opacity:.22; transform:scale(1.08); } }
+  @media(max-width:560px) { .scene { height:280px; } }
+  @media(prefers-reduced-motion:reduce) { .haze,.motes i { animation:none; } .motes { display:none; } }
+</style>
