@@ -15,10 +15,9 @@ import { experiences } from '../data/experiences';
     <header class="studio-dashboard__header">
       <div>
         <p class="studio-dashboard__eyebrow">Aether Atmosphere Composer</p>
-        <h1>Shape atmospheric experiences.</h1>
+        <h1>Aether Studio</h1>
         <p class="studio-dashboard__intro">
-          Adjust the working MVP systems, tune each environment and iterate
-          locally in the browser before refining the next version.
+          Choose an experience and shape it with sound, colour and atmosphere.
         </p>
       </div>
 
@@ -27,29 +26,56 @@ import { experiences } from '../data/experiences';
 </a>
     </header>
 
+    <section id="experience-library" class="studio-dashboard__experiences">
+      <div class="studio-dashboard__section-heading">
+        <div>
+          <p class="studio-dashboard__workspace-label">Experience library</p>
+          <h2>Choose an experience</h2>
+        </div>
+
+
+      </div>
+
+      <div class="studio-dashboard__experience-grid">
+        {
+          experiences.map((experience) => (
+            <ExperienceCard
+              cover={`/images/experience-covers/${experience.id}.jpg`}
+              title={experience.name}
+              description={experience.description}
+              status={experience.status}
+              href={experience.href}
+            />
+          ))
+        }
+      </div>
+
+      <MyExperiencesPanel />
+    </section>
+
     <section class="studio-dashboard__metrics" aria-label="Workspace overview">
       <MetricCard
         title="Experiences"
         value={String(experiences.length)}
-description="Working MVP presets"
+description="Ready-to-edit experiences"
       />
 
       <MetricCard
         title="Editable systems"
-        value="4"
-        description="Audio, lighting, particles, fog"
+        value="5"
+        description="Audio, lighting, particles, fog, environment"
       />
 
       <MetricCard
         title="Preview"
         value="Live"
-        description="Browser-based runtime"
+        description="See your changes as you edit"
       />
 
       <MetricCard
         title="Storage"
         value="Local"
-        description="Saved in-browser"
+        description="Saved on this browser"
       />
     </section>
 
@@ -83,47 +109,21 @@ description="Working MVP presets"
         />
 
         <StatusCard
-          title="Marketplace"
-          status="Planned"
-          colour="yellow"
+          title="Save and import"
+          status="Available"
+          colour="green"
         />
       </div>
-    </section>
-
-    <section id="experience-library" class="studio-dashboard__experiences">
-      <div class="studio-dashboard__section-heading">
-        <div>
-          <p class="studio-dashboard__workspace-label">Experience library</p>
-          <h2>Recent experiences</h2>
-        </div>
-
-
-      </div>
-
-      <div class="studio-dashboard__experience-grid">
-        {
-          experiences.map((experience) => (
-            <ExperienceCard
-              title={experience.name}
-              description={experience.description}
-              status={experience.status}
-              href={experience.href}
-            />
-          ))
-        }
-      </div>
-
-      <MyExperiencesPanel />
     </section>
 
     <section class="studio-dashboard__workspace">
       <div>
         <p class="studio-dashboard__workspace-label">Workspace status</p>
-        <h2>Aether works as a local MVP foundation.</h2>
+        <h2>Your workspace</h2>
         <p>
-          The available system covers editable atmosphere presets, live browser
-          preview and local experience storage. Marketplace, SDK, account
-          services and publishing remain planned in development.
+          Saved experiences stay in this browser. Use Save as Copy to download a
+          backup, or Import experience to load a saved file. Publishing and
+          marketplace features are coming soon.
         </p>
       </div>
 
@@ -197,6 +197,7 @@ description="Working MVP presets"
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem;
+    margin-top: 1.25rem;
   }
 
   .studio-dashboard__runtime {
@@ -336,7 +337,7 @@ description="Working MVP presets"
     }
 
     .studio-dashboard__experience-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
@@ -353,7 +354,7 @@ description="Working MVP presets"
     .studio-dashboard__metrics,
     .studio-dashboard__services,
     .studio-dashboard__experience-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .studio-dashboard__section-heading {
