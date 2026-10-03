@@ -41,6 +41,11 @@ const selectedAudioTrack =
         <span id="experience-editor-title" hidden>{experience.name}</span>
         <span id="experience-editor-status" hidden>{experience.status}</span>
     </header>
+    <aside class="first-creation-hint" id="first-creation-hint" aria-labelledby="first-creation-title" hidden>
+        <div><h2 id="first-creation-title">Make this atmosphere yours.</h2>
+        <p>Change a colour, adjust the sound, then choose <strong>Save as Copy</strong> to keep your version on this device.</p></div>
+        <button type="button" id="dismiss-first-creation-hint" aria-label="Dismiss getting started hint">Got it</button>
+    </aside>
     <div class="grid">
         <div class="editor-controls">
         <div class="editor-primary editor-column">
@@ -115,11 +120,13 @@ const selectedAudioTrack =
         </div>
         <div class="panel save-panel">
             <h2>Save and Import</h2>
-            <p>Save a copy to keep your changes, or import an Aether experience.</p>
+            <p>Save your creation on this device and download a backup, or import an Aether experience.</p>
             <div class="preview-actions">
                 <button type="button" id="save-experience-button">Save as Copy</button>
                 <button type="button" id="import-experience-button" class="button-secondary">Import experience</button>
             </div>
+            <p id="save-experience-feedback" class="save-feedback" role="status" aria-live="polite"></p>
+            <a id="saved-experiences-link" class="saved-experiences-link" href="/studio/#my-experiences-title" hidden>View My Experiences →</a>
             <input type="file" id="import-experience-input" accept=".aether.json,.json,application/json" hidden />
             <span id="import-experience-status" role="status"></span>
             <PlannedFeatures features={['Publish']} />
@@ -134,7 +141,32 @@ const selectedAudioTrack =
 
 </section>
 
+<script>
+    const hint = document.querySelector<HTMLElement>('#first-creation-hint');
+    const dismiss = document.querySelector<HTMLButtonElement>('#dismiss-first-creation-hint');
+    const hintKey = 'aether-studio-first-creation-seen-v1';
+    if (hint) {
+        try {
+            if (!localStorage.getItem(hintKey)) {
+                hint.hidden = false;
+                localStorage.setItem(hintKey, 'true');
+            }
+        } catch { hint.hidden = false; }
+        dismiss?.addEventListener('click', () => { hint.hidden = true; });
+    }
+</script>
 <style>
+.first-creation-hint { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 22px; margin-bottom:24px; border:1px solid #38bdf844; border-radius:14px; background:#102238; }
+.first-creation-hint[hidden], .saved-experiences-link[hidden] { display:none; }
+.first-creation-hint h2 { font-size:16px; margin:0 0 6px; }
+.first-creation-hint p { font-size:13px; line-height:1.65; color:#bdd0e5; margin:0; }
+.first-creation-hint button { flex-shrink:0; padding:9px 14px; border:1px solid #7dd3fc55; border-radius:8px; color:#e0f2fe; background:#193d5a; cursor:pointer; }
+.first-creation-hint button:focus-visible, .saved-experiences-link:focus-visible { outline:2px solid #7dd3fc; outline-offset:3px; }
+.save-feedback { font-size:13px; line-height:1.6; color:#bdd0e5; }
+.save-feedback:empty { display:none; }
+.saved-experiences-link { display:inline-block; margin-bottom:12px; font-size:13px; color:#7dd3fc; }
+@media(max-width:600px) { .first-creation-hint { align-items:flex-start; flex-direction:column; padding:16px; } }
+
 .editor{
     padding:2rem;
 }
@@ -1764,6 +1796,10 @@ const selectedAudioTrack =
                     return;
                 }
 
+                const saveFeedback = document.querySelector<HTMLElement>('#save-experience-feedback');
+                const savedExperiencesLink = document.querySelector<HTMLAnchorElement>('#saved-experiences-link');
+                if (saveFeedback) saveFeedback.textContent = '';
+                if (savedExperiencesLink) savedExperiencesLink.hidden = true;
                 saveExperienceButton.disabled = true;
                 saveExperienceButton.textContent =
                     'Saving...';
@@ -1798,6 +1834,7 @@ const selectedAudioTrack =
                     );
 
                 if (!savedToLibrary) {
+                    if (saveFeedback) saveFeedback.textContent = 'Could not save on this device. Please try again.';
                     saveExperienceButton.textContent =
                         'Save failed';
 
@@ -1823,6 +1860,10 @@ const selectedAudioTrack =
 
                 synchroniseEditor(editableExperience);
 
+                if (saveFeedback) saveFeedback.textContent = 'Saved on this device—find your creation under My Experiences. A backup download has also been started.';
+                if (savedExperiencesLink) savedExperiencesLink.hidden = false;
+                const welcomeHint = document.querySelector<HTMLElement>('#first-creation-hint');
+                if (welcomeHint) welcomeHint.hidden = true;
                 window.posthog?.capture('experience_saved');
 
                 saveExperienceButton.textContent =
