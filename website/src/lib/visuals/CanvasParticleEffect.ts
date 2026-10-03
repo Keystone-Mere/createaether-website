@@ -26,6 +26,11 @@ interface Particle {
   age: number;
   lifetime: number;
   phase: number;
+  heading: number;
+  targetHeading: number;
+  turnTimer: number;
+  flightSpeed: number;
+  pulseSpeed: number;
 }
 
 const defaultParticleSettings: ParticleSettings = {
@@ -58,7 +63,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
   public readonly description =
     "Renders experience-configured particles through the Canvas renderer.";
 
-  public readonly version = "0.21.1";
+  public readonly version = "0.21.2";
 
   public readonly category: VisualEffectCategory = "particles";
 
@@ -220,7 +225,8 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
     }
 
     if (motion === "wander") {
-      velocityY = this.randomBetween(-speed, speed);
+      velocityX = Math.cos(angle) * speed;
+      velocityY = Math.sin(angle) * speed;
     } else if (motion === "flow") {
       velocityX = speed + this.settings.drift;
       velocityY = this.randomBetween(-1, 1);
@@ -254,6 +260,11 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
       lifetime,
       phase: this.randomBetween(0, Math.PI * 2),
+      heading: angle,
+      targetHeading: angle,
+      turnTimer: this.randomBetween(0.4, 2.4),
+      flightSpeed: speed,
+      pulseSpeed: this.randomBetween(0.8, 1.6),
     };
   }
   private updateParticle(
@@ -266,10 +277,29 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
     const motion = this.resolveMotion();
 
+    if (this.settings.preset === "forest-fireflies" && motion === "wander") {
+      particle.turnTimer -= deltaSeconds;
+      if (particle.turnTimer <= 0) {
+        particle.targetHeading = particle.heading + this.randomBetween(-1.8, 1.8);
+        particle.turnTimer = this.randomBetween(0.7, 2.8);
+      }
+      // Smooth random turns rather than new random jitter on every frame.
+      const turn = Math.atan2(
+        Math.sin(particle.targetHeading - particle.heading),
+        Math.cos(particle.targetHeading - particle.heading),
+      );
+      particle.heading += turn * (1 - Math.exp(-1.8 * deltaSeconds));
+      const flutter = Math.sin(particle.age * 5.5 + particle.phase);
+      const speed = particle.flightSpeed * (0.65 + 0.7 * (0.5 + 0.5 * flutter));
+      const heading = particle.heading + flutter * this.settings.drift * 0.035;
+      particle.velocityX = Math.cos(heading) * speed;
+      particle.velocityY = Math.sin(heading) * speed;
+    }
+
     particle.x += particle.velocityX * deltaSeconds;
     particle.y += particle.velocityY * deltaSeconds;
 
-    if (motion === "wander") {
+    if (motion === "wander" && this.settings.preset !== "forest-fireflies") {
       particle.x +=
         Math.sin(particle.age * 1.8 + particle.phase) *
         this.settings.drift *
@@ -316,7 +346,14 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
     const fade = Math.sin(Math.PI * Math.min(Math.max(progress, 0), 1));
 
-    const alpha = particle.opacity * fade;
+    const isFirefly = this.settings.preset === "forest-fireflies";
+    // Each light has its own rhythm, independent of lifetime fading.
+    const pulse = isFirefly
+      ? 0.12 + 0.88 * Math.pow(
+          0.5 + 0.5 * Math.sin(particle.age * particle.pulseSpeed + particle.phase), 2,
+        )
+      : 1;
+    const alpha = particle.opacity * fade * pulse;
 
     if (alpha <= 0) {
       return;
@@ -328,7 +365,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
     context.shadowColor = this.settings.colour;
 
-    context.shadowBlur = particle.radius * this.settings.glow;
+    context.shadowBlur = particle.radius * this.settings.glow * (isFirefly ? 0.6 + 0.4 * pulse : 1);
 
     context.fillStyle = this.settings.colour;
     context.strokeStyle = this.settings.colour;
