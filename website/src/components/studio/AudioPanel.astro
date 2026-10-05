@@ -1,5 +1,4 @@
 ---
-import PlannedFeatures from './PlannedFeatures.astro';
 import { audioTracks } from '../../data/audio/tracks';
 const { experience } = Astro.props;
 const selectedTrack = audioTracks.find((track) => track.id === experience.audio.track);
@@ -43,7 +42,6 @@ const hasLayer = Boolean(selectedTrack?.layerSrc);
         <input id="layer-volume-control" type="range" min="0" max="100" value={experience.audio.layerVolume ?? 0} />
     </div>
 
-    <PlannedFeatures features={['Fade in and out']} />
 </div>
 
 <style>

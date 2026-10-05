@@ -1,6 +1,7 @@
 ---
 const navigation = [
-  { label: 'Dashboard', href: '/studio', active: true },
+  { label: 'Dashboard', href: '/studio', active: Astro.url.pathname === '/studio' || Astro.url.pathname === '/studio/' },
+  { label: 'Guided relaxation', href: '/studio/guided-relaxation/', active: Astro.url.pathname.startsWith('/studio/guided-relaxation') },
   { label: 'Library', href: '/studio/#experience-library' },
   { label: 'Modules', href: '/features/' },
   { label: 'Try the editor', href: '/studio/experiences/temple/' },

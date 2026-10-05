@@ -126,12 +126,17 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       return;
     }
 
-    const { context, width, height, deltaTime } = frame;
+    const { context, deltaTime } = frame;
+    // Keep simulation coordinates stable when the same canvas enters full screen.
+    const width = 960;
+    const height = 540;
 
-    if (width <= 1 || height <= 1) {
+    if (frame.width <= 1 || frame.height <= 1) {
       return;
     }
 
+    context.save();
+    context.scale(frame.width / width, frame.height / height);
     this.ensureParticleCount(width, height);
 
     const deltaSeconds = Math.min(deltaTime / 1000, 0.1);
@@ -141,6 +146,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
       this.drawParticle(context, particle);
     }
+    context.restore();
   }
 
   public stop(): void {
@@ -218,7 +224,11 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
     let velocityY = -speed;
 
     if (!distributeAcrossScene) {
-      if (motion === "rise") y = height + this.randomBetween(4, 40);
+      if (motion === "rise") {
+        // Spawn inside the scene so short-lived embers remain visible.
+        x = this.randomBetween(width * 0.05, width * 0.95);
+        y = this.randomBetween(height * 0.55, height * 0.95);
+      }
       if (motion === "rain" || motion === "snow")
         y = -this.randomBetween(4, 40);
       if (motion === "flow") x = -this.randomBetween(4, 40);

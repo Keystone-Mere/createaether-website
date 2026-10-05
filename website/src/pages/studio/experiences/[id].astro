@@ -4,14 +4,12 @@ import GeneralPanel from '../../../components/studio/GeneralPanel.astro';
 import AudioPanel from '../../../components/studio/AudioPanel.astro';
 import ParticlesPanel from '../../../components/studio/ParticlesPanel.astro';
 import VisualLayerPanel from '../../../components/studio/VisualLayerPanel.astro';
-import PlannedFeatures from '../../../components/studio/PlannedFeatures.astro';
 import { experiences } from '../../../data/experiences';
 import {
     audioTracks,
     defaultAudioTrack
 } from '../../../data/audio/tracks';
 import ExperienceSwitcher from '../../../components/studio/ExperienceSwitcher.astro';
-import TempleJourney from '../../../components/studio/TempleJourney.astro';
 export function getStaticPaths() {
     return experiences.map((experience) => ({
         params: {
@@ -84,10 +82,18 @@ const selectedAudioTrack =
             <div
                 id="experience-preview-stage"
                 class="preview-stage"
+                data-scene={experience.id}
                 aria-label={`${experience.name} atmosphere preview`}
                 tabindex="-1"
             >
                 <button type="button" id="exit-fullscreen-preview" class="fullscreen-exit" aria-label="Exit full-screen preview">Exit full screen</button>
+                <div class="preview-scene">
+                <img class="preview-scene-image" src="/images/experience-covers/temple.jpg" alt="" aria-hidden="true" />
+                <div class="scene-tint"></div>
+                <div class="candle-light candle-light--left"></div>
+                <div class="candle-light candle-light--back"></div>
+                <div class="candle-light candle-light--right"></div>
+                <div class="candle-light candle-light--front"></div>
                 <div class="preview-glow"></div>
 
                 <canvas
@@ -101,10 +107,11 @@ const selectedAudioTrack =
                 <div class="preview-fog preview-fog--one"></div>
                 <div class="preview-fog preview-fog--two"></div>
 
-                <div class="preview-stage__label">
-                    <span id="preview-experience-name">{experience.name} Environment</span>
-                    <small id="preview-experience-description">Ambient runtime simulation</small>
                 </div>
+            </div>
+            <div class="preview-stage__label">
+                <span id="preview-experience-name">{experience.name} Environment</span>
+                <small id="preview-experience-description">{experience.description}</small>
             </div>
 
             <div class="preview-actions">
@@ -129,12 +136,8 @@ const selectedAudioTrack =
             <a id="saved-experiences-link" class="saved-experiences-link" href="/studio/#my-experiences-title" hidden>View My Experiences →</a>
             <input type="file" id="import-experience-input" accept=".aether.json,.json,application/json" hidden />
             <span id="import-experience-status" role="status"></span>
-            <PlannedFeatures features={['Publish']} />
         </div>
         </div>
-        </div>
-        <div class="journey-slot">
-        {experience.id === 'temple' && <TempleJourney />}
         </div>
 
     </div>
@@ -164,6 +167,10 @@ const selectedAudioTrack =
 .first-creation-hint button:focus-visible, .saved-experiences-link:focus-visible { outline:2px solid #7dd3fc; outline-offset:3px; }
 .save-feedback { font-size:13px; line-height:1.6; color:#bdd0e5; }
 .save-feedback:empty { display:none; }
+.editor #save-experience-button { background:#15803d; border:1px solid #22c55e; color:#fff; font-weight:700; }
+.editor #save-experience-button:hover:not(:disabled) { background:#166534; }
+.editor #save-experience-button:focus-visible { outline:3px solid #86efac; outline-offset:3px; }
+.editor #save-experience-button:disabled { opacity:.65; cursor:wait; }
 .saved-experiences-link { display:inline-block; margin-bottom:12px; font-size:13px; color:#7dd3fc; }
 @media(max-width:600px) { .first-creation-hint { align-items:flex-start; flex-direction:column; padding:16px; } }
 
@@ -731,6 +738,55 @@ const selectedAudioTrack =
 .editor-output {order:1;}
 .hero h1 {font-size:24px;}
 }
+
+.preview-scene { position:absolute; inset:0; overflow:hidden; }
+.preview-scene-image, .scene-tint, .candle-light { display:none; pointer-events:none; }
+.preview-stage[data-scene="temple"] .preview-scene-image { display:block; position:absolute; inset:0; width:100%; height:100%; object-fit:fill; }
+.preview-stage[data-scene="temple"] .preview-glow,
+.preview-stage[data-scene="temple"] .preview-orb { display:none; }
+.preview-stage[data-scene="temple"] .scene-tint { display:block; position:absolute; inset:0; background:var(--aether-environment-colour); opacity:.08; z-index:1; }
+.preview-stage[data-scene="temple"] .candle-light { display:block; position:absolute; width:20%; height:32%; transform:translate(-50%,-50%); z-index:2; background:radial-gradient(ellipse, color-mix(in srgb,var(--aether-lighting-colour) 85%,transparent),transparent 70%); mix-blend-mode:screen; opacity:calc(var(--aether-lighting-intensity) * .6); animation:candle-shimmer var(--aether-lighting-pulse-duration, 4.7s) ease-in-out infinite alternate; }
+.candle-light--left { left:10%; top:32%; }
+.candle-light--back { left:44%; top:33%; animation-delay:-1.7s!important; }
+.candle-light--right { left:86%; top:41%; animation-delay:-2.8s!important; }
+.candle-light--front { left:7%; top:73%; animation-delay:-3.6s!important; }
+.preview-stage[data-scene="temple"].preview-stage--lighting-disabled .candle-light { display:none; }
+.preview-stage--lighting-static .candle-light { animation:none!important; }
+.preview-stage[data-scene="temple"]:not(:fullscreen) { min-height:0; aspect-ratio:16/9; }
+.preview-stage[data-scene="temple"]:fullscreen { background:#000; display:grid; place-items:center; }
+.preview-stage[data-scene="temple"]:fullscreen .preview-scene { position:relative; inset:auto; width:min(100vw,177.7778vh); height:min(100vh,56.25vw); }
+.preview-stage__label { position:static!important; margin-top:12px; }
+@keyframes candle-shimmer { 0% { opacity:calc(var(--aether-lighting-intensity) * .25); } 38% { opacity:calc(var(--aether-lighting-intensity) * .95); } 71% { opacity:calc(var(--aether-lighting-intensity) * .4); } 100% { opacity:calc(var(--aether-lighting-intensity) * .8); } }
+@media (prefers-reduced-motion:reduce) { .candle-light { animation:none!important; } }
+
+
+/* Give the experience room alongside compact settings columns. */
+@media (min-width:1101px) {
+ .grid {display:grid; grid-template-columns:minmax(230px,1fr) minmax(230px,1fr) minmax(0,2fr); gap:20px; align-items:start;}
+ .editor-controls,.editor-feedback {display:contents;}
+ .editor-primary {grid-column:1;grid-row:1;}
+ .editor-layers {grid-column:1;grid-row:2;}
+ .editor-particles {grid-column:2;grid-row:1 / span 2;}
+ .editor-output {grid-column:3;grid-row:1 / span 2;position:sticky;top:16px;align-self:start;}
+}
+@media (min-width:701px) and (max-width:1100px) {
+ .grid {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:start;}
+ .editor-controls,.editor-feedback {display:contents;}
+ .editor-primary {grid-column:1;grid-row:1;}
+ .editor-layers {grid-column:1;grid-row:2;}
+ .editor-particles {grid-column:1;grid-row:3;}
+ .editor-output {grid-column:2;grid-row:1 / span 3;position:sticky;top:16px;align-self:start;}
+}
+@media (max-width:700px) {
+ .grid {display:flex;flex-direction:column;}
+ .editor-controls,.editor-feedback {display:contents;}
+ .editor-output {order:0;position:static;}
+ .editor-primary {order:1;}
+ .editor-layers {order:2;}
+ .editor-particles {order:3;}
+ .journey-slot {order:4;}
+}
+
 </style>
 
 <style is:global>
@@ -1139,17 +1195,13 @@ const selectedAudioTrack =
             }
             experienceSelect.value = selectedExperience.id;
         }
-        const cover = document.querySelector('#experience-cover');
-        if (cover instanceof HTMLImageElement) {
-            const source = selectedExperience.particles.preset;
-            const coverId = canonicalExperienceIds.has(selectedExperience.id) ? selectedExperience.id
-                : source.includes('forest') ? 'forest' : source.includes('ocean') ? 'ocean'
-                : source.includes('christmas') || source.includes('snow') ? 'christmas'
-                : source.includes('storm') || source.includes('rain') ? 'storm'
-                : source.includes('festival') || source.includes('firework') ? 'festival' : 'temple';
-            cover.src = `/images/experience-covers/${coverId}.jpg`;
-            cover.alt = `${selectedExperience.name} experience cover`;
-        }
+        const source = selectedExperience.particles.preset;
+        const coverId = canonicalExperienceIds.has(selectedExperience.id) ? selectedExperience.id
+            : source.includes('forest') ? 'forest' : source.includes('ocean') ? 'ocean'
+            : source.includes('christmas') || source.includes('snow') ? 'christmas'
+            : source.includes('storm') || source.includes('rain') ? 'storm'
+            : source.includes('festival') || source.includes('firework') ? 'festival' : 'temple';
+        if (previewStage instanceof HTMLElement) previewStage.dataset.scene = coverId;
         const presetSelect = document.querySelector('#particle-preset-select');
         if (presetSelect instanceof HTMLSelectElement) {
             if (!Array.from(presetSelect.options).some(option => option.value === selectedExperience.particles.preset)) {
@@ -1276,6 +1328,8 @@ const selectedAudioTrack =
             }
         );
 
+        updateDualRanges();
+
         experienceCards.forEach((card) => {
             const isActive =
                 card.dataset.experienceId
@@ -1372,6 +1426,7 @@ const selectedAudioTrack =
                     colour;
                 experienceState.data.particles.colour =
                     colour;
+                updateDualRanges();
                 emitParticleSettings();
             }
         );
@@ -1407,6 +1462,52 @@ const selectedAudioTrack =
             output.value = `${value}${suffix}`;
         }
     };
+
+    const updateDualRanges = (): void => {
+        document.querySelectorAll<HTMLElement>('[data-dual-range]').forEach(group => {
+            const inputs = group.querySelectorAll<HTMLInputElement>('input[type="range"]');
+            const [lower, upper] = Array.from(inputs);
+            if (!lower || !upper) return;
+            const low = Number(lower.min), span = Number(lower.max) - low;
+            group.style.setProperty('--range-min', String((Number(lower.value) - low) / span));
+            group.style.setProperty('--range-max', String((Number(upper.value) - low) / span));
+            lower.setAttribute('aria-valuemax', upper.value);
+            upper.setAttribute('aria-valuemin', lower.value);
+        });
+    };
+
+    document.querySelectorAll<HTMLElement>('.dual-range-track').forEach(track => {
+        const [lower, upper] = Array.from(track.querySelectorAll<HTMLInputElement>('input'));
+        if (!lower || !upper) return;
+        let active: HTMLInputElement | null = null;
+        const valueAt = (event: PointerEvent): number => {
+            const rect = track.getBoundingClientRect();
+            const fraction = Math.max(0, Math.min(1, (event.clientX - rect.left - 10) / Math.max(1, rect.width - 20)));
+            const low = Number(lower.min), step = Number(lower.step);
+            return Number((low + Math.round(fraction * (Number(lower.max) - low) / step) * step).toFixed(6));
+        };
+        const move = (event: PointerEvent): void => {
+            if (!active) return;
+            const value = valueAt(event);
+            active.value = String(active === lower ? Math.min(value, Number(upper.value)) : Math.max(value, Number(lower.value)));
+            active.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        track.addEventListener('pointerdown', event => {
+            if (event.button !== 0 || lower.disabled || upper.disabled) return;
+            event.preventDefault();
+            const value = valueAt(event);
+            const leftDistance = Math.abs(value - Number(lower.value));
+            const rightDistance = Math.abs(value - Number(upper.value));
+            active = leftDistance < rightDistance || (leftDistance === rightDistance && value <= Number(lower.value)) ? lower : upper;
+            active.focus({ preventScroll: true });
+            track.setPointerCapture(event.pointerId);
+            move(event);
+        });
+        track.addEventListener('pointermove', move);
+        track.addEventListener('pointerup', () => { active = null; });
+        track.addEventListener('pointercancel', () => { active = null; });
+        track.addEventListener('lostpointercapture', () => { active = null; });
+    });
 
     const bindParticleRange = ({
         control,
@@ -1479,6 +1580,7 @@ const selectedAudioTrack =
                     suffix
                 );
 
+                updateDualRanges();
                 emitParticleSettings();
             }
         );
@@ -1573,7 +1675,9 @@ const selectedAudioTrack =
                     )
                 );
 
-            experienceCards.forEach((card) => {
+            updateDualRanges();
+
+        experienceCards.forEach((card) => {
                 card.addEventListener(
                     'click',
                     () => {
@@ -1860,7 +1964,7 @@ const selectedAudioTrack =
 
                 synchroniseEditor(editableExperience);
 
-                if (saveFeedback) saveFeedback.textContent = 'Saved on this device—find your creation under My Experiences. A backup download has also been started.';
+                if (saveFeedback) saveFeedback.textContent = `“${experienceToSave.name}” saved on this device. Find it in My Experiences. A backup download has also been started.`;
                 if (savedExperiencesLink) savedExperiencesLink.hidden = false;
                 const welcomeHint = document.querySelector<HTMLElement>('#first-creation-hint');
                 if (welcomeHint) welcomeHint.hidden = true;
