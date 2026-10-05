@@ -30,39 +30,12 @@ value={particles.count}
 <div class="colour-picker"><input id="particles-colour-control" type="color" value={particles.colour} aria-label="Particle colour" /><output id="particles-colour-value">{particles.colour.toUpperCase()}</output></div>
 <label>Opacity</label>
 
-<div class="range-pair">
-    <div>
-        <span>Minimum</span>
-        <output id="particle-min-opacity-value">
-            {particles.minOpacity}
-        </output>
-
-        <input
-            id="particle-min-opacity-control"
-            type="range"
-aria-label="min opacity"
-            min="0"
-            max="1"
-            step="0.05"
-            value={particles.minOpacity}
-        />
-    </div>
-
-    <div>
-        <span>Maximum</span>
-        <output id="particle-max-opacity-value">
-            {particles.maxOpacity}
-        </output>
-
-        <input
-            id="particle-max-opacity-control"
-            type="range"
-aria-label="max opacity"
-            min="0"
-            max="1"
-            step="0.05"
-            value={particles.maxOpacity}
-        />
+<div class="dual-range" data-dual-range role="group" aria-label="Opacity range">
+    <div class="dual-range-values"><span>Min <output id="particle-min-opacity-value">{particles.minOpacity}</output></span><span>Max <output id="particle-max-opacity-value">{particles.maxOpacity}</output></span></div>
+    <div class="dual-range-track">
+        <div class="dual-range-fill"></div>
+        <input id="particle-min-opacity-control" type="range" aria-label="Minimum particle opacity" min="0" max="1" step="0.05" value={particles.minOpacity} />
+        <input id="particle-max-opacity-control" type="range" aria-label="Maximum particle opacity" min="0" max="1" step="0.05" value={particles.maxOpacity} />
     </div>
 </div>
 
@@ -83,39 +56,12 @@ value={particles.glow}
 
 <label>Size</label>
 
-<div class="range-pair">
-    <div>
-        <span>Minimum</span>
-        <output id="particle-min-radius-value">
-            {particles.minRadius}
-        </output>
-
-        <input
-            id="particle-min-radius-control"
-            type="range"
-aria-label="min radius"
-            min="0.5"
-            max="10"
-            step="0.5"
-            value={particles.minRadius}
-        />
-    </div>
-
-    <div>
-        <span>Maximum</span>
-        <output id="particle-max-radius-value">
-            {particles.maxRadius}
-        </output>
-
-        <input
-            id="particle-max-radius-control"
-            type="range"
-aria-label="max radius"
-            min="0.5"
-            max="10"
-            step="0.5"
-            value={particles.maxRadius}
-        />
+<div class="dual-range" data-dual-range role="group" aria-label="Size range">
+    <div class="dual-range-values"><span>Min <output id="particle-min-radius-value">{particles.minRadius}</output></span><span>Max <output id="particle-max-radius-value">{particles.maxRadius}</output></span></div>
+    <div class="dual-range-track">
+        <div class="dual-range-fill"></div>
+        <input id="particle-min-radius-control" type="range" aria-label="Minimum particle size" min="0" max="10" step="0.05" value={particles.minRadius} />
+        <input id="particle-max-radius-control" type="range" aria-label="Maximum particle size" min="0" max="10" step="0.05" value={particles.maxRadius} />
     </div>
 </div>
 
@@ -137,77 +83,23 @@ value={particles.drift}
 
 <label>Speed</label>
 
-<div class="range-pair">
-    <div>
-        <span>Minimum</span>
-        <output id="particle-min-speed-value">
-            {particles.minSpeed}
-        </output>
-
-        <input
-            id="particle-min-speed-control"
-            type="range"
-aria-label="min speed"
-            min="0"
-            max="50"
-            step="1"
-            value={particles.minSpeed}
-        />
-    </div>
-
-    <div>
-        <span>Maximum</span>
-        <output id="particle-max-speed-value">
-            {particles.maxSpeed}
-        </output>
-
-        <input
-            id="particle-max-speed-control"
-            type="range"
-aria-label="max speed"
-            min="0"
-            max="50"
-            step="1"
-            value={particles.maxSpeed}
-        />
+<div class="dual-range" data-dual-range role="group" aria-label="Speed range">
+    <div class="dual-range-values"><span>Min <output id="particle-min-speed-value">{particles.minSpeed}</output></span><span>Max <output id="particle-max-speed-value">{particles.maxSpeed}</output></span></div>
+    <div class="dual-range-track">
+        <div class="dual-range-fill"></div>
+        <input id="particle-min-speed-control" type="range" aria-label="Minimum particle speed" min="0" max="50" step="1" value={particles.minSpeed} />
+        <input id="particle-max-speed-control" type="range" aria-label="Maximum particle speed" min="0" max="50" step="1" value={particles.maxSpeed} />
     </div>
 </div>
 
 <h3 class="particle-heading">Particle lifetime</h3>
 
-<div class="range-pair">
-    <div>
-        <span>Minimum</span>
-        <output id="particle-min-lifetime-value">
-            {particles.minLifetime}s
-        </output>
-
-        <input
-            id="particle-min-lifetime-control"
-            type="range"
-aria-label="min lifetime"
-            min="1"
-            max="30"
-            step="1"
-            value={particles.minLifetime}
-        />
-    </div>
-
-    <div>
-        <span>Maximum</span>
-        <output id="particle-max-lifetime-value">
-            {particles.maxLifetime}s
-        </output>
-
-        <input
-            id="particle-max-lifetime-control"
-            type="range"
-aria-label="max lifetime"
-            min="1"
-            max="30"
-            step="1"
-            value={particles.maxLifetime}
-        />
+<div class="dual-range" data-dual-range role="group" aria-label="Particle lifetime range">
+    <div class="dual-range-values"><span>Min <output id="particle-min-lifetime-value">{particles.minLifetime}s</output></span><span>Max <output id="particle-max-lifetime-value">{particles.maxLifetime}s</output></span></div>
+    <div class="dual-range-track">
+        <div class="dual-range-fill"></div>
+        <input id="particle-min-lifetime-control" type="range" aria-label="Minimum particle particle lifetime" min="1" max="30" step="1" value={particles.minLifetime} />
+        <input id="particle-max-lifetime-control" type="range" aria-label="Maximum particle particle lifetime" min="1" max="30" step="1" value={particles.maxLifetime} />
     </div>
 </div>
 
@@ -291,4 +183,17 @@ color:#7dd3fc;
 font-weight:700;
 }
 
+
+.dual-range { margin-bottom:.65rem; }
+.dual-range-values { display:flex; justify-content:space-between; font-size:.8rem; color:#cbd5e1; }
+.dual-range-values output { margin-left:.25rem; }
+.dual-range-track { position:relative; height:44px; touch-action:none; cursor:pointer; }
+.dual-range-track::before, .dual-range-fill { content:""; position:absolute; top:19px; height:6px; border-radius:4px; left:10px; right:10px; background:#475569; }
+.dual-range-fill { left:calc(10px + (100% - 20px) * var(--range-min,0)); right:calc(10px + (100% - 20px) * (1 - var(--range-max,1))); background:#7dd3fc; }
+.dual-range-track input[type="range"] { appearance:none; -webkit-appearance:none; position:absolute; inset:0; width:100%; height:44px; padding:0; margin:0; background:transparent; pointer-events:none; }
+.dual-range-track input::-webkit-slider-runnable-track { height:6px; background:transparent; }
+.dual-range-track input::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#93c5fd; border:2px solid #10182c; margin-top:-7px; }
+.dual-range-track input::-moz-range-track { height:6px; background:transparent; }
+.dual-range-track input::-moz-range-thumb { width:16px; height:16px; border-radius:50%; background:#93c5fd; border:2px solid #10182c; }
+.dual-range-track input:focus-visible { outline:2px solid #38bdf8; outline-offset:2px; border-radius:6px; z-index:2; }
 </style>
