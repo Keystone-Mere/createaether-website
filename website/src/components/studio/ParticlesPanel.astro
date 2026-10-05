@@ -10,6 +10,8 @@ const particles = experience.particles;
 
 <label class="toggle-row"><input id="particles-toggle" type="checkbox" checked={experience.atmosphere.particles} /> Particles On</label>
 <label for="particle-preset-select">Preset</label><select id="particle-preset-select">{experiences.map(item => <option value={item.particles.preset} selected={item.particles.preset === particles.preset}>{item.particles.preset.replaceAll('-', ' ')}</option>)}</select>
+<button id="reset-particle-preset" type="button">Reset to preset</button>
+<p id="particle-reset-status" role="status" aria-live="polite"></p>
 <label>
 Particle count
 <output id="particle-count-value">{particles.count}</output>
@@ -113,6 +115,11 @@ border:1px solid rgba(255,255,255,.08);
 border-radius:18px;
 padding:1.5rem;
 }
+
+.panel button { margin-top:.75rem; padding:.6rem .8rem; border:1px solid #475569; border-radius:8px; background:#192537; color:#e2e8f0; cursor:pointer; }
+.panel button:focus-visible { outline:2px solid #7dd3fc; outline-offset:3px; }
+#particle-reset-status { font-size:.8rem; color:#bdd0e5; }
+#particle-reset-status:empty { display:none; }
 
 .panel h2{
 margin-top:0;

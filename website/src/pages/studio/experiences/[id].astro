@@ -777,6 +777,11 @@ const selectedAudioTrack =
  .editor-particles {grid-column:1;grid-row:3;}
  .editor-output {grid-column:2;grid-row:1 / span 3;position:sticky;top:16px;align-self:start;}
 }
+/* Keep preview transport and saving reachable on shorter desktop screens. */
+@media (min-width:701px) {
+ .editor-output {max-height:calc(100dvh - 32px);overflow-y:auto;scrollbar-gutter:stable;}
+ .preview-stage:not(:fullscreen) {max-height:45dvh;min-height:160px;}
+}
 @media (max-width:700px) {
  .grid {display:flex;flex-direction:column;}
  .editor-controls,.editor-feedback {display:contents;}
@@ -1854,6 +1859,20 @@ const selectedAudioTrack =
         editableExperience.particles = { ...preset.particles };
         experienceLoader.load(cloneExperience(editableExperience));
         synchroniseEditor(editableExperience);
+    });
+
+    document.querySelector('#reset-particle-preset')?.addEventListener('click', () => {
+        if (!editableExperience) return;
+        const preset = defaultExperiences.find(item => item.particles.preset === editableExperience?.particles.preset);
+        const status = document.querySelector<HTMLElement>('#particle-reset-status');
+        if (!preset) {
+            if (status) status.textContent = 'This imported preset has no built-in defaults.';
+            return;
+        }
+        editableExperience.particles = { ...preset.particles };
+        experienceLoader.load(cloneExperience(editableExperience));
+        synchroniseEditor(editableExperience);
+        if (status) status.textContent = 'Particle settings reset to the selected preset.';
     });
 
     if (launchPreviewButton instanceof HTMLButtonElement && previewStage instanceof HTMLElement) {
