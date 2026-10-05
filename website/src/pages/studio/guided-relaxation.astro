@@ -29,13 +29,13 @@ const track = audioTracks.find((item) => item.id === relaxationExperience.audio.
         <div class="preview-fog preview-fog--one" aria-hidden="true"></div>
         <div class="preview-fog preview-fog--two" aria-hidden="true"></div>
         </div>
+        <div class="immersive-toolbar"><button type="button" id="guided-fullscreen">Enter full screen</button><label><input type="checkbox" id="guided-show-cues" checked /> Show guidance</label><label><input type="checkbox" id="guided-show-clock" checked /> Show timer</label></div>
         <div class="stage-caption"><strong>Temple</strong><span id="temple-stage-cue">Sound and atmosphere begin with your session.</span></div>
         <div class="stage-clock" id="temple-stage-clock" role="timer" aria-label="Time remaining" aria-hidden="true">05:00</div>
         <div class="stage-controls" id="temple-stage-controls" hidden>
           <button type="button" id="temple-stage-toggle">Pause session</button>
           <button type="button" id="temple-stage-exit">End session</button>
         </div>
-      </div>
 
       <div class="volume-row">
         <label for="experience-volume">Om So Hum volume</label>
@@ -43,6 +43,8 @@ const track = audioTracks.find((item) => item.id === relaxationExperience.audio.
         <output id="experience-volume-value" for="experience-volume">{temple.audio.volume}%</output>
       </div>
 
+      </div>
+      <p id="guided-display-status" role="status"></p>
       <TempleJourney visitor />
       <p class="page-footer"><a href="/studio/experiences/temple/">Open Temple in the editor</a></p>
     </section>
@@ -76,10 +78,51 @@ const track = audioTracks.find((item) => item.id === relaxationExperience.audio.
     });
     experienceLoader.load(JSON.parse(config.textContent ?? '{}') as Experience);
     volume.addEventListener('input',()=>experienceState.update());
+    const fullscreen = document.querySelector<HTMLButtonElement>('#guided-fullscreen');
+    const cues = document.querySelector<HTMLInputElement>('#guided-show-cues');
+    const clock = document.querySelector<HTMLInputElement>('#guided-show-clock');
+    const status = document.querySelector<HTMLElement>('#guided-display-status');
+    let hideTimer: number | undefined;
+    let keyboardInteraction = false;
+    const reveal = () => {
+      stage.classList.remove('controls-idle');
+      window.clearTimeout(hideTimer);
+      if (document.body.classList.contains('temple-session-active') && !audio.paused) {
+        hideTimer = window.setTimeout(() => {
+          // Preserve keyboard access; pointer interaction can hide controls after playback starts.
+          if (!keyboardInteraction) stage.classList.add('controls-idle');
+        }, 3500);
+      }
+    };
+    fullscreen?.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement === stage) await document.exitFullscreen();
+        else await stage.requestFullscreen();
+      } catch { if (status) status.textContent = 'Full screen is unavailable in this browser.'; }
+    });
+    const onFullscreen = () => {
+      if (fullscreen) fullscreen.textContent = document.fullscreenElement === stage ? 'Exit full screen' : 'Enter full screen';
+      reveal();
+    };
+    document.addEventListener('fullscreenchange', onFullscreen);
+    cues?.addEventListener('change', () => stage.classList.toggle('hide-guidance', !cues.checked));
+    clock?.addEventListener('change', () => stage.classList.toggle('hide-clock', !clock.checked));
+    stage.addEventListener('pointermove', () => { keyboardInteraction = false; reveal(); });
+    stage.addEventListener('pointerdown', () => { keyboardInteraction = false; reveal(); });
+    stage.addEventListener('focusin', reveal);
+    stage.addEventListener('focusout', reveal);
+    stage.addEventListener('keydown', () => { keyboardInteraction = true; reveal(); });
+    audio.addEventListener('play', reveal);
+    audio.addEventListener('pause', reveal);
+    const sessionObserver = new MutationObserver(reveal);
+    sessionObserver.observe(document.body, {attributes:true, attributeFilter:['class']});
     let disposed=false;
     const dispose=()=>{
       if(disposed)return;
       disposed=true;
+      window.clearTimeout(hideTimer);
+      sessionObserver.disconnect();
+      document.removeEventListener('fullscreenchange', onFullscreen);
       audio.pause();audio.currentTime=0;
       experienceRuntime.stop();experienceRuntime.destroy();
     };
@@ -148,4 +191,20 @@ const track = audioTracks.find((item) => item.id === relaxationExperience.audio.
 
 
 .preview-stage { min-height:0; aspect-ratio:16/9; --aether-environment-colour:#3a1f16; --aether-lighting-intensity:.82; }
+
+.immersive-toolbar { position:absolute; z-index:6; top:1rem; left:1rem; display:flex; flex-wrap:wrap; align-items:center; gap:.75rem; padding:.5rem; border-radius:12px; background:#08182acc; }
+.immersive-toolbar button { min-height:44px; padding:.6rem .9rem; border:1px solid #b6d9ef; border-radius:10px; background:#0c1d34ed; color:white; cursor:pointer; }
+.immersive-toolbar label { display:flex; align-items:center; gap:.35rem; font-size:.85rem; }
+.preview-stage .volume-row { position:absolute; z-index:6; bottom:1rem; left:1rem; margin:0; padding:.6rem; border-radius:12px; background:#08182acc; gap:.6rem; }
+.preview-stage .volume-row input { width:130px; }
+.stage-caption { bottom:5.5rem; }
+.stage-controls { bottom:1rem; }
+.preview-stage:fullscreen { width:100vw; height:100vh; min-height:0; max-height:none; aspect-ratio:auto; border:0; border-radius:0; background:#000; display:grid; place-items:center; }
+.preview-stage:fullscreen .preview-scene { position:relative; inset:auto; width:min(100vw,177.7778vh); height:min(100vh,56.25vw); }
+.immersive-toolbar, .stage-controls, .volume-row, .stage-caption, .stage-clock { transition:opacity .3s ease; }
+.controls-idle .immersive-toolbar, .controls-idle .stage-controls, .controls-idle .volume-row, .controls-idle .stage-caption, .controls-idle .stage-clock { opacity:0; pointer-events:none; }
+.hide-guidance .stage-caption, .hide-clock .stage-clock { display:none; }
+#guided-display-status:empty { display:none; }
+@media(max-width:700px) { .preview-stage:not(:fullscreen) { aspect-ratio:auto!important; height:520px; background:#000; } .preview-stage:not(:fullscreen) .preview-scene { top:100px; bottom:auto; height:auto; aspect-ratio:16/9; } .stage-clock { top:5rem; right:1rem; } .stage-controls { bottom:4.5rem; } .stage-caption, :global(body.temple-session-active) .stage-caption { bottom:8.5rem; } .immersive-toolbar { right:1rem; } }
+@media(prefers-reduced-motion:reduce) { .immersive-toolbar, .stage-controls, .volume-row, .stage-caption, .stage-clock { transition:none; } }
 </style>
