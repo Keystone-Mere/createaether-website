@@ -4,7 +4,8 @@ import TempleJourney from '../../components/studio/TempleJourney.astro';
 import temple from '../../data/experiences/temple.json';
 import { audioTracks } from '../../data/audio/tracks';
 
-const track = audioTracks.find((item) => item.id === temple.audio.track);
+const relaxationExperience = { ...temple, audio: { ...temple.audio, track: 'om-so-hum', layerVolume: 0 } };
+const track = audioTracks.find((item) => item.id === relaxationExperience.audio.track);
 ---
 
 <StudioLayout title="Guided relaxation" description="Take a few minutes to unwind with an immersive environment, ambient sound and a guided practice." privacyMode>
@@ -37,7 +38,7 @@ const track = audioTracks.find((item) => item.id === temple.audio.track);
       </div>
 
       <div class="volume-row">
-        <label for="experience-volume">Soundscape volume</label>
+        <label for="experience-volume">Om So Hum volume</label>
         <input id="experience-volume" type="range" min="0" max="100" step="1" value={temple.audio.volume} />
         <output id="experience-volume-value" for="experience-volume">{temple.audio.volume}%</output>
       </div>
@@ -46,8 +47,8 @@ const track = audioTracks.find((item) => item.id === temple.audio.track);
       <p class="page-footer"><a href="/studio/experiences/temple/">Open Temple in the editor</a></p>
     </section>
 
-    <audio id="experience-audio" src={track?.src ?? '/audio/temple-echoes.mp3'} data-track-id={temple.audio.track} preload="metadata" loop hidden></audio>
-    <script id="temple-configuration" type="application/json" set:html={JSON.stringify(temple)}></script>
+    <audio id="experience-audio" src={track?.src ?? '/audio/om-so-hum.mp3'} data-track-id={relaxationExperience.audio.track} preload="metadata" loop hidden></audio>
+    <script id="temple-configuration" type="application/json" set:html={JSON.stringify(relaxationExperience)}></script>
 </StudioLayout>
 
 <script>
