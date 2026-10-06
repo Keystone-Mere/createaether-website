@@ -8,10 +8,10 @@ const particles = experience.particles;
 
 <h2>Particles</h2>
 
-<label class="toggle-row"><input id="particles-toggle" type="checkbox" checked={experience.atmosphere.particles} /> Particles On</label>
-<label for="particle-preset-select">Preset</label><select id="particle-preset-select">{experiences.map(item => <option value={item.particles.preset} selected={item.particles.preset === particles.preset}>{item.particles.preset.replaceAll('-', ' ')}</option>)}</select>
+<label class="toggle-row"><input id="particles-toggle" type="checkbox" checked={experience.atmosphere.particles} /> <span id="effect-toggle-label">Particles on</span></label>
+<label for="particle-preset-select">Preset</label><select id="particle-preset-select">{experiences.map(item => <option value={item.particles.preset} selected={item.particles.preset === particles.preset}>{item.id === 'ocean' ? 'Ocean wave shimmer' : item.particles.preset.replaceAll('-', ' ')}</option>)}</select>
 <label>
-Particle count
+<span id="effect-count-label">Particle count</span>
 <output id="particle-count-value">{particles.count}</output>
 </label>
 
@@ -28,17 +28,10 @@ value={particles.count}
 <h3 class="particle-heading">Appearance</h3>
 <label for="particles-colour-control">Colour</label>
 <div class="colour-picker"><input id="particles-colour-control" type="color" value={particles.colour} aria-label="Particle colour" /><output id="particles-colour-value">{particles.colour.toUpperCase()}</output></div>
-<label>Opacity</label>
-
-<div class="dual-range" data-dual-range role="group" aria-label="Opacity range">
-    <div class="dual-range-values"><span>Min <output id="particle-min-opacity-value">{particles.minOpacity}</output></span><span>Max <output id="particle-max-opacity-value">{particles.maxOpacity}</output></span></div>
-    <div class="dual-range-track">
-        <div class="dual-range-fill"></div>
-        <input id="particle-min-opacity-control" type="range" aria-label="Minimum particle opacity" min="0" max="1" step="0.05" value={particles.minOpacity} />
-        <input id="particle-max-opacity-control" type="range" aria-label="Maximum particle opacity" min="0" max="1" step="0.05" value={particles.maxOpacity} />
-    </div>
-</div>
-
+<button type="button" id="reset-particles-button" class="reset-particles">Reset to preset</button>
+<p id="reset-particles-status" role="status" class="reset-status"></p>
+<details class="particle-advanced">
+<summary>Advanced <span>Opacity, size and movement</span></summary>
 <label>
 Glow
 <output id="particle-glow-value">{particles.glow}</output>
@@ -54,6 +47,18 @@ step="0.5"
 value={particles.glow}
 />
 
+
+<label>Opacity</label>
+
+<div class="dual-range" data-dual-range role="group" aria-label="Opacity range">
+    <div class="dual-range-values"><span>Min <output id="particle-min-opacity-value">{particles.minOpacity}</output></span><span>Max <output id="particle-max-opacity-value">{particles.maxOpacity}</output></span></div>
+    <div class="dual-range-track">
+        <div class="dual-range-fill"></div>
+        <input id="particle-min-opacity-control" type="range" aria-label="Minimum particle opacity" min="0" max="1" step="0.05" value={particles.minOpacity} />
+        <input id="particle-max-opacity-control" type="range" aria-label="Maximum particle opacity" min="0" max="1" step="0.05" value={particles.maxOpacity} />
+    </div>
+</div>
+
 <label>Size</label>
 
 <div class="dual-range" data-dual-range role="group" aria-label="Size range">
@@ -67,7 +72,7 @@ value={particles.glow}
 
 <h3 class="particle-heading">Movement</h3>
 <label>
-Drift
+<span id="effect-drift-label">Drift</span>
 <output id="particle-drift-value">{particles.drift}</output>
 </label>
 
@@ -98,14 +103,23 @@ value={particles.drift}
     <div class="dual-range-values"><span>Min <output id="particle-min-lifetime-value">{particles.minLifetime}s</output></span><span>Max <output id="particle-max-lifetime-value">{particles.maxLifetime}s</output></span></div>
     <div class="dual-range-track">
         <div class="dual-range-fill"></div>
-        <input id="particle-min-lifetime-control" type="range" aria-label="Minimum particle particle lifetime" min="1" max="30" step="1" value={particles.minLifetime} />
-        <input id="particle-max-lifetime-control" type="range" aria-label="Maximum particle particle lifetime" min="1" max="30" step="1" value={particles.maxLifetime} />
+        <input id="particle-min-lifetime-control" type="range" aria-label="Minimum particle lifetime" min="1" max="30" step="1" value={particles.minLifetime} />
+        <input id="particle-max-lifetime-control" type="range" aria-label="Maximum particle lifetime" min="1" max="30" step="1" value={particles.maxLifetime} />
     </div>
 </div>
 
+</details>
 </div>
 
 <style>
+.particle-advanced { margin-top:1rem; border-top:1px solid #ffffff18; padding-top:1rem; }
+.particle-advanced summary { cursor:pointer; font-weight:700; padding:.4rem 0; }
+.particle-advanced summary span { display:block; margin-top:.35rem; font-size:.75rem; color:#94a3b8; font-weight:400; }
+.reset-particles { margin-top:1rem; border:1px solid #64748b; background:transparent; color:#bae6fd; border-radius:8px; padding:.6rem .8rem; cursor:pointer; }
+.reset-status { color:#94a3b8; font-size:.8rem; margin:.5rem 0 0; }
+.reset-status:empty { display:none; }
+summary:focus-visible, button:focus-visible { outline:2px solid #7dd3fc; outline-offset:3px; }
+
 
 .panel{
 background:#10182c;

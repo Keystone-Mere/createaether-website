@@ -40,7 +40,7 @@ import { experiences } from '../data/experiences';
         {
           experiences.map((experience) => (
             <ExperienceCard
-              cover={`/images/experience-covers/${experience.id}.jpg`}
+              cover={`/images/experience-covers/${experience.id === 'festival' ? 'festival-evening' : experience.id === 'storm' ? 'storm-balcony' : experience.id}.jpg`}
               title={experience.name}
               description={experience.description}
               status={experience.status}

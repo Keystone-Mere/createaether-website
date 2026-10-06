@@ -10,7 +10,7 @@
     "track": "ocean-waves"
   },
   "atmosphere": {
-    "particles": false,
+    "particles": true,
     "lighting": true,
     "fog": true
   },
@@ -20,16 +20,16 @@
   "particles": {
     "preset": "ocean-spray",
     "motion": "flow",
-    "count": 12,
-    "colour": "#8dd7f7",
-    "glow": 4,
+    "count": 120,
+    "colour": "#b7deec",
+    "glow": 2,
     "minRadius": 1.2,
-    "maxRadius": 4,
-    "minSpeed": 1,
-    "maxSpeed": 3,
-    "drift": 8,
-    "minOpacity": 0.1,
-    "maxOpacity": 0.3,
+    "maxRadius": 2.8,
+    "minSpeed": 5,
+    "maxSpeed": 11,
+    "drift": 5,
+    "minOpacity": 0.18,
+    "maxOpacity": 0.48,
     "minLifetime": 8,
     "maxLifetime": 18
   },

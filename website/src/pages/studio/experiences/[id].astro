@@ -1,6 +1,5 @@
 ---
 import StudioLayout from '../../../layouts/StudioLayout.astro';
-import GeneralPanel from '../../../components/studio/GeneralPanel.astro';
 import AudioPanel from '../../../components/studio/AudioPanel.astro';
 import ParticlesPanel from '../../../components/studio/ParticlesPanel.astro';
 import VisualLayerPanel from '../../../components/studio/VisualLayerPanel.astro';
@@ -45,20 +44,27 @@ const selectedAudioTrack =
         <button type="button" id="dismiss-first-creation-hint" aria-label="Dismiss getting started hint">Got it</button>
     </aside>
     <div class="grid">
-        <div class="editor-controls">
-        <div class="editor-primary editor-column">
-        <div class="general-slot"><GeneralPanel experience={experience} /></div>
-        <div class="audio-slot"><AudioPanel experience={experience} /></div>
-        </div>
-        <div class="editor-layers editor-column">
-        <div class="lighting-slot"><VisualLayerPanel layer="lighting" experience={experience} /></div>
-        <div class="fog-slot"><VisualLayerPanel layer="fog" experience={experience} /></div>
-        <div class="environment-slot"><VisualLayerPanel layer="environment" experience={experience} /></div>
-        </div>
-        </div>
-        <div class="editor-feedback">
-        <div class="editor-particles editor-column">
-        <div class="particles-slot"><ParticlesPanel experience={experience} /></div>
+        <div class="editor-controls editor-column">
+            <details class="control-section" open>
+                <summary>Audio</summary>
+                <div class="audio-slot"><AudioPanel experience={experience} /></div>
+            </details>
+            <details class="control-section" open>
+                <summary><span id="effect-section-label">Visual effects</span></summary>
+                <div class="particles-slot"><ParticlesPanel experience={experience} /></div>
+            </details>
+            <details class="control-section">
+                <summary>Lighting</summary>
+                <div class="lighting-slot"><VisualLayerPanel layer="lighting" experience={experience} /></div>
+            </details>
+            <details class="control-section">
+                <summary>Fog</summary>
+                <div class="fog-slot"><VisualLayerPanel layer="fog" experience={experience} /></div>
+            </details>
+            <details class="control-section">
+                <summary>Background</summary>
+                <div class="environment-slot"><VisualLayerPanel layer="environment" experience={experience} /></div>
+            </details>
         </div>
         <div class="editor-output editor-column">
         <div class="panel preview-panel">
@@ -88,20 +94,20 @@ const selectedAudioTrack =
             >
                 <button type="button" id="exit-fullscreen-preview" class="fullscreen-exit" aria-label="Exit full-screen preview">Exit full screen</button>
                 <div class="preview-scene">
-                <img class="preview-scene-image" src="/images/experience-covers/temple.jpg" alt="" aria-hidden="true" />
+                <img class="preview-scene-image" src={`/images/experience-covers/${experience.id === 'festival' ? 'festival-evening' : experience.id === 'storm' ? 'storm-balcony' : experience.id}.jpg`} alt="" aria-hidden="true" />
                 <div class="scene-tint"></div>
                 <div class="candle-light candle-light--left"></div>
                 <div class="candle-light candle-light--back"></div>
                 <div class="candle-light candle-light--right"></div>
                 <div class="candle-light candle-light--front"></div>
-                <div class="preview-glow"></div>
+                <div class="scene-light" aria-hidden="true"></div>
 
                 <canvas
                     class="preview-canvas"
                     aria-hidden="true"
                 ></canvas>
 
-                <div class="preview-orb"></div>
+                
 
 
                 <div class="preview-fog preview-fog--one"></div>
@@ -136,7 +142,6 @@ const selectedAudioTrack =
             <a id="saved-experiences-link" class="saved-experiences-link" href="/studio/#my-experiences-title" hidden>View My Experiences →</a>
             <input type="file" id="import-experience-input" accept=".aether.json,.json,application/json" hidden />
             <span id="import-experience-status" role="status"></span>
-        </div>
         </div>
         </div>
 
@@ -741,10 +746,10 @@ const selectedAudioTrack =
 
 .preview-scene { position:absolute; inset:0; overflow:hidden; }
 .preview-scene-image, .scene-tint, .candle-light { display:none; pointer-events:none; }
-.preview-stage[data-scene="temple"] .preview-scene-image { display:block; position:absolute; inset:0; width:100%; height:100%; object-fit:fill; }
+.preview-stage .preview-scene-image { display:block; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .preview-stage[data-scene="temple"] .preview-glow,
 .preview-stage[data-scene="temple"] .preview-orb { display:none; }
-.preview-stage[data-scene="temple"] .scene-tint { display:block; position:absolute; inset:0; background:var(--aether-environment-colour); opacity:.08; z-index:1; }
+.preview-stage .scene-tint { display:block; position:absolute; inset:0; background:var(--aether-environment-colour); opacity:.08; z-index:1; }
 .preview-stage[data-scene="temple"] .candle-light { display:block; position:absolute; width:20%; height:32%; transform:translate(-50%,-50%); z-index:2; background:radial-gradient(ellipse, color-mix(in srgb,var(--aether-lighting-colour) 85%,transparent),transparent 70%); mix-blend-mode:screen; opacity:calc(var(--aether-lighting-intensity) * .6); animation:candle-shimmer var(--aether-lighting-pulse-duration, 4.7s) ease-in-out infinite alternate; }
 .candle-light--left { left:10%; top:32%; }
 .candle-light--back { left:44%; top:33%; animation-delay:-1.7s!important; }
@@ -752,45 +757,73 @@ const selectedAudioTrack =
 .candle-light--front { left:7%; top:73%; animation-delay:-3.6s!important; }
 .preview-stage[data-scene="temple"].preview-stage--lighting-disabled .candle-light { display:none; }
 .preview-stage--lighting-static .candle-light { animation:none!important; }
-.preview-stage[data-scene="temple"]:not(:fullscreen) { min-height:0; aspect-ratio:16/9; }
-.preview-stage[data-scene="temple"]:fullscreen { background:#000; display:grid; place-items:center; }
-.preview-stage[data-scene="temple"]:fullscreen .preview-scene { position:relative; inset:auto; width:min(100vw,177.7778vh); height:min(100vh,56.25vw); }
+.preview-stage:not(:fullscreen) { min-height:0; aspect-ratio:16/9; }
+.preview-stage:fullscreen { background:#000; display:grid; place-items:center; }
+.preview-stage:fullscreen .preview-scene { position:relative; inset:auto; width:min(100vw,177.7778vh); height:min(100vh,56.25vw); }
+.scene-light { position:absolute; inset:0; pointer-events:none; z-index:2; background:radial-gradient(ellipse at 65% 20%,var(--aether-lighting-colour),transparent 70%); mix-blend-mode:screen; opacity:calc(var(--aether-lighting-intensity) * .18); animation:scene-breathe var(--aether-lighting-pulse-duration) ease-in-out infinite alternate; }
+.preview-stage[data-scene="temple"] .scene-light { display:none; }
+.preview-stage[data-scene="ocean"] .scene-light { background:linear-gradient(180deg,transparent 35%,var(--aether-lighting-colour) 55%,transparent 75%); }
+.preview-stage[data-scene="christmas"] .scene-light { background:radial-gradient(ellipse at 78% 65%,var(--aether-lighting-colour),transparent 65%); }
+.preview-stage[data-scene="festival"] .scene-light { background:radial-gradient(ellipse at 35% 35%,var(--aether-lighting-colour),transparent 55%),radial-gradient(ellipse at 70% 35%,var(--aether-lighting-colour),transparent 55%); }
+.preview-stage[data-scene="storm"] .preview-fog {
+    left:0; top:0; bottom:auto; width:100%; height:100%; border-radius:0;
+    clip-path:polygon(0% 8%,23% 0%,100% 0%,100% 100%,69% 100%,0% 86%);
+    background:radial-gradient(ellipse at 65% 65%,color-mix(in srgb,var(--aether-fog-colour) 35%,transparent),transparent 65%);
+    animation:none;
+}
+.preview-stage[data-scene="storm"] .scene-light { background:radial-gradient(ellipse at 0% 100%,var(--aether-lighting-colour),transparent 30%); }
+
+/* Stage haze remains above the audience in scene-relative coordinates. */
+.preview-stage[data-scene="festival"] .preview-fog {
+    z-index:2; left:18%; width:53%; height:24%; bottom:auto;
+    border-radius:45%; filter:blur(12px);
+    mix-blend-mode:screen;
+    background:radial-gradient(ellipse at 35% 55%,color-mix(in srgb,var(--aether-fog-colour) 80%,transparent),transparent 55%),radial-gradient(ellipse at 70% 45%,color-mix(in srgb,var(--aether-lighting-colour) 50%,transparent),transparent 60%);
+    animation-name:festival-haze-drift;
+    animation-duration:calc(var(--aether-fog-duration) * 2);
+}
+.preview-stage[data-scene="festival"] .preview-fog--one { top:41%; }
+.preview-stage[data-scene="festival"] .preview-fog--two { top:47%; height:18%; animation-duration:calc(var(--aether-fog-duration) * 2.6); }
+.preview-stage[data-scene="festival"].preview-stage--fog-disabled .preview-fog { opacity:0; }
+.preview-stage[data-scene="festival"] .scene-light { animation-duration:calc(var(--aether-lighting-pulse-duration) * 2.5); }
+@keyframes festival-haze-drift {
+    0%,100% { transform:translate(-4%,0) scale(1); }
+    50% { transform:translate(4%,-4%) scale(1.05); }
+}
+@media(prefers-reduced-motion:reduce) { .preview-stage[data-scene="festival"] .preview-fog { animation:none; } }
+
+.preview-stage--lighting-disabled .scene-light { display:none; }
+.preview-stage--lighting-static .scene-light { animation:none; }
+@keyframes scene-breathe { to { opacity:calc(var(--aether-lighting-intensity) * .3); } }
+@media(prefers-reduced-motion:reduce) { .scene-light { animation:none!important; } }
 .preview-stage__label { position:static!important; margin-top:12px; }
 @keyframes candle-shimmer { 0% { opacity:calc(var(--aether-lighting-intensity) * .25); } 38% { opacity:calc(var(--aether-lighting-intensity) * .95); } 71% { opacity:calc(var(--aether-lighting-intensity) * .4); } 100% { opacity:calc(var(--aether-lighting-intensity) * .8); } }
 @media (prefers-reduced-motion:reduce) { .candle-light { animation:none!important; } }
 
 
-/* Give the experience room alongside compact settings columns. */
-@media (min-width:1101px) {
- .grid {display:grid; grid-template-columns:minmax(230px,1fr) minmax(230px,1fr) minmax(0,2fr); gap:20px; align-items:start;}
- .editor-controls,.editor-feedback {display:contents;}
- .editor-primary {grid-column:1;grid-row:1;}
- .editor-layers {grid-column:1;grid-row:2;}
- .editor-particles {grid-column:2;grid-row:1 / span 2;}
- .editor-output {grid-column:3;grid-row:1 / span 2;position:sticky;top:16px;align-self:start;}
+/* One settings column leaves most of the workspace for the scene. */
+.grid {display:grid;grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:24px;align-items:start;}
+.editor-controls {display:flex;grid-column:1;grid-row:1;flex-direction:column;gap:16px;min-width:0;}
+.editor-output {grid-column:2;grid-row:1;position:sticky;top:16px;align-self:start;min-width:0;}
+.control-section {background:#101827;border-radius:18px;overflow:hidden;}
+.control-section > summary {padding:20px;color:#93c5fd;font-size:20px;font-weight:700;cursor:pointer;}
+.control-section > summary:focus-visible {outline:2px solid #7dd3fc;outline-offset:-4px;}
+.control-section[open] > summary {padding-bottom:4px;}
+@media(max-width:900px) {
+ .editor {padding:1rem;}
+ .grid {grid-template-columns:minmax(240px,.85fr) minmax(0,1.3fr);gap:16px;}
 }
-@media (min-width:701px) and (max-width:1100px) {
- .grid {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:start;}
- .editor-controls,.editor-feedback {display:contents;}
- .editor-primary {grid-column:1;grid-row:1;}
- .editor-layers {grid-column:1;grid-row:2;}
- .editor-particles {grid-column:1;grid-row:3;}
- .editor-output {grid-column:2;grid-row:1 / span 3;position:sticky;top:16px;align-self:start;}
-}
-@media (max-width:700px) {
+@media(max-width:700px) {
  .grid {display:flex;flex-direction:column;}
- .editor-controls,.editor-feedback {display:contents;}
- .editor-output {order:0;position:static;}
- .editor-primary {order:1;}
- .editor-layers {order:2;}
- .editor-particles {order:3;}
- .journey-slot {order:4;}
+ .editor-output {order:0;position:static;width:100%;}
+ .editor-controls {order:1;width:100%;}
 }
 
 </style>
 
 <style is:global>
 .editor .panel {background:#101827;border:0;border-radius:18px;padding:20px;}
+.editor .control-section .panel > h2 {display:none;}
 .editor .panel h2 {color:#93c5fd;font-size:22px;margin:0 0 24px;}
 .editor .panel label {font-size:14px;font-weight:600;}
 .editor .panel input:not([type=checkbox]):not([type=range]):not([type=color]), .editor .panel textarea {background:#192537;border:1px solid #475569;color:white;padding:10px 12px;border-radius:8px;width:100%;}
@@ -1195,13 +1228,38 @@ const selectedAudioTrack =
             }
             experienceSelect.value = selectedExperience.id;
         }
+        // Keep the scene when a saved copy changes its particle preset.
         const source = selectedExperience.particles.preset;
-        const coverId = canonicalExperienceIds.has(selectedExperience.id) ? selectedExperience.id
-            : source.includes('forest') ? 'forest' : source.includes('ocean') ? 'ocean'
+        const legacyScene = Array.from(canonicalExperienceIds).find(id =>
+            selectedExperience.id === id || selectedExperience.id.startsWith(`${id}-custom-`));
+        const inferredScene = source.includes('forest') ? 'forest' : source.includes('ocean') ? 'ocean'
             : source.includes('christmas') || source.includes('snow') ? 'christmas'
             : source.includes('storm') || source.includes('rain') ? 'storm'
             : source.includes('festival') || source.includes('firework') ? 'festival' : 'temple';
-        if (previewStage instanceof HTMLElement) previewStage.dataset.scene = coverId;
+        const coverId = selectedExperience.sceneId && canonicalExperienceIds.has(selectedExperience.sceneId)
+            ? selectedExperience.sceneId : legacyScene ?? inferredScene;
+        selectedExperience.sceneId = coverId;
+        if (previewStage instanceof HTMLElement) {
+            previewStage.dataset.scene = coverId;
+            const image = previewStage.querySelector<HTMLImageElement>('.preview-scene-image');
+            if (image) image.src = `/images/experience-covers/${coverId === 'festival' ? 'festival-evening' : coverId === 'storm' ? 'storm-balcony' : coverId}.jpg`;
+            previewStage.setAttribute('aria-label', `${selectedExperience.name} atmosphere preview`);
+        }
+        const effectLabels: Record<string, [string, string, string]> = {
+            'storm-rain': ['Rain', 'Rain amount', 'Wind'],
+            'christmas-snow': ['Snow', 'Snow amount', 'Wind'],
+            'forest-fireflies': ['Fireflies', 'Firefly count', 'Wander'],
+            'ocean-spray': ['Wave shimmer', 'Shimmer amount', 'Drift'],
+            'festival-dust': ['Floating dust', 'Dust amount', 'Drift'],
+            'temple-embers': ['Embers', 'Ember count', 'Drift'],
+        };
+        const labels = effectLabels[selectedExperience.particles.preset] ?? ['Particles', 'Particle count', 'Drift'];
+        for (const [id, text] of [['effect-section-label', labels[0]], ['effect-toggle-label', `${labels[0]} on`], ['effect-count-label', labels[1]], ['effect-drift-label', labels[2]]]) {
+            const label = document.getElementById(id);
+            if (label) label.textContent = text;
+        }
+        particleCountControl?.setAttribute('aria-label', labels[1]);
+        particleDriftControl?.setAttribute('aria-label', labels[2]);
         const presetSelect = document.querySelector('#particle-preset-select');
         if (presetSelect instanceof HTMLSelectElement) {
             if (!Array.from(presetSelect.options).some(option => option.value === selectedExperience.particles.preset)) {
@@ -1226,15 +1284,7 @@ const selectedAudioTrack =
                 );
         }
 
-        const layerTitles: Record<string, string> = {
-            'temple-echoes': 'Wind',
-            'forest-ambience': 'Rain',
-            'ocean-waves': 'Seagulls',
-            'christmas-ambient': 'Fireplace',
-            'storm': 'Thunder',
-            'festival': 'Crowd'
-        };
-        const layerTitle = layerTitles[selectedExperience.audio.track];
+        const layerTitle = audioTracks.find(track => track.id === selectedExperience.audio.track)?.layerTitle;
         const layerControls = document.querySelector('#audio-layer-controls');
         const layerLabel = document.querySelector('#audio-layer-label');
         if (layerControls instanceof HTMLElement) {
@@ -1856,6 +1906,21 @@ const selectedAudioTrack =
         synchroniseEditor(editableExperience);
     });
 
+    document.querySelector('#reset-particles-button')?.addEventListener('click', () => {
+        if (!editableExperience) return;
+        const preset = defaultExperiences.find(item => item.particles.preset === editableExperience!.particles.preset);
+        if (!preset) {
+            const status = document.querySelector('#reset-particles-status');
+            if (status) status.textContent = 'Choose a built-in preset first to reset its settings.';
+            return;
+        }
+        editableExperience.particles = { ...preset.particles };
+        emitParticleSettings();
+        synchroniseEditor(editableExperience);
+        const status = document.querySelector('#reset-particles-status');
+        if (status) status.textContent = 'Particle settings reset to the selected preset.';
+    });
+
     if (launchPreviewButton instanceof HTMLButtonElement && previewStage instanceof HTMLElement) {
         launchPreviewButton.addEventListener('click', async () => {
             if (!editableExperience) return;
@@ -1892,7 +1957,7 @@ const selectedAudioTrack =
                     window.setTimeout(
                         () => {
                             saveExperienceButton.textContent =
-                                'Save';
+                                'Save as Copy';
                         },
                         1600
                     );
@@ -1946,7 +2011,7 @@ const selectedAudioTrack =
                         () => {
                             saveExperienceButton.disabled = false;
                             saveExperienceButton.textContent =
-                                'Save';
+                                'Save as Copy';
                         },
                         2200
                     );
@@ -2164,7 +2229,7 @@ const selectedAudioTrack =
                 const count = Math.max(
                     0,
                     Math.min(
-                        150,
+                        300,
                         Math.round(
                             Number(particleCountControl.value)
                         )
@@ -2372,7 +2437,7 @@ const selectedAudioTrack =
 
             audioPlaybackToggle.textContent =
                 isPlaying
-                    ? 'Pause Soundscape'
+                    ? 'Pause Audio'
                     : 'Play Audio';
 
             audioPlaybackToggle.setAttribute(
