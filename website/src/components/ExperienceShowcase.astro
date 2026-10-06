@@ -25,7 +25,7 @@ import { experiences } from '../data/experiences';
     {
       experiences.map((experience, index) => (
         <a class="experience-card" href={experience.href}>
-          <img class="experience-card__cover" src={`/images/experience-covers/${experience.id}.jpg`} alt="" width="1024" height="576" loading="lazy" />
+          <img class="experience-card__cover" src={`/images/experience-covers/${experience.id === 'festival' ? 'festival-evening' : experience.id === 'storm' ? 'storm-balcony' : experience.id}.jpg`} alt="" width="1024" height="576" loading="lazy" />
           <div class="experience-card__body">
           <div class="experience-card__top">
             <span class="experience-card__number">

@@ -1,7 +1,7 @@
 {
   "id": "storm",
   "name": "Storm",
-  "description": "A dark, immersive atmosphere combining rainfall, distant thunder, shifting light and an atmospheric ambient score.",
+  "description": "Watch a New York thunderstorm from a sheltered balcony, with falling rain, distant thunder and warm city lights below.",
   "status": "MVP",
   "audio": {
     "enabled": true,
@@ -20,31 +20,31 @@
   "particles": {
     "preset": "storm-rain",
     "motion": "rain",
-    "count": 110,
-    "colour": "#9bb8d1",
-    "glow": 0.25,
+    "count": 190,
+    "colour": "#b6cddd",
+    "glow": 0,
     "minRadius": 0.35,
     "maxRadius": 0.9,
-    "minSpeed": 36,
+    "minSpeed": 40,
     "maxSpeed": 50,
-    "drift": 6,
-    "minOpacity": 0.25,
-    "maxOpacity": 0.7,
-    "minLifetime": 2,
-    "maxLifetime": 5
+    "drift": 8,
+    "minOpacity": 0.3,
+    "maxOpacity": 0.75,
+    "minLifetime": 5,
+    "maxLifetime": 9
   },
   "lighting": {
     "preset": "storm-dark",
-    "colour": "#182848",
-    "intensity": 0.28,
-    "pulse": true,
+    "colour": "#e3ba79",
+    "intensity": 0.3,
+    "pulse": false,
     "speed": 0.08
   },
   "fog": {
     "preset": "storm-mist",
-    "colour": "#526779",
-    "density": 0.55,
-    "speed": 0.35
+    "colour": "#8fa5b6",
+    "density": 0.22,
+    "speed": 0.1
   },
   "transition": {
     "duration": 2600,
