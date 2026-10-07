@@ -62,6 +62,8 @@ export interface TransitionSettings {
 export interface Experience {
   /** Scene stays independent of particle and audio preset choices. */
   sceneId?: string;
+  /** Embedded, compressed JPG for user-created backgrounds. */
+  background?: string;
   id: string;
   name: string;
   description: string;

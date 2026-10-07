@@ -93,6 +93,12 @@ const selectedAudioTrack =
             </div>
 
             <div class="preview-actions">
+                <button type="button" id="choose-background" class="button-secondary">Upload background</button>
+                <input id="background-upload" type="file" accept="image/jpeg,image/png,image/webp" hidden />
+                <button type="button" id="reset-background" class="button-secondary">Use original background</button>
+            </div>
+            <p id="background-feedback" role="status" class="save-feedback">JPG, PNG or WebP, up to 15 MB. Images fill the scene and may be cropped.</p>
+            <div class="preview-actions">
                 <button type="button" id="audio-playback-toggle" aria-pressed="false">Play Audio</button>
                 <button type="button" id="launch-preview-button" class="button-secondary" aria-controls="experience-preview-stage">Full-screen Preview</button>
             </div>
@@ -105,10 +111,14 @@ const selectedAudioTrack =
         </div>
         <div class="panel save-panel">
             <h2>Save and Use Elsewhere</h2>
+            <label for="creation-name">Name your creation</label>
+            <input id="creation-name" type="text" maxlength="120" placeholder="For example, Storm podcast backdrop" style="width:100%;box-sizing:border-box;margin:8px 0 12px;padding:12px;border:1px solid #475569;border-radius:8px;background:#192537;color:#f8fafc" />
+            <small>Your saved creation appears in My Experiences at the top of the dashboard.</small>
             <p>Save a backup, import a creation, or copy a silent playback link for OBS. Each link keeps the settings you copy.</p>
             <div class="preview-actions">
                 <button type="button" id="save-experience-button">Save as Copy</button>
                 <button type="button" id="copy-playback-link" class="button-secondary">Copy playback link</button>
+                <button type="button" id="download-obs-backdrop" class="button-secondary">Download OBS backdrop</button>
                 <button type="button" id="import-experience-button" class="button-secondary">Import experience</button>
             </div>
             <p id="save-experience-feedback" class="save-feedback" role="status" aria-live="polite"></p>
@@ -840,6 +850,7 @@ const selectedAudioTrack =
 ></audio>
 
 <script>
+    import { prepareBackground, createBackdropHtml } from '../../../lib/player/Background';
     import { createPlaybackUrl } from '../../../lib/player/PlaybackLink';
     import { audioTracks } from '../../../data/audio/tracks';
     import { experiences as defaultExperiences } from '../../../data/experiences';
@@ -1144,6 +1155,8 @@ const selectedAudioTrack =
         selectedExperience: Experience
     ): void => {
         updateSaveButtonLabel(selectedExperience);
+        const creationName = document.querySelector<HTMLInputElement>('#creation-name');
+        if (creationName) creationName.value = isCanonicalExperience(selectedExperience) ? '' : selectedExperience.name;
 
         if (
             experienceNameControl
@@ -1214,9 +1227,9 @@ const selectedAudioTrack =
             ? selectedExperience.sceneId : legacyScene ?? inferredScene;
         selectedExperience.sceneId = coverId;
         if (previewStage instanceof HTMLElement) {
-            previewStage.dataset.scene = coverId;
+            previewStage.dataset.scene = selectedExperience.background ? 'custom' : coverId;
             const image = previewStage.querySelector<HTMLImageElement>('.preview-scene-image');
-            if (image) image.src = `/images/experience-covers/${coverId === 'festival' ? 'festival-evening' : coverId === 'storm' ? 'storm-balcony' : coverId}.jpg`;
+            if (image) image.src = selectedExperience.background ?? `/images/experience-covers/${coverId === 'festival' ? 'festival-evening' : coverId === 'storm' ? 'storm-balcony' : coverId}.jpg`;
             previewStage.setAttribute('aria-label', `${selectedExperience.name} atmosphere preview`);
         }
         const effectLabels: Record<string, [string, string, string]> = {
@@ -1918,10 +1931,59 @@ const selectedAudioTrack =
         });
     }
 
+    document.querySelector('#choose-background')?.addEventListener('click', () => document.querySelector<HTMLInputElement>('#background-upload')?.click());
+    let backgroundRequest = 0;
+    document.querySelector('#background-upload')?.addEventListener('change', async (event) => {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file || !editableExperience) return;
+        const target = editableExperience;
+        const request = ++backgroundRequest;
+        const feedback = document.querySelector<HTMLElement>('#background-feedback')!;
+        feedback.textContent = 'Preparing image…';
+        try {
+            const background = await prepareBackground(file);
+            if (request !== backgroundRequest || editableExperience !== target) return;
+            target.background = background;
+            synchroniseEditor(target);
+            feedback.textContent = 'Background ready. Save as Copy to keep it; Download OBS backdrop to use it elsewhere.';
+        } catch (error) {
+            if (request === backgroundRequest) feedback.textContent = error instanceof Error ? error.message : 'Could not open this image.';
+        } finally { input.value = ''; }
+    });
+    document.querySelector('#reset-background')?.addEventListener('click', () => {
+        ++backgroundRequest;
+        if (!editableExperience) return;
+        delete editableExperience.background;
+        synchroniseEditor(editableExperience);
+        document.querySelector<HTMLElement>('#background-feedback')!.textContent = 'Original background restored.';
+    });
+    document.querySelector('#download-obs-backdrop')?.addEventListener('click', () => {
+        if (!editableExperience) return;
+        const feedback = document.querySelector<HTMLElement>('#save-experience-feedback')!;
+        if (!editableExperience.background) {
+            feedback.textContent = 'For an original scene, use Copy playback link. Upload a background to download a backdrop file.';
+            return;
+        }
+        const snapshot = { ...cloneExperience(editableExperience), ...structuredClone(experienceState.data) };
+        const html = createBackdropHtml(createPlaybackUrl(snapshot, location.origin), editableExperience.background);
+        const objectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = 'aether-obs-backdrop.html';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        feedback.textContent = 'Downloaded. In OBS Browser Source, tick Local file, choose this HTML file, and set 1920 × 1080. Keep internet available; files made on localhost need your development server running. Download again after changes.';
+    });
+
     document.querySelector('#copy-playback-link')?.addEventListener('click', async () => {
         if (!editableExperience) return;
         const feedback = document.querySelector<HTMLElement>('#save-experience-feedback');
         const snapshot = { ...cloneExperience(editableExperience), ...structuredClone(experienceState.data) };
+        if (snapshot.background) {
+            if (feedback) feedback.textContent = 'For an uploaded image, use Download OBS backdrop. The file carries your image and settings together.';
+            return;
+        }
         try {
             const url = createPlaybackUrl(snapshot, window.location.origin);
             await navigator.clipboard.writeText(url);
@@ -1953,6 +2015,13 @@ const selectedAudioTrack =
                     return;
                 }
 
+                const creationName = document.querySelector<HTMLInputElement>('#creation-name');
+                const chosenName = creationName?.value.trim();
+                if (!chosenName) {
+                    document.querySelector<HTMLElement>('#save-experience-feedback')!.textContent = 'Give your creation a name before saving.';
+                    creationName?.focus();
+                    return;
+                }
                 const saveFeedback = document.querySelector<HTMLElement>('#save-experience-feedback');
                 const savedExperiencesLink = document.querySelector<HTMLAnchorElement>('#saved-experiences-link');
                 if (saveFeedback) saveFeedback.textContent = '';
@@ -1985,13 +2054,15 @@ const selectedAudioTrack =
                     experienceToSave.status = 'Custom';
                 }
 
+                experienceToSave.name = chosenName;
+
                 const savedToLibrary =
                     experienceLibrary.save(
                         experienceToSave
                     );
 
                 if (!savedToLibrary) {
-                    if (saveFeedback) saveFeedback.textContent = 'Could not save on this device. Please try again.';
+                    if (saveFeedback) saveFeedback.textContent = 'Could not save on this device. Storage may be full. Export a backup to keep this creation.';
                     saveExperienceButton.textContent =
                         'Save failed';
 
@@ -2018,7 +2089,11 @@ const selectedAudioTrack =
                 synchroniseEditor(editableExperience);
 
                 if (saveFeedback) saveFeedback.textContent = `“${experienceToSave.name}” saved on this device. Find it in My Experiences. A backup download has also been started.`;
-                if (savedExperiencesLink) savedExperiencesLink.hidden = false;
+                if (savedExperiencesLink) {
+                    savedExperiencesLink.hidden = false;
+                    savedExperiencesLink.href = `/studio/?saved=${encodeURIComponent(experienceToSave.id)}#my-experiences-title`;
+                    savedExperiencesLink.textContent = `View “${experienceToSave.name}” on dashboard →`;
+                }
                 const welcomeHint = document.querySelector<HTMLElement>('#first-creation-hint');
                 if (welcomeHint) welcomeHint.hidden = true;
                 window.posthog?.capture('experience_saved');

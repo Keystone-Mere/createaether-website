@@ -1,3 +1,4 @@
+import { isBackground } from '../player/Background';
 import type {
     Experience
 } from '../models/Experience';
@@ -67,6 +68,7 @@ export function isExperience(
         value.name.trim() !== '' &&
         typeof value.description === 'string' &&
         typeof value.status === 'string' &&
+        (value.background === undefined || isBackground(value.background)) &&
         isRecord(value.audio) &&
         isRecord(value.atmosphere) &&
         isRecord(value.lighting) &&

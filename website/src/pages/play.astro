@@ -18,6 +18,7 @@ import SceneStage from '../components/studio/SceneStage.astro';
         <a href="/studio">Open Aether Studio</a>
     </section>
     <script>
+        import { isBackground } from '../lib/player/Background';
         import { readPlaybackHash } from '../lib/player/PlaybackLink';
         import { createStudioRuntime } from '../lib/studio/StudioRuntime';
         let runtime: ReturnType<typeof createStudioRuntime> | null = null;
@@ -49,7 +50,13 @@ import SceneStage from '../components/studio/SceneStage.astro';
                 error.hidden = false;
             }
         }
+        window.addEventListener('message', event => {
+            if (event.source !== window.parent || event.data?.type !== 'aether-background' || !isBackground(event.data.image)) return;
+            const image = document.querySelector<HTMLImageElement>('.preview-scene-image');
+            if (image) { image.src = event.data.image; image.closest<HTMLElement>('.preview-stage')!.dataset.scene = 'custom'; }
+        });
         load();
+        if (window.parent !== window) window.parent.postMessage('aether-background-ready', '*');
         window.addEventListener('hashchange', load);
     </script>
 </body>
