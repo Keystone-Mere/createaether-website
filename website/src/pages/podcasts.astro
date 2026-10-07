@@ -1,0 +1,163 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import PostHog from '../components/posthog.astro';
+import { createPlaybackUrl } from '../lib/player/PlaybackLink';
+import type { Experience } from '../lib/models/Experience';
+import forest from '../data/experiences/forest.json';
+import temple from '../data/experiences/temple.json';
+import ocean from '../data/experiences/ocean.json';
+
+const scenes = [forest, temple, ocean].map(scene => ({
+  name: scene.name,
+  id: scene.id,
+  image: `/images/experience-covers/${scene.id}.jpg`,
+  playback: createPlaybackUrl(scene as Experience, ''),
+}));
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Create an animated backdrop for your podcast, stream or recording. Customise an Aether scene or upload your own image, then use its silent visuals in OBS." />
+    <title>Animated backdrops for podcasts and streams — Aether</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <PostHog />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Aether home"><img src="/brand/aether-mark.svg" alt="" width="52" height="52" /><span>Aether</span></a>
+      <nav aria-label="Primary navigation"><a href="/">Home</a><a href="#how-it-works">How it works</a><a href="/studio/">Open Studio →</a></nav>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Aether for podcasts and streams</p>
+        <h1 id="page-title">A backdrop.<br />Made yours.</h1>
+        <p class="lead">Set the scene for your next recording. Choose an environment or upload your own image, add lighting and animated effects, then bring your creation into OBS.</p>
+        <div class="actions"><a class="button primary" href="/studio/">Create your backdrop →</a><a class="button secondary" href="#backdrop-preview">Try a scene below</a></div>
+        <p class="hero-note">Six starter scenes · Your own images · Silent visuals for OBS</p>
+      </section>
+
+      <section id="backdrop-preview" class="preview-section" aria-labelledby="preview-title">
+        <div class="section-heading"><div><p class="eyebrow">Try the actual player</p><h2 id="preview-title">See the atmosphere.</h2></div><p>This is the backdrop layer you can place behind or alongside your camera in OBS. Play the preview to see Aether’s effects in motion.</p></div>
+        <div class="preview-frame">
+          <img id="scene-poster" src={scenes[0].image} alt="Forest backdrop: a woodland clearing at dusk" width="1920" height="1080" />
+          <iframe id="scene-player" title="Silent Forest backdrop preview" hidden loading="lazy"></iframe>
+        </div>
+        <div class="preview-controls">
+          <div class="scene-buttons" role="group" aria-label="Choose a backdrop preview">
+            {scenes.map((scene, i) => <button type="button" class="scene-button" data-name={scene.name} data-image={scene.image} data-playback={scene.playback} aria-pressed={i === 0 ? 'true' : 'false'}>{scene.name}</button>)}
+          </div>
+          <button type="button" id="preview-toggle" class="button secondary" aria-controls="scene-player" aria-pressed="false">Play silent preview</button>
+        </div>
+        <p class="caption">Live Aether visuals, rendered in your browser. No camera is included in this preview.</p>
+        <noscript><p>Open Studio to customise these scenes and use them in OBS.</p></noscript>
+      </section>
+
+      <section class="section" aria-labelledby="make-title">
+        <div class="section-heading"><div><p class="eyebrow">Your scene, your style</p><h2 id="make-title">Give your content a setting.</h2></div><p>A forest for a quiet conversation. Warm candlelight for an evening recording. Your own artwork for a show with a distinct identity.</p></div>
+        <div class="card-grid">
+          <article class="card"><h3>Start with a scene</h3><p>Explore Temple, Forest, Ocean, Christmas, Storm and Festival. Choose the setting that suits your recording.</p></article>
+          <article class="card"><h3>Bring your own image</h3><p>Upload a JPG, PNG or WebP background. Use your artwork or photography as the starting point for an animated environment.</p></article>
+          <article class="card"><h3>Shape the atmosphere</h3><p>Adjust lighting, colour, particles and fog. Watch your changes in the live preview and keep the effects as subtle or prominent as you like.</p></article>
+        </div>
+      </section>
+
+      <section id="how-it-works" class="section" aria-labelledby="workflow-title">
+        <div class="section-heading"><div><p class="eyebrow">From Studio to recording</p><h2 id="workflow-title">Create. Save. Use in OBS.</h2></div><p>Build your environment in Aether. Compose your camera, microphone and backdrop in OBS.</p></div>
+        <ol class="steps">
+          <li><span class="step-number" aria-hidden="true">01</span><h3>Choose and customise</h3><p>Open a starter scene in Studio. Keep its background or upload your own, then adjust the effects while watching the preview.</p></li>
+          <li><span class="step-number" aria-hidden="true">02</span><h3>Name and save</h3><p>Give your creation a name and save it. It appears under My Experiences at the top of your dashboard, stored in this browser on this device.</p></li>
+          <li><span class="step-number" aria-hidden="true">03</span><h3>Select Use in OBS</h3><p>Aether copies a playback link for a starter background, or downloads an HTML backdrop file when you use an uploaded image. The button shows the matching setup instructions.</p></li>
+          <li><span class="step-number" aria-hidden="true">04</span><h3>Add your camera</h3><p>Add the backdrop as a Browser source in OBS at 1920 × 1080. Place your camera source above it, then record or stream using your usual audio setup.</p></li>
+        </ol>
+      </section>
+
+      <section class="section questions" aria-labelledby="questions-title">
+        <p class="eyebrow">Before you record</p><h2 id="questions-title">A few useful details.</h2>
+        <details><summary>How does the backdrop appear behind me?</summary><p>In OBS, place your camera source above the Aether Browser source. A camera inset keeps your room visible inside that inset. To appear directly within the environment, use a green screen with chroma key or a separate camera background removal tool. Aether creates the environment; your recording setup handles the camera.</p></details>
+        <details><summary>Will the backdrop play sound over my microphone?</summary><p>No. The OBS player is silent, even if you used audio while creating your scene in Studio. Manage your microphone and any other audio in OBS.</p></details>
+        <details><summary>What is the difference between a link and an HTML file?</summary><p>Starter backgrounds use a playback URL: leave Local File unticked in your OBS Browser source and paste the link. Uploaded backgrounds use a downloaded HTML file containing your image: tick Local File and select that HTML file. Both need an internet connection to load the Aether player.</p></details>
+        <details><summary>Do edits automatically update my OBS backdrop?</summary><p>The export contains the settings you chose at that moment. After making changes, use Use in OBS again and replace the link or HTML file in your OBS Browser source.</p></details>
+        <details><summary>Is this a downloadable video?</summary><p>It is a browser-rendered backdrop with animated effects. OBS can record it as part of your finished video or use it in a live stream.</p></details>
+      </section>
+
+      <section class="closing" aria-labelledby="start-title"><p class="eyebrow">Make your first backdrop</p><h2 id="start-title">Start with a scene.<br />See where it takes you.</h2><a class="button primary" href="/studio/">Create your backdrop →</a></section>
+    </main>
+    <SiteFooter />
+    <script>
+      const poster = document.querySelector<HTMLImageElement>('#scene-poster')!;
+      const player = document.querySelector<HTMLIFrameElement>('#scene-player')!;
+      const toggle = document.querySelector<HTMLButtonElement>('#preview-toggle')!;
+      const buttons = document.querySelectorAll<HTMLButtonElement>('.scene-button');
+      let selected = buttons[0];
+      let playing = false;
+      function render() {
+        poster.src = selected.dataset.image!;
+        poster.alt = `${selected.dataset.name} backdrop scene`;
+        player.title = `Silent ${selected.dataset.name} backdrop preview`;
+        player.hidden = !playing;
+        poster.hidden = playing;
+        if (playing) player.src = selected.dataset.playback!;
+        else player.removeAttribute('src');
+        toggle.textContent = playing ? 'Stop preview' : 'Play silent preview';
+        toggle.setAttribute('aria-pressed', String(playing));
+        buttons.forEach(button => button.setAttribute('aria-pressed', String(button === selected)));
+      }
+      buttons.forEach(button => button.addEventListener('click', () => { selected = button; render(); }));
+      toggle.addEventListener('click', () => { playing = !playing; render(); });
+    </script>
+  </body>
+</html>
+<style>
+  :global(body) { margin:0; min-width:320px; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#f4efe7; background:radial-gradient(ellipse at 80% 0%,#24203980,transparent 45%),#090b0f; }
+  * { box-sizing:border-box; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; cursor:pointer; }
+  a:focus-visible,button:focus-visible,summary:focus-visible { outline:3px solid #66e3ff; outline-offset:5px; }
+  [hidden] { display:none!important; }
+  main,.site-header { width:min(1180px,calc(100% - 40px)); margin:auto; }
+  .site-header { padding:28px 0; display:flex; justify-content:space-between; align-items:center; gap:24px; }
+  .brand { display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.08em; }
+  nav { display:flex; gap:24px; flex-wrap:wrap; color:#b8bdc8; font-size:.9rem; }
+  nav a:hover { color:#66e3ff; }
+  .skip-link { position:absolute; left:20px; top:-80px; z-index:10; background:#fff; color:#090b0f; padding:12px; }
+  .skip-link:focus { top:12px; }
+  .hero { padding:90px 0 70px; max-width:930px; }
+  .eyebrow { color:#b2a5ff; font-size:.78rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase; margin:0 0 22px; }
+  h1 { margin:0; font-size:clamp(3.7rem,8vw,7.2rem); line-height:1; letter-spacing:-.06em; }
+  .lead { max-width:730px; color:#b4b8c3; font-size:clamp(1.1rem,2vw,1.35rem); line-height:1.75; margin:30px 0; }
+  .actions { display:flex; flex-wrap:wrap; gap:14px; }
+  .button { min-height:48px; display:inline-flex; align-items:center; justify-content:center; padding:12px 23px; border-radius:999px; border:1px solid #ffffff30; font-weight:650; }
+  .primary { background:#f4efe7; color:#090b0f; }
+  .secondary { color:#f4efe7; background:#ffffff08; }
+  .button:hover { border-color:#66e3ff; }
+  .hero-note,.caption { color:#9fa6b5; line-height:1.7; font-size:.9rem; }
+  .hero-note { margin-top:24px; }
+  .preview-section,.section { padding:70px 0; border-bottom:1px solid #ffffff1a; }
+  .section-heading { display:grid; grid-template-columns:1.1fr 1fr; align-items:end; gap:70px; margin-bottom:36px; }
+  h2 { margin:0; font-size:clamp(2rem,4.5vw,3.7rem); letter-spacing:-.045em; line-height:1.1; }
+  .section-heading>p,.card p,.steps p,details p { color:#b4b8c3; line-height:1.75; }
+  .section-heading>p { margin:0; }
+  .preview-frame { aspect-ratio:16/9; position:relative; border:1px solid #ffffff25; border-radius:20px; overflow:hidden; background:#000; }
+  .preview-frame img,.preview-frame iframe { width:100%; height:100%; display:block; object-fit:cover; border:0; }
+  .preview-controls { display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; padding-top:20px; }
+  .scene-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+  .scene-button { color:#b4b8c3; background:#111722; border:1px solid #ffffff25; border-radius:999px; padding:12px 20px; }
+  .scene-button[aria-pressed="true"] { color:#cff9e4; background:#163c2c; border-color:#67df9f; }
+  .card-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+  .card,.steps li { padding:28px; background:#ffffff06; border:1px solid #ffffff1a; border-radius:20px; }
+  h3 { font-size:1.3rem; margin:0 0 16px; letter-spacing:-.02em; }
+  .card p,.steps p { margin:0; }
+  .steps { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; padding:0; margin:0; list-style:none; }
+  .step-number { display:block; color:#66e3ff; font-size:.8rem; letter-spacing:.1em; font-weight:700; margin-bottom:30px; }
+  .questions h2 { margin-bottom:32px; }
+  details { border-top:1px solid #ffffff1a; padding:22px 0; }
+  summary { cursor:pointer; font-weight:650; font-size:1.05rem; }
+  details p { max-width:850px; margin-bottom:0; }
+  .closing { padding:90px 0 20px; }
+  .closing .button { margin-top:32px; }
+  @media(max-width:750px) { .section-heading,.card-grid,.steps { grid-template-columns:1fr; gap:20px; } .site-header { align-items:flex-start; } nav { gap:14px; justify-content:flex-end; } .hero { padding:60px 0 40px; } .section,.preview-section { padding:50px 0; } }
+  @media(max-width:440px) { main,.site-header { width:calc(100% - 32px); } nav a[href="#how-it-works"] { display:none; } .brand img { width:40px; height:40px; } h1 { font-size:3.5rem; } .preview-controls { gap:16px; } .scene-button { padding:10px 16px; } .card,.steps li { padding:24px; } }
+</style>

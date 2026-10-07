@@ -43,6 +43,7 @@ import SiteFooter from '../components/SiteFooter.astro';
       <nav aria-label="Primary navigation">
         <a href="#workflow">How it works</a>
         <a href="/studio/">Studio</a>
+        <a href="/podcasts/">Podcasts & streams</a>
         <a href="/features/">Features</a>
         <a
           href="https://github.com/Keystone-Mere/createaether-website"
@@ -167,7 +168,7 @@ import SiteFooter from '../components/SiteFooter.astro';
           <article class="workflow-step">
             <span>Creative backdrops · Available now</span><h3>Set the scene for your content</h3>
             <p>Create an animated visual backdrop for podcasts, streams and recordings. Add it to OBS as a Browser source alongside your camera.</p>
-            <a class="workflow-link" href="/studio/">Create a backdrop →</a>
+            <a class="workflow-link" href="/podcasts/">Explore podcast backdrops →</a>
           </article>
           <article class="workflow-step">
             <span>Relaxation · Available now</span><h3>Make space to unwind</h3>
@@ -641,6 +642,8 @@ import SiteFooter from '../components/SiteFooter.astro';
   }
 
   @media (max-width: 800px) {
+    .site-header { gap: 20px; flex-wrap: wrap; }
+    nav { flex-wrap: wrap; }
     .workflow-grid {
       grid-template-columns: 1fr 1fr;
     }
@@ -686,7 +689,7 @@ import SiteFooter from '../components/SiteFooter.astro';
       align-items: flex-start;
     }
 
-    nav a:not(:last-child) {
+    nav a:not([href="/studio/"]):not([href="/podcasts/"]) {
       display: none;
     }
 
