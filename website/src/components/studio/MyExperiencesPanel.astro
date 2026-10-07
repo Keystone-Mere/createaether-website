@@ -28,6 +28,7 @@
 </section>
 
 <script>
+    import { backgroundSource } from '../../lib/player/BackgroundChoices';
     import {
         ExperienceLibrary
     } from '../../lib/storage/ExperienceLibrary';
@@ -112,9 +113,7 @@
             card.id = `saved-${experience.id}`;
             card.tabIndex = -1;
             const image = document.createElement('img');
-            const scene = experience.sceneId ?? experience.id.split('-')[0];
-            const covers: Record<string, string> = {temple:'temple',forest:'forest',ocean:'ocean',christmas:'christmas',storm:'storm-balcony',festival:'festival-evening'};
-            image.src = experience.background ?? `/images/experience-covers/${covers[scene] ?? 'temple'}.jpg`;
+            image.src = backgroundSource(experience);
             image.alt = '';
             image.loading = 'lazy';
             image.style.cssText = 'width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:12px';

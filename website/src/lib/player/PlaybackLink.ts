@@ -28,6 +28,7 @@ export function validatePlayback(value: unknown): Experience {
     }
     return {
         id: value.id.slice(0, 120), sceneId, name: value.name.slice(0, 120),
+        ...(value.backgroundId ? { backgroundId: value.backgroundId } : {}),
         description: '', status: 'Playback',
         // Podcast backdrops are deliberately silent, irrespective of editor audio settings.
         audio: { enabled: false, volume: 0, layerVolume: 0, track: '' },

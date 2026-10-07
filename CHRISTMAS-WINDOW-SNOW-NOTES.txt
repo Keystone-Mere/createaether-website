@@ -1,0 +1,7 @@
+Extract into the createaether-website repository root after the sprint patch.
+Snow falls top to bottom within the three main glass panes of the current Christmas cover. The mask excludes the main wooden bars and approximates the tree and armchair outlines.
+Default snow is smaller, soft white and faster, with 44 flakes and reduced sideways drift.
+The mask uses the same 960x540 coordinates in the editor and full screen. It is specific to this cover image and will need adjustment if that cover changes.
+This patch includes the previous Ocean wave code, preserving that update.
+Refresh Christmas to load the new default settings. Older saved copies retain their values but use the new window mask when Christmas Snow is selected.
+Validation: 11-page Astro build passed; 120s snowfall simulation verified downward motion and window mask; Ocean simulation and mocked DOM switching checks passed. Browser visual alignment needs local review.

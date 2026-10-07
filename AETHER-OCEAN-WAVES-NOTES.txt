@@ -1,0 +1,8 @@
+Apply after the Aether sprint patch by extracting into the repository root.
+Ocean now starts with 120 moving curved wave highlights below the horizon.
+The Ocean wave shimmer preset retains the ocean-spray identifier for saved-copy compatibility.
+The current cover horizon is treated as 48.5% of image height; changing that cover may require adjusting it.
+Existing saved Ocean copies retain their saved controls; select the Ocean wave shimmer preset to use the new defaults and enable Particles On.
+Adjust Count, Colour and Glow; Advanced Size changes highlight length/thickness, Speed changes drift, Drift changes wave amplitude, Opacity changes visibility.
+Particles Off stops the wave overlay. The underlying image stays still.
+Validation: Astro build passed for all 11 pages; 120s simulation verified waves below the horizon, rightward drift and toggle-off; mocked DOM switching test passed all six presets without script errors. Actual browser appearance still needs local review.

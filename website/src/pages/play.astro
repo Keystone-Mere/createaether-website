@@ -19,6 +19,7 @@ import SceneStage from '../components/studio/SceneStage.astro';
     </section>
     <script>
         import { isBackground } from '../lib/player/Background';
+        import { backgroundSource } from '../lib/player/BackgroundChoices';
         import { readPlaybackHash } from '../lib/player/PlaybackLink';
         import { createStudioRuntime } from '../lib/studio/StudioRuntime';
         let runtime: ReturnType<typeof createStudioRuntime> | null = null;
@@ -32,10 +33,9 @@ import SceneStage from '../components/studio/SceneStage.astro';
             try {
                 const experience = readPlaybackHash(location.hash);
                 const stage = document.querySelector<HTMLElement>('.preview-stage')!;
-                stage.dataset.scene = experience.sceneId;
+                stage.dataset.scene = experience.backgroundId ? 'custom' : experience.sceneId;
                 stage.setAttribute('aria-label', `${experience.name} environment`);
-                const scene = experience.sceneId === 'festival' ? 'festival-evening' : experience.sceneId === 'storm' ? 'storm-balcony' : experience.sceneId;
-                stage.querySelector<HTMLImageElement>('.preview-scene-image')!.src = `/images/experience-covers/${scene}.jpg`;
+                stage.querySelector<HTMLImageElement>('.preview-scene-image')!.src = backgroundSource(experience);
                 document.title = `${experience.name} — Aether Playback`;
                 player.hidden = false;
                 runtime = createStudioRuntime({

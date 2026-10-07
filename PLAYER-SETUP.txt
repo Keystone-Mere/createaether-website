@@ -1,0 +1,39 @@
+AETHER PORTABLE PLAYER — FIRST MILESTONE
+
+Base: Keystone-Mere/createaether-website default branch, commit 24f2839374a546cbdec8f1db72fa739d64216b41.
+Contains five source files. No dependencies, images, audio, or hosting configuration are changed.
+
+Before applying: preserve any uncommitted local work and use a feature branch.
+Extract this ZIP into C:\Users\Tom\Documents\createaether-website.
+Build from the website subdirectory: npm run build
+Use your existing Cloudflare deployment workflow when ready.
+
+FIRST TEST
+1. Open Studio > Temple and change a colour or particle setting.
+2. Choose Copy playback link under Save and Use Elsewhere.
+3. Paste the link into a private/incognito browser window.
+4. Confirm the scene matches your edits and has no interface or sound.
+5. In OBS, add a Browser Source, paste the complete link, and set width 1920 and height 1080.
+6. Put your webcam source above the backdrop; your existing green-screen/background-removal setup handles the camera.
+7. Check recording performance and all six scenes before merging.
+
+WHAT THIS VERSION DOES
+- Reuses one scene component in editor and player.
+- Encodes a bounded snapshot of visual settings in the URL fragment.
+- Works without the original device's localStorage or an account.
+- Uses existing hosted scene images; stays completely silent.
+- Rejects invalid links and limits imported rendering settings.
+
+LIMITS
+- This is snapshot sharing, not server-backed publishing or access control.
+- Changes after copying require a new link. Links cannot be revoked.
+- Anyone holding a link can play and inspect its settings.
+- No uploads, payment system, new scene collections, or audio playback yet.
+- Scenes rely on the host's existing image assets and runtime remaining available.
+
+VALIDATION
+Production build passed. Codec tests passed for six scenes, Unicode names,
+custom colours/counts, silence, malformed/oversized links, unknown scenes,
+invalid colours and extreme particle counts. git diff --check passed.
+Browser/OBS visual and recording tests remain to be completed on your machine;
+the automated browser download was unavailable in this environment.

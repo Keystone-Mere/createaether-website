@@ -64,6 +64,8 @@ export interface Experience {
   sceneId?: string;
   /** Embedded, compressed JPG for user-created backgrounds. */
   background?: string;
+  /** Optional bundled alternative; omitted means the original scene image. */
+  backgroundId?: string;
   id: string;
   name: string;
   description: string;

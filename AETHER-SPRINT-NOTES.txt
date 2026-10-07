@@ -1,0 +1,43 @@
+AETHER SPRINT — 6 OCTOBER 2026
+
+Install: extract this ZIP into your createaether-website repository root.
+It contains only five changed source files under website/src.
+Existing public images and audio are reused; no new media is required.
+
+Changes
+- Scene backgrounds for all six Studio experiences, with no lighting orb.
+- The same 16:9 scene and canvas are used in editor and full screen.
+- Scene lighting overlays respond to lighting colour/on-off settings.
+- Advanced disclosure for opacity, size, drift, speed and lifetime.
+- Reset to preset restores particle settings only.
+- Particle count handler now supports the slider's full 0–300 range.
+- Rain, snow and ocean particles respawn within the scene, preventing
+  short lifetimes and low speeds from leaving particles invisible.
+- Saved copies preserve sceneId independently of particle presets.
+  Older saved copies remain supported.
+- Clearer homepage explanation and consistent Pause Audio wording.
+- Desktop/tablet sticky preview layout is preserved; mobile stays stacked.
+- Saved custom copies still use Save Changes to update their existing entry.
+
+Validation
+- All 11 static pages built successfully using Astro 7.3.5 in an isolated
+  source-only test project. Your original package/configuration was not uploaded.
+- Syntax checked 32 TypeScript modules and Astro script blocks.
+- Each particle preset stayed visible through a 120-second simulation.
+- Browser verification was unavailable because the browser download failed.
+- Uploaded source did not include public images or audio; their content and
+  playback must be checked in your local project.
+
+Local check
+From the website directory, run npm run build, then npm run dev.
+1. Open Temple, Forest, Ocean, Christmas, Storm and Festival.
+2. Confirm each shows its own scene and audio plays with its atmosphere layer.
+3. Expand Advanced, adjust effects, then Reset to preset.
+4. Try full screen and exit. Confirm the scene and effects match the editor.
+5. In Forest choose Temple Embers, Save as Copy, and reopen from My Experiences.
+   The scene should still be Forest.
+6. Check mobile width and desktop scrolling with the sticky preview.
+
+Rollback
+The included aether-sprint-rollback.zip contains the original five files.
+Extract it into the repository root to undo this patch.

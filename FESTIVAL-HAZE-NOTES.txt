@@ -1,0 +1,6 @@
+Apply after the sprint, Ocean and Christmas patches by extracting into the repository root.
+Festival starts with slow stage haze, soft pink-purple light and particles off. Optional particles use drifting dust instead of fireworks.
+Includes a new generated festival-evening.jpg scene and references it in Studio and the homepage cards. Original festival.jpg remains available.
+Fog On controls animated haze; Lighting On controls the soft light overlay. Reduced-motion preference removes overlay animations.
+Existing Festival audio remains selected. Older saved versions retain their settings; choose the built-in Festival to see the new defaults.
+Checks: isolated Astro build for all 11 pages, bundled script switching in mocked DOM, default toggle values and packaged image references passed. Browser appearance and sound still need local checking.

@@ -1,0 +1,133 @@
+---
+import SceneStage from '../../components/studio/SceneStage.astro';
+import { djedhorScenes, djedhorDetails } from '../../data/stories/djedhor';
+const opening = djedhorScenes[0];
+---
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Djedhor’s Journey · Aether Museum Lab</title><meta name="robots" content="noindex"/><meta name="description" content="Explore an ancient Egyptian belief through a visitor-paced Aether story, then return to the real museum object."/></head>
+<body>
+<main>
+<header><a href="/">AETHER</a><span>MUSEUM LAB · EDUCATIONAL PROTOTYPE</span></header>
+<h1>Djedhor’s Journey</h1><p class="intro">Explore at your own pace. Discover the story, investigate the details, then return to the real object.</p>
+<div class="toolbar"><span id="progress">Chapter 1 of 3</span><button id="sound" aria-pressed="false">Sound off</button><button id="narrate" hidden>Listen to chapter</button></div>
+<div class="layout">
+<section aria-label="Story image">
+<div id="visual-frame">
+<SceneStage sceneId="story" name="Djedhor’s Journey" imageSrc={opening.image} exitButton={false}/>
+<div id="explore-overlay" hidden><div id="scroll-cover"></div>{djedhorDetails.map((detail, i) => <button class="hotspot" data-detail={i} style={`left:${detail.x}%;top:${detail.y}%`} aria-label={`Explore ${detail.name}`}>{i+1}</button>)}</div>
+</div>
+<p id="credit" class="credit">{opening.imageCredit}</p>
+<div id="reveal-controls" hidden><label for="reveal">Reveal the scroll <output id="reveal-value">12%</output></label><input id="reveal" type="range" min="0" max="100" value="12"/><button id="reveal-all">Reveal all</button></div>
+</section>
+<section class="story-card" aria-label="Chapter text">
+<p class="eyebrow" id="chapter-label">THE OBJECT</p><h2 id="chapter-title" tabindex="-1">{opening.title}</h2><p id="caption">{opening.caption}</p>
+<div id="detail-controls" hidden><p id="found">0 of 3 details explored</p><div class="detail-buttons">{djedhorDetails.map((detail,i) => <button data-detail={i}>{i+1}. {detail.name}</button>)}</div><div id="detail" aria-live="polite"><p>Reveal the scroll, then choose a numbered detail.</p></div></div>
+<p id="completion" hidden>You’ve reached the real object. Replay the journey or take another look at the judgement scene.</p>
+<nav aria-label="Story navigation"><button id="back" disabled>← Back</button><button id="next">Explore the judgement →</button><button id="replay" hidden>Replay journey</button></nav>
+<p id="status" class="credit" role="status"></p>
+</section>
+</div>
+<footer>Powered by the Aether atmospheric engine. No automatic chapter changes. Text is always available; sound is optional.<br/>Independent prototype, not an official museum resource. Historical text is based on the exhibit labels supplied for this project and needs curatorial review before public educational use.</footer>
+<noscript>This interactive prototype needs JavaScript. The opening chapter remains available above.</noscript>
+</main>
+<audio id="story-audio" data-track-id="temple-echoes" preload="none" loop></audio>
+<script>
+import { StorySequence } from '../../lib/story/StorySequence';
+import { djedhorScenes, djedhorDetails } from '../../data/stories/djedhor';
+import { createStudioRuntime } from '../../lib/studio/StudioRuntime';
+const get = <T extends HTMLElement>(id:string) => document.getElementById(id) as T;
+const sequence = new StorySequence(djedhorScenes);
+const stage = get<HTMLDivElement>('experience-preview-stage');
+const image = stage.querySelector<HTMLImageElement>('.preview-scene-image')!;
+const audio = get<HTMLAudioElement>('story-audio');
+const runtime = createStudioRuntime({audioElement:audio, previewStage:stage, previewCanvas:stage.querySelector('canvas'), audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,particlesStatus:null,lightingStatus:null,fogStatus:null});
+const sound = get<HTMLButtonElement>('sound');
+const narrate = get<HTMLButtonElement>('narrate');
+const reveal = get<HTMLInputElement>('reveal');
+const details = new Set<number>();
+let soundEnabled = false;
+let speaking = false;
+let audioAttempt = 0;
+const speechAvailable = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+function stopNarration() { if(speechAvailable) window.speechSynthesis.cancel(); speaking=false; narrate.textContent='Listen to chapter'; }
+function loadAtmosphere() {
+  const experience = structuredClone(sequence.current.experience);
+  experience.audio.enabled = soundEnabled;
+  runtime.experienceLoader.load(experience);
+}
+async function applySound() {
+  const attempt = ++audioAttempt;
+  loadAtmosphere();
+  sound.textContent = soundEnabled ? 'Sound on' : 'Sound off';
+  sound.setAttribute('aria-pressed', String(soundEnabled));
+  if (!soundEnabled) { audio.pause(); return; }
+  try { await audio.play(); if(attempt!==audioAttempt && !soundEnabled) audio.pause(); }
+  catch { if(attempt!==audioAttempt) return; soundEnabled=false; loadAtmosphere(); sound.textContent='Sound off'; sound.setAttribute('aria-pressed','false'); get('status').textContent='Sound could not start. You can still explore the full story.'; }
+}
+function updateReveal() {
+  const value=Number(reveal.value);
+  get('scroll-cover').style.clipPath=`inset(0 0 0 ${value}%)`;
+  get('reveal-value').textContent=`${value}%`;
+  document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(button=>button.disabled=value<100);
+}
+function render(focus=false) {
+  stopNarration();
+  const scene=sequence.current;
+  image.src=scene.image; image.alt=scene.imageAlt; image.removeAttribute('aria-hidden');
+  stage.style.aspectRatio=scene.aspectRatio;
+  stage.setAttribute('aria-label',scene.title);
+  get('chapter-title').textContent=scene.title;
+  get('caption').textContent=scene.caption;
+  get('credit').textContent=scene.imageCredit;
+  get('progress').textContent=`Chapter ${sequence.index+1} of ${sequence.scenes.length}`;
+  get('chapter-label').textContent=['THE OBJECT','EXPLORE THE BELIEF','BACK TO THE OBJECT'][sequence.index];
+  const exploring=scene.id==='judgement';
+  ['explore-overlay','reveal-controls','detail-controls'].forEach(id=>get(id).hidden=!exploring);
+  get<HTMLButtonElement>('back').disabled=sequence.first;
+  get('next').hidden=sequence.last;
+  get('next').textContent=sequence.first?'Explore the judgement →':'Return to the real object →';
+  get('replay').hidden=!sequence.last;
+  get('completion').hidden=!sequence.last;
+  get('status').textContent='';
+  narrate.hidden=!speechAvailable;
+  loadAtmosphere(); updateReveal();
+  if(focus) get('chapter-title').focus({preventScroll:true});
+}
+get('next').addEventListener('click',()=>{sequence.next();render(true);});
+get('back').addEventListener('click',()=>{sequence.back();render(true);});
+get('replay').addEventListener('click',()=>{
+  sequence.replay();details.clear();reveal.value='12';
+  document.querySelectorAll('[data-detail]').forEach(button=>button.removeAttribute('aria-pressed'));
+  get('found').textContent='0 of 3 details explored';
+  get('detail').textContent='Reveal the scroll, then choose a numbered detail.';render(true);
+});
+reveal.addEventListener('input',updateReveal);
+get('reveal-all').addEventListener('click',()=>{reveal.value='100';updateReveal();});
+document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(button=>button.addEventListener('click',()=>{
+  const index=Number(button.dataset.detail); const detail=djedhorDetails[index];
+  details.add(index);get('found').textContent=`${details.size} of 3 details explored`;
+  get('detail').replaceChildren();const heading=document.createElement('h3');heading.textContent=detail.name;
+  const text=document.createElement('p');text.textContent=detail.text;get('detail').append(heading,text);
+  document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(item=>item.setAttribute('aria-pressed',String(Number(item.dataset.detail)===index)));
+}));
+sound.addEventListener('click',()=>{soundEnabled=!soundEnabled;void applySound();});
+narrate.addEventListener('click',()=>{
+  if(speaking){stopNarration();return;}
+  stopNarration();const utterance=new SpeechSynthesisUtterance(`${sequence.current.title}. ${sequence.current.caption}`);
+  utterance.lang='en-GB';utterance.rate=.9;
+  utterance.onend=()=>{speaking=false;narrate.textContent='Listen to chapter';};
+  utterance.onerror=()=>{speaking=false;narrate.textContent='Listen to chapter';get('status').textContent='Device narration is unavailable. Read the chapter text instead.';};
+  speaking=true;narrate.textContent='Stop narration';window.speechSynthesis.speak(utterance);
+});
+function silence(){stopNarration();soundEnabled=false;++audioAttempt;audio.pause();loadAtmosphere();sound.textContent='Sound off';sound.setAttribute('aria-pressed','false');}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)silence();});
+window.addEventListener('pagehide',()=>{stopNarration();audio.pause();},{once:true});
+render();
+</script>
+<style>
+:global(*){box-sizing:border-box} :global([hidden]){display:none!important}
+body{margin:0;background:#0c1625;color:#eee9de;font-family:system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:30px}header{display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:.75rem;letter-spacing:.12em;color:#b9bdc7}header a{color:#dfbe7e;font-size:1.3rem;text-decoration:none;letter-spacing:.2em}h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(2.5rem,5vw,4rem);margin:35px 0 12px}.intro{color:#c0c6d0;max-width:760px;line-height:1.7}.toolbar{display:flex;gap:12px;align-items:center;margin:25px 0}.toolbar span{margin-right:auto;color:#dfbe7e}.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:25px;align-items:start}#visual-frame{position:relative}#explore-overlay{position:absolute;inset:0;border-radius:14px;overflow:hidden;pointer-events:none}#scroll-cover{position:absolute;inset:0;background:linear-gradient(90deg,#857249,#cfb479);clip-path:inset(0 0 0 12%);opacity:.97}.hotspot{position:absolute;transform:translate(-50%,-50%);border-radius:50%;width:38px;height:38px;padding:0;pointer-events:auto;box-shadow:0 0 0 4px #09152488}.hotspot:disabled{visibility:hidden}.story-card{background:#f0e9d9;color:#302a22;border-radius:16px;padding:28px}.story-card p{line-height:1.8}h2{font-family:Georgia,serif;font-weight:400;font-size:2rem;margin:10px 0}.eyebrow{font-size:.7rem;letter-spacing:.15em;color:#746446}.credit{font-size:.75rem;line-height:1.6;color:#aeb5c1}.story-card .credit{color:#76654e}button{font:inherit;border:1px solid #c8ad77;background:#dfbe7e;color:#231d16;border-radius:8px;padding:10px 14px;cursor:pointer}button:disabled{opacity:.4;cursor:default}button[aria-pressed=true]{outline:3px solid #876522;outline-offset:2px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #4aa3df;outline-offset:4px}nav,.detail-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}#detail{border-top:1px solid #c7baa3;margin-top:20px}#found{font-size:.8rem;color:#75613f}#reveal-controls{padding:15px 0}#reveal-controls label{display:flex;justify-content:space-between}input[type=range]{width:100%;margin:18px 0;accent-color:#dfbe7e}footer{border-top:1px solid #ffffff20;margin-top:35px;padding-top:22px;color:#929dab;font-size:.75rem;line-height:1.8}:global(.preview-stage .preview-scene-image){object-fit:contain}:global(.preview-stage .scene-tint){display:none}:global(.preview-stage .preview-scene-image){transition:opacity .4s ease} @media(max-width:850px){main{padding:20px}.layout{grid-template-columns:1fr}.story-card{padding:22px}header{flex-wrap:wrap}.toolbar{flex-wrap:wrap}.hotspot{width:30px;height:30px}}@media(prefers-reduced-motion:reduce){:global(*){animation:none!important;transition:none!important}}
+</style>
+</body>
+</html>

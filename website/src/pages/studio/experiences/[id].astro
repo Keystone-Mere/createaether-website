@@ -92,6 +92,11 @@ const selectedAudioTrack =
                 <small id="preview-experience-description">{experience.description}</small>
             </div>
 
+            <fieldset class="background-choices" id="background-choices" hidden>
+                <legend>Choose your background</legend>
+                <div id="background-choice-buttons"></div>
+            </fieldset>
+
             <div class="preview-actions">
                 <button type="button" id="choose-background" class="button-secondary">Upload background</button>
                 <input id="background-upload" type="file" accept="image/jpeg,image/png,image/webp" hidden />
@@ -154,6 +159,14 @@ const selectedAudioTrack =
     }
 </script>
 <style>
+    .background-choices { margin:16px 0; padding:0; border:0; min-width:0; }
+    .background-choices legend { padding:0 0 10px; font-size:14px; font-weight:650; color:#dbeafe; }
+    #background-choice-buttons { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr)); gap:10px; }
+    .background-choices :global(button) { padding:0; overflow:hidden; border:2px solid #475569; border-radius:10px; background:#192537; color:#cbd5e1; font:inherit; cursor:pointer; }
+    .background-choices :global(button[aria-pressed="true"]) { border-color:#34d399; color:#fff; }
+    .background-choices :global(button:focus-visible) { outline:3px solid #7dd3fc; outline-offset:3px; }
+    .background-choices :global(img) { display:block; width:100%; aspect-ratio:16/9; object-fit:cover; }
+    .background-choices :global(span) { display:block; padding:8px; font-size:13px; }
 .first-creation-hint { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 22px; margin-bottom:24px; border:1px solid #38bdf844; border-radius:14px; background:#102238; }
 .first-creation-hint[hidden], .saved-experiences-link[hidden] { display:none; }
 .first-creation-hint h2 { font-size:16px; margin:0 0 6px; }
@@ -859,6 +872,7 @@ const selectedAudioTrack =
 <script>
     import { prepareBackground, createBackdropHtml } from '../../../lib/player/Background';
     import { createPlaybackUrl } from '../../../lib/player/PlaybackLink';
+    import { backgroundChoices, backgroundSource } from '../../../lib/player/BackgroundChoices';
     import { audioTracks } from '../../../data/audio/tracks';
     import { experiences as defaultExperiences } from '../../../data/experiences';
     import type {
@@ -1234,11 +1248,45 @@ const selectedAudioTrack =
             ? selectedExperience.sceneId : legacyScene ?? inferredScene;
         selectedExperience.sceneId = coverId;
         if (previewStage instanceof HTMLElement) {
-            previewStage.dataset.scene = selectedExperience.background ? 'custom' : coverId;
+            previewStage.dataset.scene = selectedExperience.background || selectedExperience.backgroundId ? 'custom' : coverId;
             const image = previewStage.querySelector<HTMLImageElement>('.preview-scene-image');
-            if (image) image.src = selectedExperience.background ?? `/images/experience-covers/${coverId === 'festival' ? 'festival-evening' : coverId === 'storm' ? 'storm-balcony' : coverId}.jpg`;
+            if (image) image.src = backgroundSource(selectedExperience);
             previewStage.setAttribute('aria-label', `${selectedExperience.name} atmosphere preview`);
         }
+        const choices = backgroundChoices.filter(choice => choice.sceneId === coverId);
+        const choiceGroup = document.querySelector<HTMLFieldSetElement>('#background-choices')!;
+        const choiceButtons = document.querySelector<HTMLElement>('#background-choice-buttons')!;
+        choiceGroup.hidden = choices.length === 0;
+        // Keep the buttons in place during slider changes so keyboard focus is retained.
+        if (choiceButtons.dataset.scene !== coverId) {
+            choiceButtons.replaceChildren();
+            choiceButtons.dataset.scene = coverId;
+            const options = [{ id: '', name: 'Original', src: backgroundSource({ id: coverId }) }, ...choices];
+            for (const choice of options) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.dataset.backgroundChoice = choice.id;
+                const thumbnail = document.createElement('img');
+                thumbnail.src = choice.src;
+                thumbnail.alt = '';
+                const label = document.createElement('span');
+                label.textContent = choice.name;
+                button.append(thumbnail, label);
+                button.addEventListener('click', () => {
+                    ++backgroundRequest;
+                    if (!editableExperience) return;
+                    delete editableExperience.background;
+                    if (choice.id) editableExperience.backgroundId = choice.id;
+                    else delete editableExperience.backgroundId;
+                    synchroniseEditor(editableExperience);
+                    document.querySelector<HTMLElement>('#background-feedback')!.textContent = `${choice.name} background selected. Save your creation to keep this choice.`;
+                });
+                choiceButtons.append(button);
+            }
+        }
+        choiceButtons.querySelectorAll<HTMLButtonElement>('button').forEach(button => {
+            button.setAttribute('aria-pressed', String(!selectedExperience.background && (selectedExperience.backgroundId ?? '') === button.dataset.backgroundChoice));
+        });
         const effectLabels: Record<string, [string, string, string]> = {
             'storm-rain': ['Rain', 'Rain amount', 'Wind'],
             'christmas-snow': ['Snow', 'Snow amount', 'Wind'],
@@ -1650,6 +1698,10 @@ const selectedAudioTrack =
                         ?? initialExperience
                 );
 
+            const requestedBackground = new URLSearchParams(location.search).get('background');
+            const requestedChoice = backgroundChoices.find(choice => choice.id === requestedBackground && choice.sceneId === initialExperience.id);
+            if (!stagedExperience && requestedChoice) editableExperience.backgroundId = requestedChoice.id;
+
             experienceLoader.load(
                 editableExperience
             );
@@ -1952,6 +2004,7 @@ const selectedAudioTrack =
             const background = await prepareBackground(file);
             if (request !== backgroundRequest || editableExperience !== target) return;
             target.background = background;
+            delete target.backgroundId;
             synchroniseEditor(target);
             feedback.textContent = 'Background ready. Save as Copy to keep it; Use in OBS to use it elsewhere.';
         } catch (error) {
@@ -1962,6 +2015,7 @@ const selectedAudioTrack =
         ++backgroundRequest;
         if (!editableExperience) return;
         delete editableExperience.background;
+        delete editableExperience.backgroundId;
         synchroniseEditor(editableExperience);
         document.querySelector<HTMLElement>('#background-feedback')!.textContent = 'Original background restored.';
     });

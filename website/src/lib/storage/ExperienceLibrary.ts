@@ -1,4 +1,5 @@
 import { isBackground } from '../player/Background';
+import { isBackgroundId } from '../player/BackgroundChoices';
 import type {
     Experience
 } from '../models/Experience';
@@ -69,6 +70,7 @@ export function isExperience(
         typeof value.description === 'string' &&
         typeof value.status === 'string' &&
         (value.background === undefined || isBackground(value.background)) &&
+        (value.backgroundId === undefined || isBackgroundId(value.backgroundId)) &&
         isRecord(value.audio) &&
         isRecord(value.atmosphere) &&
         isRecord(value.lighting) &&

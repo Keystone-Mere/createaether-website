@@ -1,0 +1,31 @@
+Aether Studio redesign
+
+Install on feature/studio-redesign with a clean working tree.
+Extract this ZIP into C:\Users\Tom\Documents\createaether-website.
+Only the seven listed source files and six new covers are supplied.
+Do not apply the earlier stash: these additions were already present on origin/main.
+
+From the repository root in PowerShell:
+  git status
+  cd website
+  npm.cmd run build
+  npm.cmd run dev
+
+Open the local URL printed by Astro, then /studio/experiences/temple/.
+Check desktop, tablet and mobile widths; all six experiences; audio; toggles;
+colours; particle sliders/presets; fullscreen; save a copy; import; and Temple journey.
+Production audio files are not included in the source export used for validation.
+Keep the deployment unchanged until the local preview is accepted.
+
+Implemented: responsive four/two/one-column editor, six 16:9 cover images,
+experience dropdown, separate Lighting/Fog/Environment cards, particle controls,
+main audio track selector, separate Preview and Save/Import cards, Coming soon rows.
+Atmosphere tracks remain paired with their main audio track as in the existing runtime.
+The original Studio navigation and Temple journey remain available.
+Canonical defaults and actual saved data values remain the source of truth.
+The cover for imported/saved copies is inferred from their particle preset.
+
+Validation: Astro production build; rendered six routes and cover paths;
+unique control IDs; DOM runtime checks of experience dropdown, track and preset changes,
+save export and custom experience import. Browser visual preview was blocked here;
+local visual and audible/fullscreen checks remain necessary.

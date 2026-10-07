@@ -1,21 +1,21 @@
 ---
 const scenes = [
-  { id: 'temple', name: 'Temple', mood: 'Warm light. A moment of stillness.' },
+  { id: 'temple', name: 'Temple', mood: 'Mountain light. A different perspective.' },
   { id: 'forest', name: 'Forest', mood: 'Soft sunlight. Space to breathe.' },
   { id: 'ocean', name: 'Ocean', mood: 'Open horizons. A slower rhythm.' },
 ];
 ---
 <div class="atmosphere" data-hero-atmosphere>
   <div class="scene" data-scene="temple">
-    {scenes.map((scene, index) => <img src={`/images/experience-covers/${scene.id}.jpg`} alt={`${scene.name} atmosphere`} width="1024" height="576" hidden={index !== 0} data-scene-image={scene.id} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} />)}
+    {scenes.map((scene, index) => <img src={`/images/experience-covers/${scene.id === 'temple' ? 'temple-mountain' : scene.id}.jpg`} alt={`${scene.name} atmosphere`} width="1024" height="576" hidden={index !== 0} data-scene-image={scene.id} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} />)}
     <div class="haze" aria-hidden="true"></div>
     <div class="motes" aria-hidden="true">{Array.from({length: 12}, (_,i) => <i style={`--x:${(i*23+7)%100}%;--delay:-${i*1.7}s;--duration:${10+i%5}s`}></i>)}</div>
     <span class="preview-label">Atmosphere preview</span>
-    <div class="scene-caption" aria-live="polite"><h2 data-scene-name>Temple</h2><p data-scene-mood>Warm light. A moment of stillness.</p></div>
+    <div class="scene-caption" aria-live="polite"><h2 data-scene-name>Temple</h2><p data-scene-mood>Mountain light. A different perspective.</p></div>
   </div>
   <div class="scene-controls" role="group" aria-label="Choose an atmosphere preview">
     {scenes.map((scene,index) => <button type="button" aria-pressed={index === 0 ? 'true' : 'false'} data-scene-choice={scene.id} data-mood={scene.mood}>{scene.name}</button>)}
-    <a href="/studio/experiences/temple/" data-scene-link>Make it yours →</a>
+    <a href="/studio/experiences/temple/?background=temple-mountain" data-scene-link>Make it yours →</a>
   </div>
 </div>
 <script>
@@ -28,7 +28,7 @@ const scenes = [
         root.querySelector<HTMLElement>('[data-scene]')!.dataset.scene = id;
         root.querySelector<HTMLElement>('[data-scene-name]')!.textContent = button.textContent;
         root.querySelector<HTMLElement>('[data-scene-mood]')!.textContent = button.dataset.mood!;
-        root.querySelector<HTMLAnchorElement>('[data-scene-link]')!.href = `/studio/experiences/${id}/`;
+        root.querySelector<HTMLAnchorElement>('[data-scene-link]')!.href = `/studio/experiences/${id}/${id === 'temple' ? '?background=temple-mountain' : ''}`;
       });
     });
   });
