@@ -114,12 +114,19 @@ const selectedAudioTrack =
             <label for="creation-name">Name your creation</label>
             <input id="creation-name" type="text" maxlength="120" placeholder="For example, Storm podcast backdrop" style="width:100%;box-sizing:border-box;margin:8px 0 12px;padding:12px;border:1px solid #475569;border-radius:8px;background:#192537;color:#f8fafc" />
             <small>Your saved creation appears in My Experiences at the top of the dashboard.</small>
-            <p>Save a backup, import a creation, or copy a silent playback link for OBS. Each link keeps the settings you copy.</p>
+            <p>Save your creation or use it as a silent animated backdrop in OBS. Export again after changing its settings.</p>
             <div class="preview-actions">
                 <button type="button" id="save-experience-button">Save as Copy</button>
-                <button type="button" id="copy-playback-link" class="button-secondary">Copy playback link</button>
-                <button type="button" id="download-obs-backdrop" class="button-secondary">Download OBS backdrop</button>
+                <button type="button" id="use-in-obs" class="button-secondary" aria-controls="obs-setup">Use in OBS</button>
                 <button type="button" id="import-experience-button" class="button-secondary">Import experience</button>
+            </div>
+            <div id="obs-setup" hidden>
+                <h3>Set up your OBS backdrop</h3>
+                <p id="obs-setup-instructions" role="status" aria-live="polite"></p>
+                <label for="obs-playback-url" id="obs-playback-label" hidden>Playback URL — select and copy this link</label>
+                <input id="obs-playback-url" type="text" readonly hidden style="width:100%;box-sizing:border-box;padding:12px;background:#192537;color:#f8fafc;border:1px solid #475569;border-radius:8px" />
+                <p id="obs-host-warning" hidden>This export uses your local development server. Keep it running, or export from createaether.com for use without that server.</p>
+                <small>Sound is off. Export again after changes. An internet connection is required for exports from the live website.</small>
             </div>
             <p id="save-experience-feedback" class="save-feedback" role="status" aria-live="polite"></p>
             <a id="saved-experiences-link" class="saved-experiences-link" href="/studio/#my-experiences-title" hidden>View My Experiences →</a>
@@ -1946,7 +1953,7 @@ const selectedAudioTrack =
             if (request !== backgroundRequest || editableExperience !== target) return;
             target.background = background;
             synchroniseEditor(target);
-            feedback.textContent = 'Background ready. Save as Copy to keep it; Download OBS backdrop to use it elsewhere.';
+            feedback.textContent = 'Background ready. Save as Copy to keep it; Use in OBS to use it elsewhere.';
         } catch (error) {
             if (request === backgroundRequest) feedback.textContent = error instanceof Error ? error.message : 'Could not open this image.';
         } finally { input.value = ''; }
@@ -1958,40 +1965,39 @@ const selectedAudioTrack =
         synchroniseEditor(editableExperience);
         document.querySelector<HTMLElement>('#background-feedback')!.textContent = 'Original background restored.';
     });
-    document.querySelector('#download-obs-backdrop')?.addEventListener('click', () => {
+    document.querySelector('#use-in-obs')?.addEventListener('click', async () => {
         if (!editableExperience) return;
-        const feedback = document.querySelector<HTMLElement>('#save-experience-feedback')!;
-        if (!editableExperience.background) {
-            feedback.textContent = 'For an original scene, use Copy playback link. Upload a background to download a backdrop file.';
-            return;
-        }
+        const setup = document.querySelector<HTMLElement>('#obs-setup')!;
+        const instructions = document.querySelector<HTMLElement>('#obs-setup-instructions')!;
+        const urlInput = document.querySelector<HTMLInputElement>('#obs-playback-url')!;
+        const urlLabel = document.querySelector<HTMLElement>('#obs-playback-label')!;
+        setup.hidden = false;
+        document.querySelector<HTMLElement>('#obs-host-warning')!.hidden = !['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
         const snapshot = { ...cloneExperience(editableExperience), ...structuredClone(experienceState.data) };
-        const html = createBackdropHtml(createPlaybackUrl(snapshot, location.origin), editableExperience.background);
-        const objectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-        const link = document.createElement('a');
-        link.href = objectUrl;
-        link.download = 'aether-obs-backdrop.html';
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-        feedback.textContent = 'Downloaded. In OBS Browser Source, tick Local file, choose this HTML file, and set 1920 × 1080. Keep internet available; files made on localhost need your development server running. Download again after changes.';
-    });
-
-    document.querySelector('#copy-playback-link')?.addEventListener('click', async () => {
-        if (!editableExperience) return;
-        const feedback = document.querySelector<HTMLElement>('#save-experience-feedback');
-        const snapshot = { ...cloneExperience(editableExperience), ...structuredClone(experienceState.data) };
+        const url = createPlaybackUrl(snapshot, location.origin);
+        urlInput.hidden = urlLabel.hidden = !!snapshot.background;
         if (snapshot.background) {
-            if (feedback) feedback.textContent = 'For an uploaded image, use Download OBS backdrop. The file carries your image and settings together.';
-            return;
+            const html = createBackdropHtml(url, snapshot.background);
+            const objectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = 'aether-obs-backdrop.html';
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+            instructions.textContent = 'HTML backdrop downloaded. In OBS, add or open a Browser source, tick Local File, browse to the newly downloaded aether-obs-backdrop.html, set Width to 1920 and Height to 1080, then click OK.';
+        } else {
+            urlInput.value = url;
+            instructions.textContent = 'In OBS, add or open a Browser source, untick Local File, paste the playback URL below into URL, set Width to 1920 and Height to 1080, then click OK.';
+            try {
+                await navigator.clipboard.writeText(url);
+                instructions.textContent = 'Playback link copied. ' + instructions.textContent;
+            } catch {
+                instructions.textContent = 'Select and copy the playback URL below. ' + instructions.textContent;
+            }
         }
-        try {
-            const url = createPlaybackUrl(snapshot, window.location.origin);
-            await navigator.clipboard.writeText(url);
-            if (feedback) feedback.textContent = 'Playback link copied. Paste it into OBS Browser Source (1920 × 1080). Sound is off. The link keeps these settings; copy a new link after changes.';
-        } catch (error) {
-            if (feedback) feedback.textContent = 'Could not copy the playback link. Please try again.';
-            console.error(error);
-        }
+    });
+    document.querySelector<HTMLInputElement>('#obs-playback-url')?.addEventListener('click', (event) => {
+        (event.currentTarget as HTMLInputElement).select();
     });
 
     if (
