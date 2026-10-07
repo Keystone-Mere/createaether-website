@@ -1,0 +1,215 @@
+---
+interface Props { sceneId: string; name: string; exitButton?: boolean; }
+const { sceneId, name, exitButton = true } = Astro.props;
+---
+            <div
+                id="experience-preview-stage"
+                class="preview-stage"
+                data-scene={sceneId}
+                aria-label={`${name} atmosphere preview`}
+                tabindex="-1"
+            >
+                {exitButton && <button type="button" id="exit-fullscreen-preview" class="fullscreen-exit" aria-label="Exit full-screen preview">Exit full screen</button>}
+                <div class="preview-scene">
+                <img class="preview-scene-image" src={`/images/experience-covers/${sceneId === 'festival' ? 'festival-evening' : sceneId === 'storm' ? 'storm-balcony' : sceneId}.jpg`} alt="" aria-hidden="true" />
+                <div class="scene-tint"></div>
+                <div class="candle-light candle-light--left"></div>
+                <div class="candle-light candle-light--back"></div>
+                <div class="candle-light candle-light--right"></div>
+                <div class="candle-light candle-light--front"></div>
+                <div class="scene-light" aria-hidden="true"></div>
+
+                <canvas
+                    class="preview-canvas"
+                    aria-hidden="true"
+                ></canvas>
+
+                
+
+
+                <div class="preview-fog preview-fog--one"></div>
+                <div class="preview-fog preview-fog--two"></div>
+
+                </div>
+            </div>
+
+<style>
+.preview-stage{
+    --aether-lighting-colour:#3b82f6;
+    --aether-stage-ambient:#3b82f6;
+    --aether-environment-colour:#0b1427;
+    --aether-lighting-intensity:1;
+    --aether-lighting-glow-strength:18%;
+    --aether-lighting-orb-strength:55%;
+    --aether-lighting-shadow-strength:42%;
+    --aether-lighting-pulse-duration:4s;
+
+    --aether-fog-colour:#94a3b8;
+    --aether-fog-opacity:.35;
+    --aether-fog-secondary-opacity:.2;
+    --aether-fog-blur:20px;
+    --aether-fog-duration:14s;
+
+    --aether-transition-duration:1000ms;
+    --aether-transition-easing:ease;
+
+    position:relative;
+    min-height:240px;
+    overflow:hidden;
+    border:1px solid rgba(56,189,248,.18);
+    border-radius:14px;
+    background:
+        radial-gradient(
+            circle at 50% 48%,
+            color-mix(
+                in srgb,
+                var(--aether-stage-ambient) 16%,
+                transparent
+            ),
+            transparent 34%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--aether-environment-colour) 72%, #020617) 0%,
+            var(--aether-environment-colour) 58%,
+            color-mix(in srgb, var(--aether-environment-colour) 70%, #1e293b) 100%
+        );
+}
+
+.preview-canvas{
+    position:absolute;
+    z-index:3;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+
+.preview-stage--fog-disabled .preview-fog{
+    opacity:0;
+}
+
+.preview-fog{
+    position:absolute;
+    left:-15%;
+    z-index:1;
+    width:130%;
+    height:82px;
+    border-radius:50%;
+    background:
+        radial-gradient(
+            ellipse at center,
+            color-mix(
+                in srgb,
+                var(--aether-fog-colour) 65%,
+                transparent
+            ) 0%,
+            color-mix(
+                in srgb,
+                var(--aether-fog-colour) 32%,
+                transparent
+            ) 48%,
+            transparent 78%
+        );
+    filter:blur(var(--aether-fog-blur));
+    opacity:var(--aether-fog-opacity);
+    pointer-events:none;
+    will-change:transform,opacity;
+}
+
+.preview-fog--one{
+    bottom:15px;
+    animation:
+        fog-drift
+        var(--aether-fog-duration)
+        ease-in-out
+        infinite;
+}
+
+.preview-fog--two{
+    bottom:48px;
+    opacity:var(--aether-fog-secondary-opacity);
+    animation:
+        fog-drift
+        calc(var(--aether-fog-duration) * 1.3)
+        ease-in-out
+        infinite
+        reverse;
+}
+
+@keyframes fog-drift{
+    0%,
+    100%{
+        transform:translateX(-3%);
+    }
+
+    50%{
+        transform:translateX(3%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .preview-glow,
+    .preview-orb,
+    .preview-fog{
+        animation:none;
+    }
+}
+
+
+.preview-scene { position:absolute; inset:0; overflow:hidden; }
+.preview-scene-image, .scene-tint, .candle-light { display:none; pointer-events:none; }
+.preview-stage .preview-scene-image { display:block; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.preview-stage[data-scene="temple"] .preview-glow,
+.preview-stage[data-scene="temple"] .preview-orb { display:none; }
+.preview-stage .scene-tint { display:block; position:absolute; inset:0; background:var(--aether-environment-colour); opacity:.08; z-index:1; }
+.preview-stage[data-scene="temple"] .candle-light { display:block; position:absolute; width:20%; height:32%; transform:translate(-50%,-50%); z-index:2; background:radial-gradient(ellipse, color-mix(in srgb,var(--aether-lighting-colour) 85%,transparent),transparent 70%); mix-blend-mode:screen; opacity:calc(var(--aether-lighting-intensity) * .6); animation:candle-shimmer var(--aether-lighting-pulse-duration, 4.7s) ease-in-out infinite alternate; }
+.candle-light--left { left:10%; top:32%; }
+.candle-light--back { left:44%; top:33%; animation-delay:-1.7s!important; }
+.candle-light--right { left:86%; top:41%; animation-delay:-2.8s!important; }
+.candle-light--front { left:7%; top:73%; animation-delay:-3.6s!important; }
+.preview-stage[data-scene="temple"].preview-stage--lighting-disabled .candle-light { display:none; }
+.preview-stage--lighting-static .candle-light { animation:none!important; }
+.preview-stage:not(:fullscreen) { min-height:0; aspect-ratio:16/9; }
+.preview-stage:fullscreen { background:#000; display:grid; place-items:center; }
+.preview-stage:fullscreen .preview-scene { position:relative; inset:auto; width:min(100vw,177.7778vh); height:min(100vh,56.25vw); }
+.scene-light { position:absolute; inset:0; pointer-events:none; z-index:2; background:radial-gradient(ellipse at 65% 20%,var(--aether-lighting-colour),transparent 70%); mix-blend-mode:screen; opacity:calc(var(--aether-lighting-intensity) * .18); animation:scene-breathe var(--aether-lighting-pulse-duration) ease-in-out infinite alternate; }
+.preview-stage[data-scene="temple"] .scene-light { display:none; }
+.preview-stage[data-scene="ocean"] .scene-light { background:linear-gradient(180deg,transparent 35%,var(--aether-lighting-colour) 55%,transparent 75%); }
+.preview-stage[data-scene="christmas"] .scene-light { background:radial-gradient(ellipse at 78% 65%,var(--aether-lighting-colour),transparent 65%); }
+.preview-stage[data-scene="festival"] .scene-light { background:radial-gradient(ellipse at 35% 35%,var(--aether-lighting-colour),transparent 55%),radial-gradient(ellipse at 70% 35%,var(--aether-lighting-colour),transparent 55%); }
+.preview-stage[data-scene="storm"] .preview-fog {
+    left:0; top:0; bottom:auto; width:100%; height:100%; border-radius:0;
+    clip-path:polygon(0% 8%,23% 0%,100% 0%,100% 100%,69% 100%,0% 86%);
+    background:radial-gradient(ellipse at 65% 65%,color-mix(in srgb,var(--aether-fog-colour) 35%,transparent),transparent 65%);
+    animation:none;
+}
+.preview-stage[data-scene="storm"] .scene-light { background:radial-gradient(ellipse at 0% 100%,var(--aether-lighting-colour),transparent 30%); }
+
+/* Stage haze remains above the audience in scene-relative coordinates. */
+.preview-stage[data-scene="festival"] .preview-fog {
+    z-index:2; left:18%; width:53%; height:24%; bottom:auto;
+    border-radius:45%; filter:blur(12px);
+    mix-blend-mode:screen;
+    background:radial-gradient(ellipse at 35% 55%,color-mix(in srgb,var(--aether-fog-colour) 80%,transparent),transparent 55%),radial-gradient(ellipse at 70% 45%,color-mix(in srgb,var(--aether-lighting-colour) 50%,transparent),transparent 60%);
+    animation-name:festival-haze-drift;
+    animation-duration:calc(var(--aether-fog-duration) * 2);
+}
+.preview-stage[data-scene="festival"] .preview-fog--one { top:41%; }
+.preview-stage[data-scene="festival"] .preview-fog--two { top:47%; height:18%; animation-duration:calc(var(--aether-fog-duration) * 2.6); }
+.preview-stage[data-scene="festival"].preview-stage--fog-disabled .preview-fog { opacity:0; }
+.preview-stage[data-scene="festival"] .scene-light { animation-duration:calc(var(--aether-lighting-pulse-duration) * 2.5); }
+@keyframes festival-haze-drift {
+    0%,100% { transform:translate(-4%,0) scale(1); }
+    50% { transform:translate(4%,-4%) scale(1.05); }
+}
+@media(prefers-reduced-motion:reduce) { .preview-stage[data-scene="festival"] .preview-fog { animation:none; } }
+
+.preview-stage--lighting-disabled .scene-light { display:none; }
+.preview-stage--lighting-static .scene-light { animation:none; }
+@keyframes scene-breathe { to { opacity:calc(var(--aether-lighting-intensity) * .3); } }
+@media(prefers-reduced-motion:reduce) { .scene-light { animation:none!important; } }
+@keyframes candle-shimmer { 0% { opacity:calc(var(--aether-lighting-intensity) * .25); } 38% { opacity:calc(var(--aether-lighting-intensity) * .95); } 71% { opacity:calc(var(--aether-lighting-intensity) * .4); } 100% { opacity:calc(var(--aether-lighting-intensity) * .8); } }
+.fullscreen-exit{display:none}.preview-stage:fullscreen .fullscreen-exit{display:block;position:absolute;right:24px;top:24px;z-index:10;background:#192537;color:white;border:1px solid #94a3b8;padding:10px;border-radius:8px}
+
+</style>

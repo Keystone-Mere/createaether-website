@@ -143,18 +143,15 @@ export const createStudioRuntime = (
             experienceState
         );
 
-    window.addEventListener(
-        'pagehide',
-        () => {
-            experienceRuntime.destroy();
-            canvasRenderer?.destroy();
-        },
-        {
-            once: true
-        }
-    );
+    const destroy = () => {
+        experienceRuntime.destroy();
+        canvasRenderer?.destroy();
+        window.removeEventListener('pagehide', destroy);
+    };
+    window.addEventListener('pagehide', destroy, { once: true });
 
     return {
+        destroy,
         experienceRuntime,
         experienceLibrary,
         experienceState,

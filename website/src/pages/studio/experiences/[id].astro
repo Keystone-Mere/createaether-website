@@ -1,4 +1,5 @@
 ---
+import SceneStage from '../../../components/studio/SceneStage.astro';
 import StudioLayout from '../../../layouts/StudioLayout.astro';
 import AudioPanel from '../../../components/studio/AudioPanel.astro';
 import ParticlesPanel from '../../../components/studio/ParticlesPanel.astro';
@@ -85,36 +86,7 @@ const selectedAudioTrack =
                 </span>
             </div>
 
-            <div
-                id="experience-preview-stage"
-                class="preview-stage"
-                data-scene={experience.id}
-                aria-label={`${experience.name} atmosphere preview`}
-                tabindex="-1"
-            >
-                <button type="button" id="exit-fullscreen-preview" class="fullscreen-exit" aria-label="Exit full-screen preview">Exit full screen</button>
-                <div class="preview-scene">
-                <img class="preview-scene-image" src={`/images/experience-covers/${experience.id === 'festival' ? 'festival-evening' : experience.id === 'storm' ? 'storm-balcony' : experience.id}.jpg`} alt="" aria-hidden="true" />
-                <div class="scene-tint"></div>
-                <div class="candle-light candle-light--left"></div>
-                <div class="candle-light candle-light--back"></div>
-                <div class="candle-light candle-light--right"></div>
-                <div class="candle-light candle-light--front"></div>
-                <div class="scene-light" aria-hidden="true"></div>
-
-                <canvas
-                    class="preview-canvas"
-                    aria-hidden="true"
-                ></canvas>
-
-                
-
-
-                <div class="preview-fog preview-fog--one"></div>
-                <div class="preview-fog preview-fog--two"></div>
-
-                </div>
-            </div>
+            <SceneStage sceneId={experience.id} name={experience.name} />
             <div class="preview-stage__label">
                 <span id="preview-experience-name">{experience.name} Environment</span>
                 <small id="preview-experience-description">{experience.description}</small>
@@ -132,10 +104,11 @@ const selectedAudioTrack =
             </div>
         </div>
         <div class="panel save-panel">
-            <h2>Save and Import</h2>
-            <p>Save your creation on this device and download a backup, or import an Aether experience.</p>
+            <h2>Save and Use Elsewhere</h2>
+            <p>Save a backup, import a creation, or copy a silent playback link for OBS. Each link keeps the settings you copy.</p>
             <div class="preview-actions">
                 <button type="button" id="save-experience-button">Save as Copy</button>
+                <button type="button" id="copy-playback-link" class="button-secondary">Copy playback link</button>
                 <button type="button" id="import-experience-button" class="button-secondary">Import experience</button>
             </div>
             <p id="save-experience-feedback" class="save-feedback" role="status" aria-live="polite"></p>
@@ -867,6 +840,7 @@ const selectedAudioTrack =
 ></audio>
 
 <script>
+    import { createPlaybackUrl } from '../../../lib/player/PlaybackLink';
     import { audioTracks } from '../../../data/audio/tracks';
     import { experiences as defaultExperiences } from '../../../data/experiences';
     import type {
@@ -1943,6 +1917,20 @@ const selectedAudioTrack =
             if (!document.fullscreenElement) launchPreviewButton.focus({ preventScroll: true });
         });
     }
+
+    document.querySelector('#copy-playback-link')?.addEventListener('click', async () => {
+        if (!editableExperience) return;
+        const feedback = document.querySelector<HTMLElement>('#save-experience-feedback');
+        const snapshot = { ...cloneExperience(editableExperience), ...structuredClone(experienceState.data) };
+        try {
+            const url = createPlaybackUrl(snapshot, window.location.origin);
+            await navigator.clipboard.writeText(url);
+            if (feedback) feedback.textContent = 'Playback link copied. Paste it into OBS Browser Source (1920 × 1080). Sound is off. The link keeps these settings; copy a new link after changes.';
+        } catch (error) {
+            if (feedback) feedback.textContent = 'Could not copy the playback link. Please try again.';
+            console.error(error);
+        }
+    });
 
     if (
         saveExperienceButton instanceof HTMLButtonElement

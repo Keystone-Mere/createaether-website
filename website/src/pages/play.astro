@@ -1,0 +1,64 @@
+---
+import SceneStage from '../components/studio/SceneStage.astro';
+---
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Aether Playback</title>
+</head>
+<body>
+    <main id="player" hidden><SceneStage sceneId="temple" name="Aether environment" exitButton={false} /></main>
+    <section id="playback-error" hidden role="alert">
+        <h1>This playback link could not be opened</h1>
+        <p>Return to the Studio and copy a new playback link.</p>
+        <a href="/studio">Open Aether Studio</a>
+    </section>
+    <script>
+        import { readPlaybackHash } from '../lib/player/PlaybackLink';
+        import { createStudioRuntime } from '../lib/studio/StudioRuntime';
+        let runtime: ReturnType<typeof createStudioRuntime> | null = null;
+        function load() {
+            runtime?.destroy();
+            runtime = null;
+            const player = document.querySelector<HTMLElement>('#player')!;
+            const error = document.querySelector<HTMLElement>('#playback-error')!;
+            player.hidden = true;
+            error.hidden = true;
+            try {
+                const experience = readPlaybackHash(location.hash);
+                const stage = document.querySelector<HTMLElement>('.preview-stage')!;
+                stage.dataset.scene = experience.sceneId;
+                stage.setAttribute('aria-label', `${experience.name} environment`);
+                const scene = experience.sceneId === 'festival' ? 'festival-evening' : experience.sceneId === 'storm' ? 'storm-balcony' : experience.sceneId;
+                stage.querySelector<HTMLImageElement>('.preview-scene-image')!.src = `/images/experience-covers/${scene}.jpg`;
+                document.title = `${experience.name} — Aether Playback`;
+                player.hidden = false;
+                runtime = createStudioRuntime({
+                    audioElement: null, audioEnabledToggle: null, volumeControl: null, layerVolumeControl: null,
+                    volumeValue: null, particlesToggle: null, lightingToggle: null, fogToggle: null,
+                    previewStage: stage, previewCanvas: stage.querySelector('canvas'),
+                    particlesStatus: null, lightingStatus: null, fogStatus: null,
+                });
+                runtime.experienceLoader.load(experience);
+            } catch {
+                player.hidden = true;
+                error.hidden = false;
+            }
+        }
+        load();
+        window.addEventListener('hashchange', load);
+    </script>
+</body>
+</html>
+<style is:global>
+    html,body { margin:0; width:100%; height:100%; background:#000; overflow:hidden; }
+    #player { width:100%; height:100%; }
+    #player:not([hidden]) { display:grid; place-items:center; }
+    #player .preview-stage { width:min(100vw,177.7778vh); height:min(100vh,56.25vw); min-height:0; aspect-ratio:16/9; border:0; border-radius:0; }
+    #playback-error { font:16px/1.6 system-ui; color:#e2e8f0; max-width:540px; padding:40px; }
+    #playback-error a { color:#7dd3fc; }
+</style>
