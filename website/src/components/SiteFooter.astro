@@ -9,17 +9,11 @@ const platformLinks = [
 const developerLinks = [
   {
     label: 'GitHub',
-    href: 'https://github.com/Benchelt/createaether-website',
+    href: 'https://github.com/Keystone-Mere/createaether-website',
     external: true,
   },
 ];
 
-const comingSoonLinks = [
-  'Documentation',
-  'Playground',
-  'LinkedIn',
-  'YouTube',
-];
 ---
 
 <footer class="site-footer">
@@ -43,11 +37,11 @@ const comingSoonLinks = [
       </a>
 
       <p class="footer-product-name">
-        Experience Operating System
+        Immersive environments
       </p>
 
       <p class="footer-description">
-        Design, orchestrate and deploy immersive digital experiences.
+        Create environments with scenes, sound, lighting and animated effects.
       </p>
 
       <div class="runtime-card" aria-label="Aether runtime status">
@@ -55,8 +49,8 @@ const comingSoonLinks = [
           <span class="runtime-dot" aria-hidden="true"></span>
 
           <span>
-            <strong>Runtime online</strong>
-            <small>Experience engine active</small>
+            <strong>Create in your browser</strong>
+            <small>Live scene preview</small>
           </span>
         </div>
 
@@ -109,45 +103,17 @@ const comingSoonLinks = [
           ))
         }
 
-        <li>
-          <span class="future-link">
-            SDK
-            <small>Coming soon</small>
-          </span>
-        </li>
-
-        <li>
-          <span class="future-link">
-            API
-            <small>Coming soon</small>
-          </span>
-        </li>
       </ul>
     </nav>
 
-    <div class="footer-column">
-      <h2>Coming next</h2>
 
-      <ul>
-        {
-          comingSoonLinks.map((label) => (
-            <li>
-              <span class="future-link">
-                {label}
-                <small>Coming soon</small>
-              </span>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
   </div>
 
   <div class="footer-statement">
     <span class="statement-line" aria-hidden="true"></span>
 
     <p>
-      Experience Operating System
+      Immersive environments
       <strong>for the Web</strong>
     </p>
 
@@ -224,7 +190,7 @@ const comingSoonLinks = [
     display: grid;
     grid-template-columns:
       minmax(320px, 1.9fr)
-      repeat(3, minmax(140px, 1fr));
+      repeat(2, minmax(140px, 1fr));
     gap: clamp(2.5rem, 5vw, 5rem);
     padding: clamp(3.5rem, 7vw, 5.5rem) 0;
   }

@@ -2,7 +2,7 @@
 import HeroAtmosphere from '../components/HeroAtmosphere.astro';
 import PostHog from '../components/posthog.astro';
 import ExperienceShowcase from '../components/ExperienceShowcase.astro';
-import PlannedProjects from '../components/PlannedProjects.astro';
+
 
 import '../styles/design-system.css';
 import '../styles/animations.css';
@@ -20,9 +20,9 @@ import SiteFooter from '../components/SiteFooter.astro';
     />
     <meta
       name="description"
-      content="Create a personal relaxation experience with Aether. Choose from six immersive scenes, customise sound and visual effects, and enjoy it in full screen."
+      content="Create immersive environments with Aether. Combine scenes, sound, lighting and animated effects, enjoy them in full screen, or use their visuals in OBS."
     />
-    <title>Aether — Immersive scenes for relaxation</title>
+    <title>Aether — Create immersive environments</title>
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <PostHog />
   </head>
@@ -72,16 +72,16 @@ import SiteFooter from '../components/SiteFooter.astro';
         <div class="hero-content">
           <p class="eyebrow">Immersive experiences, shaped by you</p>
 
-          <h1>Make space to unwind.</h1>
+          <h1>Create immersive environments.</h1>
 
           <p class="hero-copy">
-            Aether lets you create a personal relaxation experience with immersive scenes and sound.
-            Choose a scene, adjust its sound and visual effects, then enjoy it in full screen.
+            Combine scenes, sound, lighting and animated effects in a live editor.
+            Make an environment your own, enjoy it in full screen, or use its visuals as a backdrop in OBS.
           </p>
 
           <div class="actions">
             <a class="button primary" href="#experiences">
-              Explore experiences →
+              Explore scenes →
             </a>
 
             <a class="button secondary" href="/studio/">
@@ -89,7 +89,7 @@ import SiteFooter from '../components/SiteFooter.astro';
             </a>
           </div>
 
-          <p class="hero-benefits">Six ready-made experiences · Live preview · Save on this device</p>
+          <p class="hero-benefits">Six starter scenes · Upload your own background · Use in OBS</p>
         </div>
         <div class="hero-visual"><HeroAtmosphere /></div>
       </section>
@@ -121,7 +121,7 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>01</span>
             <h3>Choose</h3>
             <p>
-              Start with a ready-made experience preset, then shape its atmosphere and behaviour.
+              Choose one of six starter scenes, or upload your own background image.
             </p>
           </article>
 
@@ -137,15 +137,15 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>03</span>
             <h3>Preview</h3>
             <p>
-              Test the experience in the live browser-based preview.
+              See your changes immediately, then explore your environment in full screen.
             </p>
           </article>
 
           <article class="workflow-step">
             <span>04</span>
-            <h3>Save</h3>
+            <h3>Save and use</h3>
             <p>
-              Keep your changes on this device and return to your atmosphere whenever you like.
+              Save your creation on this device. Use in OBS provides a silent playback link or an HTML backdrop file.
             </p>
           </article>
         </div>
@@ -158,7 +158,29 @@ import SiteFooter from '../components/SiteFooter.astro';
       <p class="technology-link">
         Curious about the engine? <a href="/features/#architecture">Explore Aether’s technology →</a>
       </p>
-      <PlannedProjects />
+      <section id="applications" class="workflow-section" aria-labelledby="applications-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">What you can create</p><h2 id="applications-title">One engine. Different experiences.</h2></div>
+          <p>Atmosphere can set the scene for a recording, a quiet moment or a story. Explore working tools and an educational prototype.</p>
+        </div>
+        <div class="workflow-grid applications-grid">
+          <article class="workflow-step">
+            <span>Creative backdrops · Available now</span><h3>Set the scene for your content</h3>
+            <p>Create an animated visual backdrop for podcasts, streams and recordings. Add it to OBS as a Browser source alongside your camera.</p>
+            <a class="workflow-link" href="/studio/">Create a backdrop →</a>
+          </article>
+          <article class="workflow-step">
+            <span>Relaxation · Available now</span><h3>Make space to unwind</h3>
+            <p>Shape your own soundscape and visual environment, or try a guided relaxation session in full screen.</p>
+            <a class="workflow-link" href="/studio/guided-relaxation/">Try guided relaxation →</a>
+          </article>
+          <article class="workflow-step">
+            <span>Education and storytelling · Prototype</span><h3>Explore a story through place</h3>
+            <p>Djed-Hor’s Journey explores an interactive educational experience inspired by an ancient Egyptian exhibit. This educational prototype demonstrates a different direction for immersive experiences.</p>
+          </article>
+        </div>
+        <p>OBS exports are silent and require a connection to the Aether player. Your uploaded image is included in the HTML backdrop file. Camera background removal is handled separately in your recording setup.</p>
+      </section>
     </main>
 
     <SiteFooter />
@@ -545,6 +567,8 @@ import SiteFooter from '../components/SiteFooter.astro';
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
   }
+
+  .applications-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
 
   .workflow-step {
     min-height: 220px;
