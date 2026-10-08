@@ -1,5 +1,6 @@
 import type { Experience } from '../models/Experience';
 export interface StoryScene {
+  label?: string; nextLabel?: string;
   id: string; title: string; caption: string; image: string; imageAlt: string;
   imageCredit: string; aspectRatio: string; experience: Experience;
 }

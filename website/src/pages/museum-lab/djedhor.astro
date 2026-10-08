@@ -33,75 +33,21 @@ const opening = djedhorScenes[0];
 </main>
 <audio id="story-audio" data-track-id="temple-echoes" preload="none" loop></audio>
 <script>
-import { StorySequence } from '../../lib/story/StorySequence';
+import { createStoryPlayer } from '../../lib/story/StoryPlayer';
 import { djedhorScenes, djedhorDetails } from '../../data/stories/djedhor';
 import { createStudioRuntime } from '../../lib/studio/StudioRuntime';
 const get = <T extends HTMLElement>(id:string) => document.getElementById(id) as T;
-const sequence = new StorySequence(djedhorScenes);
 const stage = get<HTMLDivElement>('experience-preview-stage');
-const image = stage.querySelector<HTMLImageElement>('.preview-scene-image')!;
 const audio = get<HTMLAudioElement>('story-audio');
 const runtime = createStudioRuntime({audioElement:audio, previewStage:stage, previewCanvas:stage.querySelector('canvas'), audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,particlesStatus:null,lightingStatus:null,fogStatus:null});
-const sound = get<HTMLButtonElement>('sound');
-const narrate = get<HTMLButtonElement>('narrate');
 const reveal = get<HTMLInputElement>('reveal');
 const details = new Set<number>();
-let soundEnabled = false;
-let speaking = false;
-let audioAttempt = 0;
-const speechAvailable = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
-function stopNarration() { if(speechAvailable) window.speechSynthesis.cancel(); speaking=false; narrate.textContent='Listen to chapter'; }
-function loadAtmosphere() {
-  const experience = structuredClone(sequence.current.experience);
-  experience.audio.enabled = soundEnabled;
-  runtime.experienceLoader.load(experience);
-}
-async function applySound() {
-  const attempt = ++audioAttempt;
-  loadAtmosphere();
-  sound.textContent = soundEnabled ? 'Sound on' : 'Sound off';
-  sound.setAttribute('aria-pressed', String(soundEnabled));
-  if (!soundEnabled) { audio.pause(); return; }
-  try { await audio.play(); if(attempt!==audioAttempt && !soundEnabled) audio.pause(); }
-  catch { if(attempt!==audioAttempt) return; soundEnabled=false; loadAtmosphere(); sound.textContent='Sound off'; sound.setAttribute('aria-pressed','false'); get('status').textContent='Sound could not start. You can still explore the full story.'; }
-}
 function updateReveal() {
   const value=Number(reveal.value);
   get('scroll-cover').style.clipPath=`inset(0 0 0 ${value}%)`;
   get('reveal-value').textContent=`${value}%`;
   document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(button=>button.disabled=value<100);
 }
-function render(focus=false) {
-  stopNarration();
-  const scene=sequence.current;
-  image.src=scene.image; image.alt=scene.imageAlt; image.removeAttribute('aria-hidden');
-  stage.style.aspectRatio=scene.aspectRatio;
-  stage.setAttribute('aria-label',scene.title);
-  get('chapter-title').textContent=scene.title;
-  get('caption').textContent=scene.caption;
-  get('credit').textContent=scene.imageCredit;
-  get('progress').textContent=`Chapter ${sequence.index+1} of ${sequence.scenes.length}`;
-  get('chapter-label').textContent=['THE OBJECT','EXPLORE THE BELIEF','BACK TO THE OBJECT'][sequence.index];
-  const exploring=scene.id==='judgement';
-  ['explore-overlay','reveal-controls','detail-controls'].forEach(id=>get(id).hidden=!exploring);
-  get<HTMLButtonElement>('back').disabled=sequence.first;
-  get('next').hidden=sequence.last;
-  get('next').textContent=sequence.first?'Explore the judgement →':'Return to the real object →';
-  get('replay').hidden=!sequence.last;
-  get('completion').hidden=!sequence.last;
-  get('status').textContent='';
-  narrate.hidden=!speechAvailable;
-  loadAtmosphere(); updateReveal();
-  if(focus) get('chapter-title').focus({preventScroll:true});
-}
-get('next').addEventListener('click',()=>{sequence.next();render(true);});
-get('back').addEventListener('click',()=>{sequence.back();render(true);});
-get('replay').addEventListener('click',()=>{
-  sequence.replay();details.clear();reveal.value='12';
-  document.querySelectorAll('[data-detail]').forEach(button=>button.removeAttribute('aria-pressed'));
-  get('found').textContent='0 of 3 details explored';
-  get('detail').textContent='Reveal the scroll, then choose a numbered detail.';render(true);
-});
 reveal.addEventListener('input',updateReveal);
 get('reveal-all').addEventListener('click',()=>{reveal.value='100';updateReveal();});
 document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(button=>button.addEventListener('click',()=>{
@@ -111,19 +57,22 @@ document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(button=>bu
   const text=document.createElement('p');text.textContent=detail.text;get('detail').append(heading,text);
   document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(item=>item.setAttribute('aria-pressed',String(Number(item.dataset.detail)===index)));
 }));
-sound.addEventListener('click',()=>{soundEnabled=!soundEnabled;void applySound();});
-narrate.addEventListener('click',()=>{
-  if(speaking){stopNarration();return;}
-  stopNarration();const utterance=new SpeechSynthesisUtterance(`${sequence.current.title}. ${sequence.current.caption}`);
-  utterance.lang='en-GB';utterance.rate=.9;
-  utterance.onend=()=>{speaking=false;narrate.textContent='Listen to chapter';};
-  utterance.onerror=()=>{speaking=false;narrate.textContent='Listen to chapter';get('status').textContent='Device narration is unavailable. Read the chapter text instead.';};
-  speaking=true;narrate.textContent='Stop narration';window.speechSynthesis.speak(utterance);
+createStoryPlayer({
+  scenes: djedhorScenes, root: document, stage, audio,
+  loader: runtime.experienceLoader,
+  onSceneChange(scene) {
+    get('chapter-label').textContent=scene.label ?? '';
+    const exploring=scene.id==='judgement';
+    ['explore-overlay','reveal-controls','detail-controls'].forEach(id=>get(id).hidden=!exploring);
+    updateReveal();
+  },
+  onReplay() {
+    details.clear();reveal.value='12';
+    document.querySelectorAll('[data-detail]').forEach(button=>button.removeAttribute('aria-pressed'));
+    get('found').textContent='0 of 3 details explored';
+    get('detail').textContent='Reveal the scroll, then choose a numbered detail.';
+  }
 });
-function silence(){stopNarration();soundEnabled=false;++audioAttempt;audio.pause();loadAtmosphere();sound.textContent='Sound off';sound.setAttribute('aria-pressed','false');}
-document.addEventListener('visibilitychange',()=>{if(document.hidden)silence();});
-window.addEventListener('pagehide',()=>{stopNarration();audio.pause();},{once:true});
-render();
 </script>
 <style>
 :global(*){box-sizing:border-box} :global([hidden]){display:none!important}
