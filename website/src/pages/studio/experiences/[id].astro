@@ -100,7 +100,6 @@ const selectedAudioTrack =
             <div class="preview-actions">
                 <button type="button" id="choose-background" class="button-secondary">Upload background</button>
                 <input id="background-upload" type="file" accept="image/jpeg,image/png,image/webp" hidden />
-                <button type="button" id="reset-background" class="button-secondary">Use original background</button>
             </div>
             <p id="background-feedback" role="status" class="save-feedback">JPG, PNG or WebP, up to 15 MB. Images fill the scene and may be cropped.</p>
             <div class="preview-actions">
@@ -1256,7 +1255,8 @@ const selectedAudioTrack =
         const choices = backgroundChoices.filter(choice => choice.sceneId === coverId);
         const choiceGroup = document.querySelector<HTMLFieldSetElement>('#background-choices')!;
         const choiceButtons = document.querySelector<HTMLElement>('#background-choice-buttons')!;
-        choiceGroup.hidden = choices.length === 0;
+        // Original also restores uploaded images when no alternative scenes exist.
+        choiceGroup.hidden = false;
         // Keep the buttons in place during slider changes so keyboard focus is retained.
         if (choiceButtons.dataset.scene !== coverId) {
             choiceButtons.replaceChildren();
@@ -2010,14 +2010,6 @@ const selectedAudioTrack =
         } catch (error) {
             if (request === backgroundRequest) feedback.textContent = error instanceof Error ? error.message : 'Could not open this image.';
         } finally { input.value = ''; }
-    });
-    document.querySelector('#reset-background')?.addEventListener('click', () => {
-        ++backgroundRequest;
-        if (!editableExperience) return;
-        delete editableExperience.background;
-        delete editableExperience.backgroundId;
-        synchroniseEditor(editableExperience);
-        document.querySelector<HTMLElement>('#background-feedback')!.textContent = 'Original background restored.';
     });
     document.querySelector('#use-in-obs')?.addEventListener('click', async () => {
         if (!editableExperience) return;

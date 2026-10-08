@@ -8,7 +8,7 @@ const hasLayer = Boolean(selectedTrack?.layerSrc);
 <div class="panel">
     <h2>Audio</h2>
 
-    <label class="toggle-row"><input id="audio-enabled" type="checkbox" checked={experience.audio.enabled} /> Sound On</label>
+    <label class="toggle-row"><input id="audio-enabled" type="checkbox" checked={experience.audio.enabled} /> Enable audio</label>
     <label for="main-audio-select">Main audio</label>
     <select id="main-audio-select">{audioTracks.map(track => <option value={track.id} selected={track.id === experience.audio.track}>{track.title}</option>)}</select>
     <div class="volume-heading">
