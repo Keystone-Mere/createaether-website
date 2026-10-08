@@ -1,0 +1,109 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import SceneStage from '../../components/studio/SceneStage.astro';
+---
+<StudioLayout title="Evening wind-down" description="Five quiet minutes in Aether's Night Garden.">
+  <section class="wind-down">
+    <a href="/studio/">← Back to Studio</a>
+    <p class="eyebrow">NIGHT GARDEN · FIVE MINUTES</p>
+    <h1>Evening wind-down</h1>
+    <p class="intro">Step into a quiet garden. Follow gentle on-screen guidance, or simply enjoy the view.</p>
+    <div id="garden-player">
+      <SceneStage sceneId="custom" name="Night Garden" imageSrc="/images/experience-covers/night-garden.jpg" exitButton={false} />
+      <div class="guidance" id="garden-guidance" aria-live="polite"><strong id="cue-title">Your quiet moment</strong><p id="cue-text">Start whenever you are ready.</p></div>
+      <div class="controls">
+        <button id="session-toggle" type="button">Start five-minute session</button>
+        <button id="session-end" type="button" hidden>End session</button>
+        <button id="garden-fullscreen" type="button">Enter full screen</button>
+        <span id="session-clock" role="timer" aria-label="Time remaining">05:00</span>
+        <label><input id="show-guidance" type="checkbox" checked /> Show guidance</label>
+        <label>Wind volume <input id="garden-volume" type="range" min="0" max="100" value="25" /></label>
+      </div>
+    </div>
+    <p id="session-status" role="status">Text guidance with gentle wind audio. Headphones optional.</p>
+    <audio id="garden-audio" src="/audio/forest_wind.mp3" preload="none" loop></audio>
+  </section>
+</StudioLayout>
+<script>
+  import forest from '../../data/experiences/forest.json';
+  import { createStudioRuntime } from '../../lib/studio/StudioRuntime';
+  import type { Experience } from '../../lib/models/Experience';
+  import { eveningWindDown, cueAt } from '../../data/sessions/eveningWindDown';
+  const player = document.querySelector<HTMLElement>('#garden-player')!;
+  const stage = player.querySelector<HTMLElement>('#experience-preview-stage')!;
+  const audio = document.querySelector<HTMLAudioElement>('#garden-audio')!;
+  const toggle = document.querySelector<HTMLButtonElement>('#session-toggle')!;
+  const end = document.querySelector<HTMLButtonElement>('#session-end')!;
+  const clock = document.querySelector<HTMLElement>('#session-clock')!;
+  const title = document.querySelector<HTMLElement>('#cue-title')!;
+  const text = document.querySelector<HTMLElement>('#cue-text')!;
+  const status = document.querySelector<HTMLElement>('#session-status')!;
+  const fullscreen = document.querySelector<HTMLButtonElement>('#garden-fullscreen')!;
+  const volume = document.querySelector<HTMLInputElement>('#garden-volume')!;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const runtime = createStudioRuntime({ audioElement:null, audioEnabledToggle:null,
+    volumeControl:null, layerVolumeControl:null, volumeValue:null, particlesToggle:null,
+    lightingToggle:null, fogToggle:null, previewStage:stage, previewCanvas:stage.querySelector('canvas'),
+    particlesStatus:null, lightingStatus:null, fogStatus:null });
+  runtime.experienceLoader.load({ ...forest, id:'night-garden', name:'Night Garden',
+    audio:{ ...forest.audio, enabled:false }, atmosphere:{ particles:!reducedMotion, lighting:true, fog:false },
+    particles:{ ...forest.particles, count:14, colour:'#e8d99c', glow:6 },
+    lighting:{ ...forest.lighting, colour:'#f0c985', intensity:0.3, pulse:false },
+  } as Experience);
+  audio.volume = 0.25;
+  let running = false, elapsed = 0, startedAt = 0, timer: number | undefined, generation = 0;
+  let lastCue = -1;
+  const elapsedNow = () => Math.min(eveningWindDown.durationSeconds, elapsed + (running ? (performance.now()-startedAt)/1000 : 0));
+  const clearTimer = () => { window.clearInterval(timer); timer = undefined; };
+  function render() {
+    const seconds = elapsedNow();
+    const remaining = Math.ceil(eveningWindDown.durationSeconds-seconds);
+    clock.textContent = `${Math.floor(remaining/60).toString().padStart(2,'0')}:${(remaining%60).toString().padStart(2,'0')}`;
+    const cue = cueAt(seconds);
+    if (cue.at !== lastCue) { title.textContent = cue.title; text.textContent = cue.text; lastCue = cue.at; }
+    if (running && remaining === 0) finish(true);
+  }
+  function finish(completed = false) {
+    generation++; running = false; elapsed = 0; clearTimer(); audio.pause(); audio.currentTime = 0;
+    toggle.textContent = 'Start five-minute session'; end.hidden = true; lastCue = -1;
+    clock.textContent = completed ? '00:00' : '05:00';
+    title.textContent = completed ? 'Your session is complete' : 'Your quiet moment';
+    text.textContent = completed ? 'Take your time. Stay in the garden, or return whenever you like.' : 'Start whenever you are ready.';
+    status.textContent = completed ? 'Five-minute session complete.' : 'Session ended. You can start again whenever you like.';
+  }
+  toggle.addEventListener('click', () => {
+    if (running) {
+      elapsed = elapsedNow(); running = false; generation++; clearTimer(); audio.pause();
+      toggle.textContent = 'Resume session'; status.textContent = 'Session paused.'; return;
+    }
+    running = true; startedAt = performance.now(); const attempt = ++generation;
+    toggle.textContent = 'Pause session'; end.hidden = false; status.textContent = 'Session playing.';
+    render(); timer = window.setInterval(render,250);
+    void audio.play().then(() => { if (!running) audio.pause(); })
+      .catch(() => { if (generation === attempt) status.textContent = 'Audio could not play. You can continue with the on-screen guidance.'; });
+  });
+  end.addEventListener('click', () => finish());
+  volume.addEventListener('input', () => { audio.volume = Number(volume.value)/100; });
+  document.querySelector<HTMLInputElement>('#show-guidance')!.addEventListener('change', event => {
+    document.querySelector<HTMLElement>('#garden-guidance')!.hidden = !(event.target as HTMLInputElement).checked;
+  });
+  fullscreen.addEventListener('click', async () => {
+    try { if (document.fullscreenElement === player) await document.exitFullscreen(); else await player.requestFullscreen(); }
+    catch { status.textContent = 'Full screen is unavailable in this browser.'; }
+  });
+  const onFullscreen = () => { fullscreen.textContent = document.fullscreenElement === player ? 'Exit full screen' : 'Enter full screen'; };
+  document.addEventListener('fullscreenchange',onFullscreen);
+  let disposed = false;
+  const dispose = () => { if(disposed)return; disposed=true; generation++; running=false; clearTimer(); audio.pause();
+    runtime.experienceRuntime.stop(); runtime.experienceRuntime.destroy(); document.removeEventListener('fullscreenchange',onFullscreen); };
+  window.addEventListener('pagehide',dispose,{once:true});
+  document.addEventListener('astro:before-swap',dispose,{once:true});
+</script>
+<style>
+.wind-down{max-width:1100px;margin:auto;padding:2rem 1rem;color:#dce5ec}.wind-down>a{color:#afdbcb}.eyebrow{margin-top:2rem;letter-spacing:.15em;color:#a4c9b8;font-size:.8rem}h1{font-size:clamp(2rem,5vw,3.5rem);margin:.6rem 0}.intro{line-height:1.7;max-width:65ch;margin-bottom:2rem}
+#garden-player{position:relative;background:#08110f;border-radius:18px;overflow:hidden}#garden-player :global(.preview-stage){border:0;border-radius:0;aspect-ratio:16/9;min-height:0}
+.guidance{position:absolute;bottom:110px;left:5%;right:5%;max-width:650px;padding:1rem 1.3rem;background:#071610dd;border:1px solid #c6d6ba55;border-radius:14px;color:#fff}.guidance p{line-height:1.6;margin:.5rem 0 0}.guidance[hidden]{display:none}
+.controls{display:flex;align-items:center;flex-wrap:wrap;gap:.8rem;padding:1rem;background:#0b1b17}.controls button{font:inherit;min-height:44px;padding:.6rem 1rem;border:1px solid #759e8d;border-radius:9px;background:#173c2e;color:#fff;cursor:pointer}.controls button[hidden]{display:none}.controls label{display:flex;align-items:center;gap:.4rem;font-size:.9rem}.controls input[type=range]{width:100px}.controls button:focus-visible,.controls input:focus-visible{outline:3px solid #c7efdc;outline-offset:3px}#session-clock{font-variant-numeric:tabular-nums}#session-status{line-height:1.6;color:#b3c6be}
+#garden-player:fullscreen{width:100vw;height:100vh;border-radius:0;display:flex;flex-direction:column;justify-content:center;background:#000}#garden-player:fullscreen :global(.preview-stage){width:100%;height:calc(100% - 120px);aspect-ratio:auto}#garden-player:fullscreen :global(.preview-scene-image){object-fit:contain}#garden-player:fullscreen .controls{flex-shrink:0}#garden-player:fullscreen .guidance{bottom:140px}
+@media(max-width:700px){.guidance{position:relative;inset:auto;max-width:none;margin:0;border-radius:0}.controls{gap:.6rem}#garden-player:fullscreen .guidance{position:relative;bottom:auto}#garden-player:fullscreen :global(.preview-stage){flex:1;height:auto;min-height:120px}}
+</style>
