@@ -2,12 +2,12 @@
 const navigation = [
   { label: 'Dashboard', href: '/studio', active: Astro.url.pathname === '/studio' || Astro.url.pathname === '/studio/' },
   { label: 'Guided relaxation', href: '/studio/guided-relaxation/', active: Astro.url.pathname.startsWith('/studio/guided-relaxation') },
-  { label: 'Library', href: '/studio/#experience-library' },
-  { label: 'Modules', href: '/features/' },
-  { label: 'Try the editor', href: '/studio/experiences/temple/' },
+  { label: 'Choose an experience', href: '/studio/#experience-library' },
+  { label: 'My Experiences', href: '/studio/#my-experiences-title' },
 ];
 
 const secondaryNavigation = [
+  { label: 'About Aether', href: '/features/' },
   {
     label: 'Documentation',
     href: 'https://github.com/Keystone-Mere/createaether-website/tree/main/docs',
@@ -31,8 +31,8 @@ const secondaryNavigation = [
     <span class="studio-sidebar__runtime-indicator" aria-hidden="true"></span>
 
     <span>
-      <strong>Working MVP</strong>
-      <small>Experience workspace</small>
+      <strong>Aether Studio</strong>
+      <small>Create your environment</small>
     </span>
   </div>
 
@@ -60,7 +60,7 @@ const secondaryNavigation = [
     </ul>
 
     <p class="studio-sidebar__label studio-sidebar__label--secondary">
-      Platform
+      Resources
     </p>
 
     <ul>
