@@ -28,11 +28,7 @@ value={particles.count}
 <h3 class="particle-heading">Appearance</h3>
 <label for="particles-colour-control">Colour</label>
 <div class="colour-picker"><input id="particles-colour-control" type="color" value={particles.colour} aria-label="Particle colour" /><output id="particles-colour-value">{particles.colour.toUpperCase()}</output></div>
-<button type="button" id="reset-particles-button" class="reset-particles">Reset to preset</button>
-<p id="reset-particles-status" role="status" class="reset-status"></p>
-<details class="particle-advanced">
-<summary>Advanced <span>Opacity, size and movement</span></summary>
-<label>
+<label for="particle-glow-control">
 Glow
 <output id="particle-glow-value">{particles.glow}</output>
 </label>
@@ -46,8 +42,10 @@ max="20"
 step="0.5"
 value={particles.glow}
 />
-
-
+<button type="button" id="reset-particles-button" class="reset-particles">Reset to preset</button>
+<p id="reset-particles-status" role="status" class="reset-status"></p>
+<details class="particle-advanced">
+<summary>Advanced <span>Opacity, size and movement</span></summary>
 <label>Opacity</label>
 
 <div class="dual-range" data-dual-range role="group" aria-label="Opacity range">
