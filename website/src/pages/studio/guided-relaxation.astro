@@ -16,6 +16,11 @@ const track = audioTracks.find((item) => item.id === relaxationExperience.audio.
         <p>Take a few minutes to unwind with an immersive environment, ambient sound and a guided practice. Headphones recommended.</p>
       </div>
 
+      <a class="garden-session-card" href="/studio/evening-wind-down/">
+        <img src="/images/experience-covers/night-garden.jpg" alt="Lantern-lit courtyard garden with a stone fountain" width="1672" height="941" loading="lazy" />
+        <div><span>FIVE-MINUTE SESSION</span><h2>Evening wind-down</h2><p>Settle into the Night Garden with gentle wind and on-screen guidance.</p><strong>Explore Night Garden →</strong></div>
+      </a>
+
       <div class="preview-stage" data-scene="temple" id="experience-preview-stage" role="group" aria-label="Temple atmosphere with warm light and drifting particles">
         <div class="preview-scene">
         <img class="preview-scene-image" src="/images/experience-covers/temple.jpg" alt="" aria-hidden="true" />
@@ -132,6 +137,13 @@ const track = audioTracks.find((item) => item.id === relaxationExperience.audio.
 </script>
 
 <style>
+  .garden-session-card{display:grid;grid-template-columns:minmax(180px,1fr) 1.6fr;gap:1.5rem;align-items:center;margin:0 0 2rem;padding:1rem;border:1px solid #476859;border-radius:18px;background:#0c211b;color:#eef6ef;text-decoration:none}
+  .garden-session-card img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:10px}
+  .garden-session-card span{font-size:.75rem;letter-spacing:.12em;color:#b9d5bd}.garden-session-card h2{margin:.5rem 0;font-size:1.6rem}.garden-session-card p{line-height:1.6;color:#c0d1c5}.garden-session-card strong{color:#b8efcf}
+  .garden-session-card:hover{border-color:#b8efcf}.garden-session-card:focus-visible{outline:3px solid #b8efcf;outline-offset:4px}
+  :global(body.temple-session-active) .garden-session-card{display:none}
+  @media(max-width:600px){.garden-session-card{grid-template-columns:1fr;gap:1rem}}
+
   :global(:root){color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#050914;color:#e2e8f0}
   :global(*){box-sizing:border-box}
   :global(body){margin:0;min-width:320px;background:radial-gradient(circle at 50% 15%,#132545 0%,#050914 55%)}
