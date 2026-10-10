@@ -6,6 +6,7 @@ import { AudioSystem } from '../systems/AudioSystem';
 import { VisualSystem } from '../systems/VisualSystem';
 import { CanvasRenderer } from '../rendering/CanvasRenderer';
 import { CanvasParticleEffect } from '../visuals/CanvasParticleEffect';
+import { CanvasSmokeEffect } from '../visuals/CanvasSmokeEffect';
 import { CssFogEffect } from '../visuals/CssFogEffect';
 import { CssLightingEffect } from '../visuals/CssLightingEffect';
 import { CssParticleEffect } from '../visuals/CssParticleEffect';
@@ -89,6 +90,10 @@ export const createStudioRuntime = (
             particlesStatus
         )
     );
+
+    if (previewStage instanceof HTMLElement) {
+        visualSystem.register(new CanvasSmokeEffect(previewStage));
+    }
 
     const canvasRenderer =
         previewCanvas instanceof HTMLCanvasElement

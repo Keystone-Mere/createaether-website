@@ -2,6 +2,7 @@
 const navigation = [
   { label: 'Dashboard', href: '/studio', active: Astro.url.pathname === '/studio' || Astro.url.pathname === '/studio/' },
   { label: 'Guided relaxation', href: '/studio/guided-relaxation/', active: Astro.url.pathname.startsWith('/studio/guided-relaxation') },
+  { label: 'Podcast & Stream', href: '/studio/podcast/', active: Astro.url.pathname.startsWith('/studio/podcast') },
   { label: 'Choose an experience', href: '/studio/#experience-library' },
   { label: 'My Experiences', href: '/studio/#my-experiences-title' },
 ];

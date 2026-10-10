@@ -49,5 +49,9 @@
   "transition": {
     "duration": 1800,
     "easing": "ease-in-out"
+  },
+  "smoke": {
+    "enabled": false,
+    "amount": 35
   }
 }

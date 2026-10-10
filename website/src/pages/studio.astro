@@ -26,6 +26,11 @@ import { experiences } from '../data/experiences';
 </a>
     </header>
 
+    <a href="/studio/podcast/" class="podcast-dashboard-card">
+      <span><strong>Podcast &amp; Stream</strong><small>Create a branded setting for your show, with silent OBS playback.</small></span>
+      <span aria-hidden="true">Open creator workspace →</span>
+    </a>
+
     <MyExperiencesPanel />
 
     <section id="experience-library" class="studio-dashboard__experiences">
@@ -363,4 +368,13 @@ description="Ready-to-edit experiences"
       flex-direction: column;
     }
   }
+</style>
+
+<style>
+.podcast-dashboard-card { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:22px; margin-bottom:24px; background:linear-gradient(120deg,#112e2a,#101e30); border:1px solid #315e52; border-radius:14px; color:#a9f0d2; text-decoration:none; }
+.podcast-dashboard-card strong { display:block; font-size:18px; margin-bottom:6px; color:#edfdf6; }
+.podcast-dashboard-card small { color:#adc6c4; line-height:1.6; }
+.podcast-dashboard-card>span:last-child { font-size:12px; }
+.podcast-dashboard-card:hover { border-color:#8ee5c1; }
+@media(max-width:600px) { .podcast-dashboard-card { flex-direction:column; align-items:flex-start; } }
 </style>

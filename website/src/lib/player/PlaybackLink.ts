@@ -36,6 +36,7 @@ export function validatePlayback(value: unknown): Experience {
         environment: { colour: colour(value.environment?.colour ?? value.lighting.colour) },
         lighting: { preset: value.lighting.preset.slice(0, 80), colour: colour(value.lighting.colour), intensity: number(value.lighting.intensity, 0, 2), pulse: value.lighting.pulse, speed: number(value.lighting.speed, 0, 1) },
         fog: { preset: value.fog.preset.slice(0, 80), colour: colour(value.fog.colour), density: number(value.fog.density, 0, 1), speed: number(value.fog.speed, 0, 1) },
+        smoke: { enabled: value.smoke?.enabled === true, amount: typeof value.smoke?.amount === 'number' && Number.isFinite(value.smoke.amount) ? number(value.smoke.amount, 0, 100) : 35 },
         particles,
         transition: { duration: number(value.transition.duration, 0, 10000), easing: ['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out'].includes(value.transition.easing) ? value.transition.easing : 'ease' },
     };

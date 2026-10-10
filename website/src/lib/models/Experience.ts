@@ -61,6 +61,7 @@ export interface TransitionSettings {
 
 export interface Experience {
   /** Scene stays independent of particle and audio preset choices. */
+  smoke?: { enabled: boolean; amount: number };
   sceneId?: string;
   /** Embedded, compressed JPG for user-created backgrounds. */
   background?: string;

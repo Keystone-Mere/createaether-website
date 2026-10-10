@@ -1,0 +1,42 @@
+---
+import SceneStage from './SceneStage.astro';
+---
+<div class="broadcast-stage" data-layout="duo" data-motion="subtle">
+    <SceneStage sceneId="custom" name="Liverpool from the Wirral" exitButton={false} imageSrc="/images/podcast/wirral-liverpool.jpg" />
+    <button type="button" id="podcast-exit-fullscreen" class="broadcast-fullscreen-exit">Exit full screen</button>
+    <div class="broadcast-brand">
+        <img class="broadcast-logo" alt="Show logo" hidden />
+        <div class="broadcast-titles"><h2 data-show-title>The Evening Conversation</h2><p data-episode>Good conversations. A little space to unwind.</p></div>
+    </div>
+    <div class="broadcast-cameras">
+        <div class="broadcast-camera"><div class="camera-guide" aria-hidden="true"><span>Host camera</span></div><span class="camera-name" data-host>Host</span></div>
+        <div class="broadcast-camera broadcast-camera--guest"><div class="camera-guide" aria-hidden="true"><span>Guest camera</span></div><span class="camera-name" data-guest>Guest</span></div>
+    </div>
+    <p class="broadcast-scene-credit">Liverpool from the Wirral</p>
+</div>
+<style is:global>
+.broadcast-stage { --show-accent:#d6ad72; position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; background:#09121c; border-radius:16px; container-type:inline-size; isolation:isolate; }
+.broadcast-stage > .preview-stage { position:absolute; inset:0; width:100%; height:100%; border:0; border-radius:0; }
+.broadcast-stage .preview-canvas { clip-path:inset(14% 8% 28% 8%); }
+.broadcast-stage .preview-fog,.broadcast-stage .scene-light,.broadcast-stage .scene-tint { display:none; }
+.broadcast-fullscreen-exit { display:none; }
+.broadcast-stage:fullscreen .broadcast-fullscreen-exit { display:block; position:absolute; right:2%; top:2%; z-index:8; padding:10px 14px; background:#09121ce8; color:white; border:1px solid #91a3b6; border-radius:8px; font:12px system-ui; cursor:pointer; }
+.broadcast-brand { position:absolute; z-index:5; left:5%; right:5%; top:4%; display:flex; align-items:center; gap:2cqw; min-height:10%; color:#fff; }
+.broadcast-logo { width:6cqw; height:6cqw; object-fit:contain; flex-shrink:0; }
+.broadcast-logo[hidden] { display:none; }
+.broadcast-titles { min-width:0; text-shadow:0 2px 12px #000; }
+.broadcast-titles h2 { font:600 2.7cqw/1.2 system-ui; letter-spacing:-.035em; margin:0; overflow-wrap:anywhere; }
+.broadcast-titles p { font:400 1.1cqw/1.4 system-ui; margin:.7cqw 0 0; color:#dbe2e8; overflow-wrap:anywhere; }
+.broadcast-cameras { position:absolute; z-index:5; left:5%; right:5%; top:30%; display:grid; grid-template-columns:1fr 1fr; gap:3%; }
+.broadcast-camera { position:relative; aspect-ratio:16/9; border:2px solid var(--show-accent); border-radius:1cqw; box-shadow:0 10px 40px #0005; }
+.camera-guide { display:none; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(150deg,#14232ee8,#0b1727ef); align-items:center; justify-content:center; color:#bac5d1; font:500 1.7cqw/1.2 system-ui; }
+.broadcast-stage[data-guides="true"] .camera-guide { display:flex; }
+.camera-guide span::before { content:''; display:block; margin:0 auto 1cqw; width:3cqw; height:2cqw; border:1px solid #8b9bb2; border-radius:.4cqw; }
+.camera-name { position:absolute; top:calc(100% + 1cqw); left:0; padding:.6cqw 1cqw; border-left:3px solid var(--show-accent); background:#09121ce8; color:white; border-radius:0 .5cqw .5cqw 0; font:500 1.3cqw/1.2 system-ui; max-width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.camera-name:empty { display:none; }
+.broadcast-stage[data-layout="solo"] .broadcast-cameras { left:21%; right:21%; top:23%; grid-template-columns:1fr; }
+.broadcast-stage[data-layout="solo"] .broadcast-camera--guest,.broadcast-stage[data-layout="background"] .broadcast-cameras { display:none; }
+.broadcast-scene-credit { display:none; }
+.broadcast-stage[data-motion="still"] .preview-canvas { display:none; }
+.broadcast-stage[data-motion="still"] * { animation:none!important; }
+</style>

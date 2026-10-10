@@ -71,6 +71,7 @@ export function isExperience(
         typeof value.status === 'string' &&
         (value.background === undefined || isBackground(value.background)) &&
         (value.backgroundId === undefined || isBackgroundId(value.backgroundId)) &&
+        (value.smoke === undefined || (isRecord(value.smoke) && typeof value.smoke.enabled === 'boolean' && isFiniteNumber(value.smoke.amount) && value.smoke.amount >= 0 && value.smoke.amount <= 100)) &&
         isRecord(value.audio) &&
         isRecord(value.atmosphere) &&
         isRecord(value.lighting) &&

@@ -63,6 +63,7 @@ export class ExperienceLoader {
         experience: Experience
     ): ExperienceStateData {
         return {
+            smoke: experience.smoke ? { ...experience.smoke } : undefined,
             audio: {
                 ...experience.audio
             },
@@ -101,6 +102,7 @@ export class ExperienceLoader {
         return {
             ...experience,
 
+            smoke: experience.smoke ? { ...experience.smoke } : undefined,
             audio: {
                 ...experience.audio
             },

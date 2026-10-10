@@ -53,6 +53,12 @@ const selectedAudioTrack =
             <details class="control-section" open>
                 <summary><span id="effect-section-label">Visual effects</span></summary>
                 <div class="particles-slot"><ParticlesPanel experience={experience} /></div>
+                <section id="smoke-panel" class="studio-card" hidden style="padding:18px;border-radius:14px;background:#111b2a;color:#cbd5e1">
+                    <h2 style="font-size:16px;color:#93c5fd;margin:0 0 14px">Incense smoke</h2>
+                    <label><input id="smoke-enabled" type="checkbox" /> Smoke on</label>
+                    <label for="smoke-amount" style="display:block;margin-top:16px">Amount <output id="smoke-amount-value">35%</output></label>
+                    <input id="smoke-amount" type="range" min="0" max="100" step="1" value="35" style="width:100%;accent-color:#60a5fa" />
+                </section>
             </details>
             <details class="control-section">
                 <summary>Lighting</summary>
@@ -1063,6 +1069,19 @@ const selectedAudioTrack =
     });
 
     let editableExperience: Experience | null = null;
+    const smokeToggle = document.querySelector<HTMLInputElement>('#smoke-enabled')!;
+    const smokeAmount = document.querySelector<HTMLInputElement>('#smoke-amount')!;
+    const smokeValue = document.querySelector<HTMLOutputElement>('#smoke-amount-value')!;
+    const updateSmoke = () => {
+        if (!editableExperience) return;
+        const smoke = { enabled: smokeToggle.checked, amount: Number(smokeAmount.value) };
+        editableExperience.smoke = { ...smoke };
+        experienceState.data.smoke = { ...smoke };
+        smokeValue.value = `${smoke.amount}%`;
+        experienceRuntime.update(experienceState.data);
+    };
+    smokeToggle.addEventListener('change', updateSmoke);
+    smokeAmount.addEventListener('input', updateSmoke);
 
     const canonicalExperienceIds = new Set([
         'temple',
@@ -1246,6 +1265,14 @@ const selectedAudioTrack =
         const coverId = selectedExperience.sceneId && canonicalExperienceIds.has(selectedExperience.sceneId)
             ? selectedExperience.sceneId : legacyScene ?? inferredScene;
         selectedExperience.sceneId = coverId;
+        const smokeAvailable = coverId === 'temple' && !selectedExperience.background && !selectedExperience.backgroundId;
+        document.querySelector<HTMLElement>('#smoke-panel')!.hidden = !smokeAvailable;
+        const smoke = selectedExperience.smoke ?? { enabled: false, amount: 35 };
+        selectedExperience.smoke = { ...smoke };
+        experienceState.data.smoke = { ...smoke };
+        smokeToggle.checked = smoke.enabled;
+        smokeAmount.value = String(smoke.amount);
+        smokeValue.value = `${smoke.amount}%`;
         if (previewStage instanceof HTMLElement) {
             previewStage.dataset.scene = selectedExperience.background || selectedExperience.backgroundId ? 'custom' : coverId;
             const image = previewStage.querySelector<HTMLImageElement>('.preview-scene-image');
@@ -1420,6 +1447,7 @@ const selectedAudioTrack =
             }
         );
 
+        experienceRuntime.update(experienceState.data);
         updateDualRanges();
 
         experienceCards.forEach((card) => {
@@ -1771,7 +1799,8 @@ const selectedAudioTrack =
                     )
                 );
 
-            updateDualRanges();
+            experienceRuntime.update(experienceState.data);
+        updateDualRanges();
 
         experienceCards.forEach((card) => {
                 card.addEventListener(
