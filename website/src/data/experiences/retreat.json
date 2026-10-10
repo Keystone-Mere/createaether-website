@@ -1,0 +1,54 @@
+{
+  "id": "retreat",
+  "name": "Cosy Retreat",
+  "description": "Settle into a sheltered lakeside cabin. Choose a quiet evening, gentle rain or a winter view.",
+  "status": "MVP",
+  "audio": {
+    "enabled": true,
+    "volume": 25,
+    "layerVolume": 0,
+    "track": "retreat-wind"
+  },
+  "atmosphere": {
+    "particles": false,
+    "lighting": true,
+    "fog": false
+  },
+  "environment": {
+    "colour": "#251b14"
+  },
+  "particles": {
+    "preset": "retreat-rain",
+    "motion": "rain",
+    "count": 120,
+    "colour": "#b6cddd",
+    "glow": 0,
+    "minRadius": 0.35,
+    "maxRadius": 0.9,
+    "minSpeed": 40,
+    "maxSpeed": 50,
+    "drift": 8,
+    "minOpacity": 0.15,
+    "maxOpacity": 0.45,
+    "minLifetime": 5,
+    "maxLifetime": 9
+  },
+  "lighting": {
+    "preset": "storm-dark",
+    "colour": "#edbd7d",
+    "intensity": 0.5,
+    "pulse": false,
+    "speed": 0
+  },
+  "fog": {
+    "preset": "storm-mist",
+    "colour": "#8fa5b6",
+    "density": 0,
+    "speed": 0.1
+  },
+  "transition": {
+    "duration": 2600,
+    "easing": "ease-in-out"
+  },
+  "sceneId": "retreat"
+}

@@ -1,0 +1,28 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+const presets = [
+ { id:'quiet', title:'Quiet Evening', image:'retreat', text:'A warm cabin, a still lake and gentle woodland wind.' },
+ { id:'rain', title:'Rainy Afternoon', image:'retreat', text:'Gentle rainfall outside the window, with a dry, sheltered room.' },
+ { id:'winter', title:'Winter Retreat', image:'retreat-winter', text:'A snowy landscape and soft flurries beyond the glass.' },
+];
+---
+<StudioLayout title="Cosy Retreat — Aether">
+ <section class="retreat-intro">
+  <a href="/studio/">← Aether Studio</a>
+  <p class="eyebrow">One place. Three ways to unwind.</p>
+  <h1>Cosy Retreat</h1>
+  <p>Settle into a lakeside cabin. Choose your setting, then adjust the sound, lighting and weather to make it yours.</p>
+  <div class="retreat-grid">{presets.map(preset => <article>
+   <img src={`/images/experience-covers/${preset.image}.jpg`} alt={preset.id === 'winter' ? 'Warm cabin looking out over a snowy lakeside landscape' : 'Sheltered cabin with a panoramic view across a quiet lake'} />
+   <div><h2>{preset.title}</h2><p>{preset.text}</p><a class="choose" href={`/studio/experiences/retreat/?retreat=${preset.id}`}>Open this retreat →</a></div>
+  </article>)}</div>
+  <p class="use-note">Want a backdrop for your show? Open a retreat and choose <strong>Use in OBS</strong> for silent playback.</p>
+ </section>
+</StudioLayout>
+<style>
+.retreat-intro { max-width:1150px;margin:auto;padding:28px 0;color:#e2e8f0; }
+a { color:#93c5fd; }.eyebrow { color:#6ee7b7;font-size:13px;margin-top:32px; }h1 { font-size:clamp(30px,5vw,48px);margin:8px 0; }p { line-height:1.7;color:#aebed0;max-width:720px; }
+.retreat-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:30px 0; }
+article { border:1px solid #334155;border-radius:14px;overflow:hidden;background:#111b2a; }article img { width:100%;aspect-ratio:16/9;object-fit:cover;display:block; }article>div { padding:20px; }h2 { font-size:20px;margin:0; }article p { min-height:80px; }.choose { display:inline-block;border-radius:8px;padding:12px 16px;background:#16634f;color:#fff;text-decoration:none; }.use-note { margin-top:24px; }
+@media(max-width:850px) { .retreat-grid { grid-template-columns:1fr; }article p { min-height:0; } }
+</style>

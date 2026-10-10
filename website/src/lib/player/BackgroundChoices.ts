@@ -1,5 +1,6 @@
 /** Bundled choices use known local assets, never arbitrary imported URLs. */
 export const backgroundChoices = [
+    { id: 'retreat-winter', sceneId: 'retreat', name: 'Winter landscape', src: '/images/experience-covers/retreat-winter.jpg' },
     { id: 'temple-mountain', sceneId: 'temple', name: 'Mountain temple', src: '/images/experience-covers/temple-mountain.jpg' },
     { id: 'temple-angkor', sceneId: 'temple', name: 'Angkor-inspired sanctuary (AI)', src: '/images/experience-covers/temple-angkor.jpg' },
     { id: 'forest-stream', sceneId: 'forest', name: 'Fern grotto (AI)', src: '/images/experience-covers/forest-fern-grotto.png' },
@@ -23,6 +24,6 @@ export function backgroundSource(experience: { id: string; sceneId?: string; bac
     const choice = backgroundChoices.find(choice => choice.id === experience.backgroundId);
     if (choice) return choice.src;
     const scene = experience.sceneId ?? experience.id.split('-')[0];
-    const covers: Record<string, string> = { temple:'temple', forest:'forest', ocean:'ocean', christmas:'christmas', storm:'storm-balcony', festival:'festival-evening' };
+    const covers: Record<string, string> = { retreat:'retreat', temple:'temple', forest:'forest', ocean:'ocean', christmas:'christmas', storm:'storm-balcony', festival:'festival-evening' };
     return `/images/experience-covers/${covers[scene] ?? 'temple'}.jpg`;
 }

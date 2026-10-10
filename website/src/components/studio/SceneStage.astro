@@ -175,6 +175,8 @@ const { sceneId, name, exitButton = true, imageSrc } = Astro.props;
 .preview-stage:fullscreen .preview-scene { position:relative; inset:auto; width:min(100vw,177.7778vh); height:min(100vh,56.25vw); }
 .scene-light { position:absolute; inset:0; pointer-events:none; z-index:2; background:radial-gradient(ellipse at 65% 20%,var(--aether-lighting-colour),transparent 70%); mix-blend-mode:screen; opacity:calc(var(--aether-lighting-intensity) * .18); animation:scene-breathe var(--aether-lighting-pulse-duration) ease-in-out infinite alternate; }
 .preview-stage[data-scene="temple"] .scene-light { display:none; }
+.preview-stage[data-scene="retreat"] .scene-light { background:radial-gradient(ellipse at 96% 45%,var(--aether-lighting-colour),transparent 30%); animation:none; }
+.preview-stage[data-scene="retreat"] .preview-fog { display:none; }
 .preview-stage[data-scene="ocean"] .scene-light { background:linear-gradient(180deg,transparent 35%,var(--aether-lighting-colour) 55%,transparent 75%); }
 .preview-stage[data-scene="christmas"] .scene-light { background:radial-gradient(ellipse at 78% 65%,var(--aether-lighting-colour),transparent 65%); }
 .preview-stage[data-scene="festival"] .scene-light { background:radial-gradient(ellipse at 35% 35%,var(--aether-lighting-colour),transparent 55%),radial-gradient(ellipse at 70% 35%,var(--aether-lighting-colour),transparent 55%); }

@@ -1,7 +1,7 @@
 import type { Experience } from '../models/Experience';
-import { isExperience } from '../storage/ExperienceLibrary';
+import { isExperience, EXPERIENCE_FORMAT_VERSION } from '../models/ExperienceFormat';
 
-const scenes = new Set(['temple', 'forest', 'ocean', 'christmas', 'storm', 'festival']);
+const scenes = new Set(['temple', 'forest', 'ocean', 'christmas', 'storm', 'festival', 'retreat']);
 const colour = (value: string) => {
     if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error('Invalid colour');
     return value;
@@ -27,6 +27,7 @@ export function validatePlayback(value: unknown): Experience {
         if (particles[min] > particles[max]) [particles[min], particles[max]] = [particles[max], particles[min]];
     }
     return {
+        formatVersion: EXPERIENCE_FORMAT_VERSION,
         id: value.id.slice(0, 120), sceneId, name: value.name.slice(0, 120),
         ...(value.backgroundId ? { backgroundId: value.backgroundId } : {}),
         description: '', status: 'Playback',

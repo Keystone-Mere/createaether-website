@@ -88,6 +88,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
   constructor(
     private readonly renderer: CanvasRenderer,
     private readonly events: RuntimeEvents,
+    private readonly stage: Element | null = null,
   ) {}
 
   public initialise(): void {
@@ -149,11 +150,18 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       return;
     }
 
-    if (this.isWindowSnow()) {
+    const retreat = this.stage instanceof HTMLElement && this.stage.dataset.scene === 'retreat';
+    if (retreat) {
+      // Panoramic glass only: preserve timber frame, room, lamp and chair.
+      context.beginPath();
+      context.rect(width * .133, height * .079, width * .744, height * .611);
+      context.clip();
+    }
+    if (!retreat && this.isWindowSnow()) {
       this.clipChristmasWindow(context, width, height);
     }
 
-    if (this.isStormRain()) {
+    if (!retreat && this.isStormRain()) {
       this.clipStormExterior(context, width, height);
     }
 
@@ -368,7 +376,8 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       velocityY = Math.sin(angle) * speed;
     }
 
-    if (this.isStormRain()) {
+    const retreat = this.stage instanceof HTMLElement && this.stage.dataset.scene === 'retreat';
+    if (this.isStormRain() || (retreat && motion === 'rain')) {
       x = this.randomBetween(-width * 0.04, width);
       y = distributeAcrossScene ? this.randomBetween(0, height) : -8;
       // Faster fall with subtle depth variation and a consistent breeze.
@@ -376,7 +385,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       velocityX = velocityY * 0.06 + this.randomBetween(-1, 1) * this.settings.drift * 0.25;
     }
 
-    if (this.isWindowSnow()) {
+    if (!retreat && this.isWindowSnow()) {
       x = Math.random() < 0.67
         ? this.randomBetween(width * 0.233, width * 0.438)
         : this.randomBetween(width * 0.460, width * 0.562);
@@ -384,6 +393,11 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
         ? this.randomBetween(height * 0.02, height * 0.465)
         : height * 0.015;
       velocityX *= 0.25;
+    }
+
+    if (retreat) {
+      x = this.randomBetween(width * .133, width * .877);
+      y = distributeAcrossScene ? this.randomBetween(height * .079, height * .690) : height * .075;
     }
 
     return {
@@ -504,7 +518,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
           0.5 + 0.5 * Math.sin(particle.age * particle.pulseSpeed + particle.phase), 2,
         )
       : 1;
-    const alpha = particle.opacity * (this.isStormRain() ? 1 : fade) * pulse;
+    const alpha = particle.opacity * ((this.isStormRain() || this.settings.preset === "retreat-rain") ? 1 : fade) * pulse;
 
     if (alpha <= 0) {
       return;
@@ -527,7 +541,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       context.lineWidth = Math.max(0.5, particle.radius);
       context.lineCap = "round";
       // Droplet length stays short even when the user increases fall speed.
-      const length = this.isStormRain() ? 3.5 + particle.radius * 1.5 : particle.velocityY * 0.1;
+      const length = (this.isStormRain() || this.settings.preset === "retreat-rain") ? 3.5 + particle.radius * 1.5 : particle.velocityY * 0.1;
       const slant = particle.velocityY > 0 ? particle.velocityX / particle.velocityY : 0;
       context.beginPath();
       context.moveTo(particle.x, particle.y);

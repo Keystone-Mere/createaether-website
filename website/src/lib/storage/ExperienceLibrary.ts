@@ -1,5 +1,6 @@
-import { isBackground } from '../player/Background';
-import { isBackgroundId } from '../player/BackgroundChoices';
+import { isExperience, normalizeExperience, cloneExperience } from '../models/ExperienceFormat';
+// Compatibility export for existing editor integrations.
+export { isExperience } from '../models/ExperienceFormat';
 import type {
     Experience
 } from '../models/Experience';
@@ -10,107 +11,6 @@ const STORAGE_KEY =
 const EDITING_STORAGE_KEY =
     'aether.studio.editing-experience.v1';
 
-function cloneExperience(
-    experience: Experience
-): Experience {
-    return {
-        ...experience,
-
-        audio: {
-            ...experience.audio
-        },
-
-        atmosphere: {
-            ...experience.atmosphere
-        },
-
-        lighting: {
-            ...experience.lighting
-        },
-
-        fog: {
-            ...experience.fog
-        },
-
-        particles: {
-            ...experience.particles
-        },
-
-        transition: {
-            ...experience.transition
-        }
-    };
-}
-
-function isRecord(
-    value: unknown
-): value is Record<string, unknown> {
-    return (
-        typeof value === 'object' &&
-        value !== null &&
-        !Array.isArray(value)
-    );
-}
-
-const isFiniteNumber = (value: unknown): value is number =>
-    typeof value === 'number' && Number.isFinite(value);
-
-export function isExperience(
-    value: unknown
-): value is Experience {
-    if (!isRecord(value)) {
-        return false;
-    }
-
-    return (
-        typeof value.id === 'string' &&
-        value.id.trim() !== '' &&
-        typeof value.name === 'string' &&
-        value.name.trim() !== '' &&
-        typeof value.description === 'string' &&
-        typeof value.status === 'string' &&
-        (value.background === undefined || isBackground(value.background)) &&
-        (value.backgroundId === undefined || isBackgroundId(value.backgroundId)) &&
-        (value.smoke === undefined || (isRecord(value.smoke) && typeof value.smoke.enabled === 'boolean' && isFiniteNumber(value.smoke.amount) && value.smoke.amount >= 0 && value.smoke.amount <= 100)) &&
-        isRecord(value.audio) &&
-        isRecord(value.atmosphere) &&
-        isRecord(value.lighting) &&
-        isRecord(value.fog) &&
-        isRecord(value.particles) &&
-        isRecord(value.transition) &&
-        typeof value.audio.enabled === 'boolean' &&
-        isFiniteNumber(value.audio.volume) &&
-        typeof value.audio.track === 'string' &&
-        typeof value.atmosphere.particles === 'boolean' &&
-        typeof value.atmosphere.lighting === 'boolean' &&
-        typeof value.atmosphere.fog === 'boolean' &&
-        (value.environment === undefined ||
-            (isRecord(value.environment) &&
-                typeof value.environment.colour === 'string')) &&
-        typeof value.lighting.preset === 'string' &&
-        typeof value.lighting.colour === 'string' &&
-        isFiniteNumber(value.lighting.intensity) &&
-        typeof value.lighting.pulse === 'boolean' &&
-        isFiniteNumber(value.lighting.speed) &&
-        typeof value.fog.preset === 'string' &&
-        typeof value.fog.colour === 'string' &&
-        isFiniteNumber(value.fog.density) &&
-        isFiniteNumber(value.fog.speed) &&
-        typeof value.particles.preset === 'string' &&
-        (value.particles.motion === undefined ||
-            ['rise', 'wander', 'flow', 'rain', 'snow', 'burst'].includes(
-                String(value.particles.motion)
-            )) &&
-        typeof value.particles.colour === 'string' &&
-        [
-            'count', 'glow', 'minRadius', 'maxRadius',
-            'minSpeed', 'maxSpeed', 'drift', 'minOpacity',
-            'maxOpacity', 'minLifetime', 'maxLifetime'
-        ].every((key) => isFiniteNumber(value.particles[key])) &&
-        isFiniteNumber(value.transition.duration) &&
-        typeof value.transition.easing === 'string'
-    );
-}
 
 function readLibrary(): Experience[] {
     try {
@@ -130,10 +30,24 @@ function readLibrary(): Experience[] {
 
         return parsed
             .filter(isExperience)
-            .map(cloneExperience);
+            .map(normalizeExperience);
     } catch {
         return [];
     }
+}
+
+/** Reading a newer-format save must not cause an older app to erase it. */
+function preserveUnreadableEntries(experiences: Experience[]): unknown[] {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return experiences;
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) throw new TypeError('Unrecognised saved library format.');
+    const unreadable = parsed.filter(value => !isExperience(value));
+    const ids = new Set(experiences.map(value => value.id));
+    if (unreadable.some(value => value && typeof value === 'object' && ids.has(value.id))) {
+        throw new TypeError('Cannot overwrite an unsupported saved experience.');
+    }
+    return [...experiences, ...unreadable];
 }
 
 function writeLibrary(
@@ -142,7 +56,7 @@ function writeLibrary(
     try {
         localStorage.setItem(
             STORAGE_KEY,
-            JSON.stringify(experiences)
+            JSON.stringify(preserveUnreadableEntries(experiences))
         );
 
         return true;
@@ -180,7 +94,7 @@ export class ExperienceLibrary {
             readLibrary();
 
         const savedExperience =
-            cloneExperience(experience);
+            normalizeExperience(experience);
 
         const existingIndex =
             library.findIndex(
@@ -313,7 +227,7 @@ export class ExperienceLibrary {
             sessionStorage.setItem(
                 EDITING_STORAGE_KEY,
                 JSON.stringify(
-                    cloneExperience(experience)
+                    normalizeExperience(experience)
                 )
             );
 
@@ -342,7 +256,7 @@ export class ExperienceLibrary {
                 JSON.parse(stored);
 
             return isExperience(parsed)
-                ? cloneExperience(parsed)
+                ? normalizeExperience(parsed)
                 : null;
         } catch {
             sessionStorage.removeItem(

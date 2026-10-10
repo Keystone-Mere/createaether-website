@@ -1,3 +1,4 @@
+import { normalizeExperience } from './models/ExperienceFormat';
 import type {
     Experience
 } from './models/Experience';
@@ -30,33 +31,6 @@ export class ExperienceLoader {
     ) {
         this.runtime = runtime;
         this.state = state;
-    }
-
-    private validate(
-        experience: Experience
-    ): void {
-        if (
-            !experience ||
-            typeof experience.id !== 'string' ||
-            experience.id.trim() === ''
-        ) {
-            throw new TypeError(
-                'Experiences must provide a valid id.'
-            );
-        }
-
-        if (
-            !experience.audio ||
-            !experience.atmosphere ||
-            !experience.lighting ||
-            !experience.fog ||
-            !experience.particles ||
-            !experience.transition
-        ) {
-            throw new TypeError(
-                'Experiences must provide audio, atmosphere, lighting, fog, particle and transition settings.'
-            );
-        }
     }
 
     private createState(
@@ -96,49 +70,14 @@ export class ExperienceLoader {
         };
     }
 
-    private cloneExperience(
-        experience: Experience
-    ): Experience {
-        return {
-            ...experience,
-
-            smoke: experience.smoke ? { ...experience.smoke } : undefined,
-            audio: {
-                ...experience.audio
-            },
-
-            atmosphere: {
-                ...experience.atmosphere
-            },
-
-            environment: {
-                colour:
-                    experience.environment?.colour
-                    ?? experience.lighting.colour
-            },
-
-            lighting: {
-                ...experience.lighting
-            },
-
-            fog: {
-                ...experience.fog
-            },
-
-            particles: {
-                ...experience.particles
-            },
-
-            transition: {
-                ...experience.transition
-            }
-        };
+    private cloneExperience(experience: Experience): Experience {
+        return normalizeExperience(experience);
     }
 
     public load(
         experience: Experience
     ): Experience {
-        this.validate(experience);
+        const validatedExperience = normalizeExperience(experience);
 
         const previousExperience =
             this.activeExperience
@@ -148,7 +87,7 @@ export class ExperienceLoader {
                 : null;
 
         const nextExperience =
-            this.cloneExperience(experience);
+            this.cloneExperience(validatedExperience);
 
         this.runtime.events.emit(
             'experience:loading',

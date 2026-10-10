@@ -329,17 +329,17 @@
 
             const supportedRouteIds =
                 new Set([
+                    'retreat',
                     'temple',
                     'forest',
-                    'ocean'
+                    'ocean',
+                    'christmas',
+                    'storm',
+                    'festival'
                 ]);
 
-            const editorRouteId =
-                supportedRouteIds.has(
-                    experience.id
-                )
-                    ? experience.id
-                    : 'temple';
+            const sceneRouteId = experience.sceneId ?? experience.id.split('-')[0];
+            const editorRouteId = supportedRouteIds.has(sceneRouteId) ? sceneRouteId : 'temple';
 
             continueLink.className =
                 'my-experiences__continue';

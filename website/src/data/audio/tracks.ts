@@ -1,6 +1,8 @@
 ﻿import type { AudioTrack } from '../../lib/models/AudioTrack';
 
 export const audioTracks: AudioTrack[] = [
+  { id: 'retreat-wind', title: 'Gentle woodland wind', description: 'A quiet natural soundscape for the cabin.', src: '/audio/forest_wind.mp3', loop: true },
+  { id: 'retreat-rain', title: 'Gentle rain', description: 'Steady woodland rain without thunder.', src: '/audio/forest_rain.mp3', loop: true },
   {
     id: 'om-so-hum',
     title: 'OM SO HUM',
@@ -64,4 +66,4 @@ export const audioTracks: AudioTrack[] = [
   },
 ];
 
-export const defaultAudioTrack = audioTracks[0];
+export const defaultAudioTrack = audioTracks.find(track => track.id === 'om-so-hum')!;

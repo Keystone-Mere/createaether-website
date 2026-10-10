@@ -1,3 +1,4 @@
+import { registerRuntimeCleanup } from '../runtime/RuntimeLifecycle';
 import { ExperienceState } from '../ExperienceState';
 import { ExperienceRuntime } from '../ExperienceRuntime';
 import { ExperienceLoader } from '../ExperienceLoader';
@@ -104,7 +105,8 @@ export const createStudioRuntime = (
         visualSystem.register(
             new CanvasParticleEffect(
                 canvasRenderer,
-                experienceRuntime.events
+                experienceRuntime.events,
+                previewStage
             )
         );
     }
@@ -148,12 +150,14 @@ export const createStudioRuntime = (
             experienceState
         );
 
-    const destroy = () => {
-        experienceRuntime.destroy();
-        canvasRenderer?.destroy();
-        window.removeEventListener('pagehide', destroy);
-    };
-    window.addEventListener('pagehide', destroy, { once: true });
+    const destroy = registerRuntimeCleanup(() => {
+        try {
+            experienceRuntime.stop();
+            experienceRuntime.destroy();
+        } finally {
+            canvasRenderer?.destroy();
+        }
+    });
 
     return {
         destroy,

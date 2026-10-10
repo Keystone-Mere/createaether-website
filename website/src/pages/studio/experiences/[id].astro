@@ -46,6 +46,15 @@ const selectedAudioTrack =
     </aside>
     <div class="grid">
         <div class="editor-controls editor-column">
+            <section id="retreat-presets" hidden class="control-section" style="padding:18px">
+                <h2 style="margin:0 0 12px;font-size:16px;color:#93c5fd">Choose your retreat</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button type="button" data-retreat-preset="quiet">Quiet Evening</button>
+                    <button type="button" data-retreat-preset="rain">Rainy Afternoon</button>
+                    <button type="button" data-retreat-preset="winter">Winter Retreat</button>
+                </div>
+                <p style="font-size:12px;color:#94a3b8;margin-bottom:0">Each choice resets sound, weather and lighting. Play Audio when you are ready.</p>
+            </section>
             <details class="control-section" open>
                 <summary>Audio</summary>
                 <div class="audio-slot"><AudioPanel experience={experience} /></div>
@@ -877,6 +886,7 @@ const selectedAudioTrack =
 <script>
     import { prepareBackground, createBackdropHtml } from '../../../lib/player/Background';
     import { createPlaybackUrl } from '../../../lib/player/PlaybackLink';
+    import { applyRetreatPreset, type RetreatPreset } from '../../../lib/player/RetreatPresets';
     import { backgroundChoices, backgroundSource } from '../../../lib/player/BackgroundChoices';
     import { audioTracks } from '../../../data/audio/tracks';
     import { experiences as defaultExperiences } from '../../../data/experiences';
@@ -1069,6 +1079,14 @@ const selectedAudioTrack =
     });
 
     let editableExperience: Experience | null = null;
+    document.querySelectorAll<HTMLButtonElement>('[data-retreat-preset]').forEach(button => {
+        button.addEventListener('click', () => {
+            if (!editableExperience) return;
+            editableExperience = applyRetreatPreset(editableExperience, button.dataset.retreatPreset as RetreatPreset);
+            experienceLoader.load(editableExperience);
+            synchroniseEditor(editableExperience);
+        });
+    });
     const smokeToggle = document.querySelector<HTMLInputElement>('#smoke-enabled')!;
     const smokeAmount = document.querySelector<HTMLInputElement>('#smoke-amount')!;
     const smokeValue = document.querySelector<HTMLOutputElement>('#smoke-amount-value')!;
@@ -1084,6 +1102,7 @@ const selectedAudioTrack =
     smokeAmount.addEventListener('input', updateSmoke);
 
     const canonicalExperienceIds = new Set([
+        'retreat',
         'temple',
         'forest',
         'ocean',
@@ -1147,6 +1166,8 @@ const selectedAudioTrack =
         trackId: string
     ): string => {
         const titles: Record<string, string> = {
+            'retreat-wind': 'Gentle woodland wind',
+            'retreat-rain': 'Gentle rain',
             'temple-echoes': 'Temple Echoes',
             'forest-ambience': 'Forest Wind',
             'ocean-waves': 'Ocean Ambient',
@@ -1265,6 +1286,9 @@ const selectedAudioTrack =
         const coverId = selectedExperience.sceneId && canonicalExperienceIds.has(selectedExperience.sceneId)
             ? selectedExperience.sceneId : legacyScene ?? inferredScene;
         selectedExperience.sceneId = coverId;
+        document.querySelector<HTMLElement>('#retreat-presets')!.hidden = coverId !== 'retreat';
+        const activeRetreatPreset = !selectedExperience.atmosphere.particles ? 'quiet' : selectedExperience.particles.motion === 'snow' ? 'winter' : 'rain';
+        document.querySelectorAll<HTMLButtonElement>('[data-retreat-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.retreatPreset === activeRetreatPreset)));
         const smokeAvailable = coverId === 'temple' && !selectedExperience.background && !selectedExperience.backgroundId;
         document.querySelector<HTMLElement>('#smoke-panel')!.hidden = !smokeAvailable;
         const smoke = selectedExperience.smoke ?? { enabled: false, amount: 35 };
@@ -1274,7 +1298,7 @@ const selectedAudioTrack =
         smokeAmount.value = String(smoke.amount);
         smokeValue.value = `${smoke.amount}%`;
         if (previewStage instanceof HTMLElement) {
-            previewStage.dataset.scene = selectedExperience.background || selectedExperience.backgroundId ? 'custom' : coverId;
+            previewStage.dataset.scene = coverId === 'retreat' && !selectedExperience.background && (!selectedExperience.backgroundId || selectedExperience.backgroundId === 'retreat-winter') ? 'retreat' : selectedExperience.background || selectedExperience.backgroundId ? 'custom' : coverId;
             const image = previewStage.querySelector<HTMLImageElement>('.preview-scene-image');
             if (image) image.src = backgroundSource(selectedExperience);
             previewStage.setAttribute('aria-label', `${selectedExperience.name} atmosphere preview`);
@@ -1315,6 +1339,8 @@ const selectedAudioTrack =
             button.setAttribute('aria-pressed', String(!selectedExperience.background && (selectedExperience.backgroundId ?? '') === button.dataset.backgroundChoice));
         });
         const effectLabels: Record<string, [string, string, string]> = {
+            'retreat-rain': ['Rain', 'Rain amount', 'Wind'],
+            'retreat-snow': ['Snow', 'Snow amount', 'Wind'],
             'storm-rain': ['Rain', 'Rain amount', 'Wind'],
             'christmas-snow': ['Snow', 'Snow amount', 'Wind'],
             'forest-fireflies': ['Fireflies', 'Firefly count', 'Wander'],
@@ -1726,6 +1752,10 @@ const selectedAudioTrack =
                         ?? initialExperience
                 );
 
+            const requestedRetreat = new URLSearchParams(location.search).get('retreat');
+            if (!stagedExperience && initialExperience.id === 'retreat' && ['quiet','rain','winter'].includes(requestedRetreat ?? '')) {
+                editableExperience = applyRetreatPreset(editableExperience, requestedRetreat as RetreatPreset);
+            }
             const requestedBackground = new URLSearchParams(location.search).get('background');
             const requestedChoice = backgroundChoices.find(choice => choice.id === requestedBackground && choice.sceneId === initialExperience.id);
             if (!stagedExperience && requestedChoice) editableExperience.backgroundId = requestedChoice.id;
@@ -1974,7 +2004,9 @@ const selectedAudioTrack =
     document.querySelector('#particle-preset-select')?.addEventListener('change', event => {
         const select = event.target;
         if (!(select instanceof HTMLSelectElement) || !editableExperience) return;
-        const preset = defaultExperiences.find(item => item.particles.preset === select.value);
+        const preset = select.value === 'retreat-snow' && editableExperience.sceneId === 'retreat'
+            ? applyRetreatPreset(editableExperience, 'winter')
+            : defaultExperiences.find(item => item.particles.preset === select.value);
         if (!preset) return;
         editableExperience.particles = { ...preset.particles };
         experienceLoader.load(cloneExperience(editableExperience));
@@ -1983,7 +2015,9 @@ const selectedAudioTrack =
 
     document.querySelector('#reset-particles-button')?.addEventListener('click', () => {
         if (!editableExperience) return;
-        const preset = defaultExperiences.find(item => item.particles.preset === editableExperience!.particles.preset);
+        const preset = editableExperience.sceneId === 'retreat' && ['retreat-rain','retreat-snow'].includes(editableExperience.particles.preset)
+            ? applyRetreatPreset(editableExperience, editableExperience.particles.motion === 'snow' ? 'winter' : 'rain')
+            : defaultExperiences.find(item => item.particles.preset === editableExperience!.particles.preset);
         if (!preset) {
             const status = document.querySelector('#reset-particles-status');
             if (status) status.textContent = 'Choose a built-in preset first to reset its settings.';
@@ -2640,3 +2674,8 @@ const selectedAudioTrack =
 </script>
 
 </StudioLayout>
+
+<style>
+#retreat-presets button { border:1px solid #475569;background:#192537;color:#e2e8f0;padding:10px 12px;border-radius:8px;cursor:pointer; }
+#retreat-presets button[aria-pressed="true"] { border-color:#34d399;background:#14342e; }
+</style>
