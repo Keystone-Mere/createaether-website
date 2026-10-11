@@ -1,0 +1,1433 @@
+[
+  {
+    "scene": "retreat",
+    "motion": "rain",
+    "preset": "retreat-rain",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "rain",
+    "preset": "retreat-rain",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "rain",
+    "preset": "retreat-rain",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "retreat",
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "rect",
+        127.68,
+        42.660000000000004,
+        714.24,
+        329.94
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "storm",
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        0,
+        43.2
+      ],
+      [
+        "lineTo",
+        220.8,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        540
+      ],
+      [
+        "lineTo",
+        662.4,
+        540
+      ],
+      [
+        "lineTo",
+        0,
+        464.4
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "storm",
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        0,
+        43.2
+      ],
+      [
+        "lineTo",
+        220.8,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        540
+      ],
+      [
+        "lineTo",
+        662.4,
+        540
+      ],
+      [
+        "lineTo",
+        0,
+        464.4
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "storm",
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        0,
+        43.2
+      ],
+      [
+        "lineTo",
+        220.8,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        540
+      ],
+      [
+        "lineTo",
+        662.4,
+        540
+      ],
+      [
+        "lineTo",
+        0,
+        464.4
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "christmas",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        223.68,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        259.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        223.68,
+        172.8
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        117.72
+      ],
+      [
+        "lineTo",
+        441.6,
+        117.72
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        218.70000000000002
+      ],
+      [
+        "lineTo",
+        508.8,
+        224.1
+      ],
+      [
+        "lineTo",
+        499.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        441.6,
+        251.10000000000002
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "christmas",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        223.68,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        259.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        223.68,
+        172.8
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        117.72
+      ],
+      [
+        "lineTo",
+        441.6,
+        117.72
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        218.70000000000002
+      ],
+      [
+        "lineTo",
+        508.8,
+        224.1
+      ],
+      [
+        "lineTo",
+        499.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        441.6,
+        251.10000000000002
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "christmas",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        223.68,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        259.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        223.68,
+        172.8
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        117.72
+      ],
+      [
+        "lineTo",
+        441.6,
+        117.72
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        218.70000000000002
+      ],
+      [
+        "lineTo",
+        508.8,
+        224.1
+      ],
+      [
+        "lineTo",
+        499.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        441.6,
+        251.10000000000002
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "christmas",
+    "motion": "rain",
+    "preset": "christmas-snow",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "christmas",
+    "motion": "rain",
+    "preset": "christmas-snow",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "christmas",
+    "motion": "rain",
+    "preset": "christmas-snow",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "temple",
+    "motion": "rise",
+    "preset": "temple-embers",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "temple",
+    "motion": "rise",
+    "preset": "temple-embers",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "temple",
+    "motion": "rise",
+    "preset": "temple-embers",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": null,
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        0,
+        43.2
+      ],
+      [
+        "lineTo",
+        220.8,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        540
+      ],
+      [
+        "lineTo",
+        662.4,
+        540
+      ],
+      [
+        "lineTo",
+        0,
+        464.4
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": null,
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        0,
+        43.2
+      ],
+      [
+        "lineTo",
+        220.8,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        540
+      ],
+      [
+        "lineTo",
+        662.4,
+        540
+      ],
+      [
+        "lineTo",
+        0,
+        464.4
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": null,
+    "motion": "rain",
+    "preset": "storm-rain",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        0,
+        43.2
+      ],
+      [
+        "lineTo",
+        220.8,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        0
+      ],
+      [
+        "lineTo",
+        960,
+        540
+      ],
+      [
+        "lineTo",
+        662.4,
+        540
+      ],
+      [
+        "lineTo",
+        0,
+        464.4
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "forest",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 960,
+    "height": 540,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        1,
+        1
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        223.68,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        259.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        223.68,
+        172.8
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        117.72
+      ],
+      [
+        "lineTo",
+        441.6,
+        117.72
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        218.70000000000002
+      ],
+      [
+        "lineTo",
+        508.8,
+        224.1
+      ],
+      [
+        "lineTo",
+        499.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        441.6,
+        251.10000000000002
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "forest",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 1920,
+    "height": 1080,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        2,
+        2
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        223.68,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        259.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        223.68,
+        172.8
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        117.72
+      ],
+      [
+        "lineTo",
+        441.6,
+        117.72
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        218.70000000000002
+      ],
+      [
+        "lineTo",
+        508.8,
+        224.1
+      ],
+      [
+        "lineTo",
+        499.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        441.6,
+        251.10000000000002
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  },
+  {
+    "scene": "forest",
+    "motion": "snow",
+    "preset": "christmas-snow",
+    "width": 360,
+    "height": 640,
+    "calls": [
+      [
+        "save"
+      ],
+      [
+        "scale",
+        0.375,
+        1.1851851851851851
+      ],
+      [
+        "beginPath"
+      ],
+      [
+        "moveTo",
+        223.68,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        8.1
+      ],
+      [
+        "lineTo",
+        420.48,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        259.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        223.68,
+        172.8
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        14.58
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        117.72
+      ],
+      [
+        "lineTo",
+        441.6,
+        117.72
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "moveTo",
+        441.6,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        129.06
+      ],
+      [
+        "lineTo",
+        539.5200000000001,
+        218.70000000000002
+      ],
+      [
+        "lineTo",
+        508.8,
+        224.1
+      ],
+      [
+        "lineTo",
+        499.20000000000005,
+        251.10000000000002
+      ],
+      [
+        "lineTo",
+        441.6,
+        251.10000000000002
+      ],
+      [
+        "closePath"
+      ],
+      [
+        "clip"
+      ],
+      [
+        "restore"
+      ]
+    ]
+  }
+]

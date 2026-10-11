@@ -1,3 +1,4 @@
+import { applyStoryAsset } from '../player/ScenePresentation';
 import type { Experience } from '../models/Experience';
 import { StorySequence, type StoryScene } from './StorySequence';
 
@@ -68,6 +69,7 @@ async function applySound() {
 function render(focus=false) {
   stopNarration();
   const scene=sequence.current;
+  applyStoryAsset(stage, scene.image, scene.assetId);
   image.src=scene.image; image.alt=scene.imageAlt; image.removeAttribute('aria-hidden');
   stage.style.aspectRatio=scene.aspectRatio;
   stage.setAttribute('aria-label',scene.title);

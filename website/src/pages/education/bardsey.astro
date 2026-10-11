@@ -1,0 +1,137 @@
+---
+import SceneStage from '../../components/studio/SceneStage.astro';
+import { bardseyScenes, bardseyDetails } from '../../data/stories/bardsey';
+const opening = bardseyScenes[0];
+---
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Bardsey: Before the Storm · Aether Education Lab</title><meta name="robots" content="noindex"/><meta name="description" content="Explore coastal wildlife and watch a fictional storm pass from shelter."/></head>
+<body>
+<main>
+<header><a href="/">AETHER</a><span>EDUCATION LAB · EDUCATIONAL PROTOTYPE</span></header>
+<h1>Bardsey: Before the Storm</h1><p class="intro">Explore Ynys Enlli, discover coastal wildlife, then watch a storm pass from shelter. A real island view, wildlife photographs and simulated weather. Explore at your own pace.</p>
+<div class="toolbar"><span id="progress">Chapter 1 of 6</span><button id="sound" aria-pressed="false">Sound off</button><button id="narrate" hidden>Listen to chapter</button></div>
+<div class="layout">
+<section aria-label="Story image">
+<div id="visual-frame"><button id="exit-scene" class="exit-scene">Exit full screen</button>
+<SceneStage sceneId="story" name="Bardsey: Before the Storm" imageSrc={opening.image} exitButton={false}/>
+<div id="explore-overlay"><div class="shelter" id="shelter" hidden aria-hidden="true"></div></div>
+</div>
+<p id="credit" class="credit">{opening.imageCredit}</p>
+<div id="field-guide"><p class="credit">Field-guide examples photographed elsewhere: study the clues, then select a discovery.</p><div class="wildlife-cards">{[
+  { src: 'thrift.jpg', clue: 'Pink coastal flowers', alt: 'Close-up of a cluster of pink thrift flowers.' },
+  { src: 'oystercatcher.jpg', clue: 'A straight orange-red bill', alt: 'Black-and-white bird with a long straight orange-red bill.' },
+  { src: 'chough.jpg', clue: 'A curved red bill', alt: 'Close-up of a dark bird with a curved red bill.' }
+].map((item,i)=><button class="wildlife-card" data-detail={i}><img src={`/images/bardsey/${item.src}`} alt={item.alt} loading="lazy"/><span>{i+1}. {item.clue}</span></button>)}</div></div>
+<div class="view-controls"><button id="fullscreen">Full-screen scene</button><button id="gentle" aria-pressed="false">Gentler storm</button></div>
+</section>
+<section class="story-card" aria-label="Chapter text">
+<p class="eyebrow" id="chapter-label">EXPLORE & NOTICE</p><h2 id="chapter-title" tabindex="-1">{opening.title}</h2><p id="caption">{opening.caption}</p>
+<div id="detail-controls" hidden><p id="found">0 of 3 discoveries explored</p><div class="detail-buttons">{bardseyDetails.map((detail,i) => <button data-detail={i}>{i+1}. {detail.name}</button>)}</div><div id="detail" aria-live="polite"><p>Choose a wildlife photograph below the island view.</p></div></div>
+<p id="completion" hidden>Your discoveries are listed below. Replay to explore again.</p>
+<ul id="notebook" hidden></ul><nav aria-label="Story navigation"><button id="back" disabled>← Back</button><button id="next">Watch the weather change →</button><button id="replay" hidden>Replay journey</button></nav>
+<p id="status" class="credit" role="status"></p>
+</section>
+</div>
+<footer>Powered by the Aether atmospheric engine. No automatic chapter changes. Text is always available; sound is optional.<br/>Independent educational prototype. The island view is a real photograph. The story, shelter and weather are simulated; this is not a visitor route or weather forecast. Wildlife references: <a href="https://enlli.org/natural-environment/wildlife/">Bardsey Island Trust</a> and <a href="https://www.bbfo.org.uk/about">Bardsey Bird &amp; Field Observatory</a>. General coastal audio is not a recording from the island.<details class="photo-credits"><summary>Photograph credits &amp; licences</summary>
+<p>Island view: <a href="https://commons.wikimedia.org/wiki/File:Bardsey_Island_-_geograph.org.uk_-_6234522.jpg">Bardsey Island</a> by Eirian Evans, 19 May 2019 — <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>. Wikimedia thumbnail reproduced unchanged; simulated cloud, dimming, rain and shelter layers appear over it. This scene presentation is available under the same licence.</p>
+<p>Thrift: <a href="https://commons.wikimedia.org/wiki/File:Armeria_maritima_(flowers).jpg">Armeria maritima (flowers)</a> by Hans Hillewaert, France — <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>. Wikimedia thumbnail reproduced unchanged.</p>
+<p>Oystercatcher: <a href="https://commons.wikimedia.org/wiki/File:Haematopus_ostralegus_-_Bremerhaven_01.jpg">Haematopus ostralegus — Bremerhaven 01</a> by H. Zell, Germany — <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>. Wikimedia thumbnail reproduced unchanged.</p>
+<p>Chough: <a href="https://commons.wikimedia.org/wiki/File:Pyrrhocorax_pyrrhocorax_head.jpg">Pyrrhocorax pyrrhocorax head</a>, Ross Elliott; cropped by Toter Alter Mann, Devon — <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>. Supplied crop reproduced unchanged. Wildlife photographs are identification examples, not sightings documented at this viewpoint. No photographer or island organisation endorses this prototype.</p>
+</details></footer>
+<noscript>This interactive prototype needs JavaScript. The opening chapter remains available above.</noscript>
+</main>
+<audio id="story-audio" data-track-id="ocean-waves" preload="none" loop></audio>
+<script>
+import { createStoryPlayer } from '../../lib/story/StoryPlayer';
+import { bardseyScenes, bardseyDetails } from '../../data/stories/bardsey';
+import { createStudioRuntime } from '../../lib/studio/StudioRuntime';
+const get = <T extends HTMLElement>(id:string) => document.getElementById(id) as T;
+const stage = get<HTMLDivElement>('experience-preview-stage');
+const audio = get<HTMLAudioElement>('story-audio');
+const runtime = createStudioRuntime({audioElement:audio, previewStage:stage, previewCanvas:stage.querySelector('canvas'), audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,particlesStatus:null,lightingStatus:null,fogStatus:null});
+const clouds = document.createElement('div'); clouds.className='bardsey-clouds'; clouds.setAttribute('aria-hidden','true'); stage.querySelector('.preview-scene')?.append(clouds);
+const details = new Set<number>();
+let gentle = false;
+let current = bardseyScenes[0];
+const wrappedLoader = { load(experience: import('../../lib/models/Experience').Experience) {
+  const value = structuredClone(experience);
+  if (gentle && value.atmosphere.particles) {
+    value.particles.count = Math.min(value.particles.count, 45);
+    value.audio.track = 'retreat-rain'; value.audio.volume = 16;
+  }
+  return runtime.experienceLoader.load(value);
+}};
+get('gentle').addEventListener('click',()=>{
+  gentle = !gentle; get('gentle').setAttribute('aria-pressed', String(gentle));
+  get('gentle').textContent = gentle ? 'Gentler storm on' : 'Gentler storm';
+  const value = structuredClone(current.experience);
+  value.audio.enabled = get('sound').getAttribute('aria-pressed') === 'true';
+  wrappedLoader.load(value);
+});
+get('exit-scene').addEventListener('click',()=>{ void document.exitFullscreen().catch(()=>{}); });
+get('fullscreen').addEventListener('click',async()=>{
+  try { if(document.fullscreenElement) await document.exitFullscreen(); else await get('visual-frame').requestFullscreen(); }
+  catch { get('status').textContent='Full-screen is unavailable on this device.'; }
+});
+document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(button=>button.addEventListener('click',()=>{
+  const index=Number(button.dataset.detail); const detail=bardseyDetails[index];
+  details.add(index);get('found').textContent=`${details.size} of 3 discoveries explored`;
+  get('detail').replaceChildren();const heading=document.createElement('h3');heading.textContent=detail.name;
+  const text=document.createElement('p');text.textContent=detail.text;get('detail').append(heading,text);
+  document.querySelectorAll<HTMLButtonElement>('[data-detail]').forEach(item=>item.setAttribute('aria-pressed',String(Number(item.dataset.detail)===index)));
+}));
+const player = createStoryPlayer({
+  scenes: bardseyScenes, root: document, stage, audio,
+  loader: wrappedLoader,
+  onSceneChange(scene) {
+    current = scene;
+    get('chapter-label').textContent=scene.label ?? '';
+    const exploring=scene.id==='trail';
+    get('detail-controls').hidden=!exploring; get('field-guide').hidden=!exploring;
+    document.querySelectorAll<HTMLElement>('.hotspot').forEach(button=>button.hidden=!exploring);
+    get('shelter').hidden=!['shelter','storm','clearing','notebook'].includes(scene.id);
+    stage.dataset.weather = scene.id;
+    const notebook=get('notebook'); notebook.hidden=scene.id!=='notebook'; notebook.replaceChildren();
+    bardseyDetails.forEach((detail,index)=>{ const item=document.createElement('li'); item.textContent=details.has(index) ? `${detail.name}: ${detail.text}` : `${detail.name}: not explored yet — use Back or Replay to discover it.`; notebook.append(item); });
+  },
+  onReplay() {
+    details.clear();
+    document.querySelectorAll('[data-detail]').forEach(button=>button.removeAttribute('aria-pressed'));
+    get('found').textContent='0 of 3 discoveries explored';
+    get('detail').textContent='Choose a wildlife photograph below the island view.';
+  }
+
+});
+document.addEventListener('astro:before-swap',()=>player.destroy(),{once:true});
+</script>
+<style>
+:global(*){box-sizing:border-box} :global([hidden]){display:none!important}
+body{margin:0;background:#0c1625;color:#eee9de;font-family:system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:30px}header{display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:.75rem;letter-spacing:.12em;color:#b9bdc7}header a{color:#dfbe7e;font-size:1.3rem;text-decoration:none;letter-spacing:.2em}h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(2.5rem,5vw,4rem);margin:35px 0 12px}.intro{color:#c0c6d0;max-width:760px;line-height:1.7}.toolbar{display:flex;gap:12px;align-items:center;margin:25px 0}.toolbar span{margin-right:auto;color:#dfbe7e}.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:25px;align-items:start}#visual-frame{position:relative}#explore-overlay{position:absolute;inset:0;border-radius:14px;overflow:hidden;pointer-events:none}#scroll-cover{position:absolute;inset:0;background:linear-gradient(90deg,#857249,#cfb479);clip-path:inset(0 0 0 12%);opacity:.97}.hotspot{position:absolute;transform:translate(-50%,-50%);border-radius:50%;width:38px;height:38px;padding:0;pointer-events:auto;box-shadow:0 0 0 4px #09152488}.hotspot:disabled{visibility:hidden}.story-card{background:#f0e9d9;color:#302a22;border-radius:16px;padding:28px}.story-card p{line-height:1.8}h2{font-family:Georgia,serif;font-weight:400;font-size:2rem;margin:10px 0}.eyebrow{font-size:.7rem;letter-spacing:.15em;color:#746446}.credit{font-size:.75rem;line-height:1.6;color:#aeb5c1}.story-card .credit{color:#76654e}button{font:inherit;border:1px solid #c8ad77;background:#dfbe7e;color:#231d16;border-radius:8px;padding:10px 14px;cursor:pointer}button:disabled{opacity:.4;cursor:default}button[aria-pressed=true]{outline:3px solid #876522;outline-offset:2px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #4aa3df;outline-offset:4px}nav,.detail-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}#detail{border-top:1px solid #c7baa3;margin-top:20px}#found{font-size:.8rem;color:#75613f}#reveal-controls{padding:15px 0}#reveal-controls label{display:flex;justify-content:space-between}input[type=range]{width:100%;margin:18px 0;accent-color:#dfbe7e}footer{border-top:1px solid #ffffff20;margin-top:35px;padding-top:22px;color:#929dab;font-size:.75rem;line-height:1.8}:global(.preview-stage .preview-scene-image){object-fit:cover}:global(.preview-stage .scene-tint){display:none}:global(.preview-stage .preview-scene-image){transition:opacity .4s ease} @media(max-width:850px){main{padding:20px}.layout{grid-template-columns:1fr}.story-card{padding:22px}header{flex-wrap:wrap}.toolbar{flex-wrap:wrap}.hotspot{width:30px;height:30px}}@media(prefers-reduced-motion:reduce){:global(*){animation:none!important;transition:none!important}}
+
+.exit-scene{display:none;position:absolute;right:12px;top:12px;z-index:20}#visual-frame:fullscreen .exit-scene{display:block}
+.view-controls{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+#notebook{padding-left:20px;line-height:1.7}#notebook li{margin:12px 0}
+footer a{color:#d5bd86}
+#explore-overlay{z-index:6}
+.shelter{position:absolute;inset:0;pointer-events:none;background:linear-gradient(#202b29,#202b29) top/100% 15% no-repeat,linear-gradient(#3e463f,#3e463f) bottom/100% 10% no-repeat,linear-gradient(#28312f,#28312f) left/5% 100% no-repeat,linear-gradient(#28312f,#28312f) right/5% 100% no-repeat;box-shadow:inset 0 0 30px #101b19aa}
+/* Matching rectangular opening for this fictional shelter; masks are page-local. */
+:global(.preview-canvas){clip-path:inset(15% 5% 10% 5%)}
+:global(.preview-stage[data-weather="storm"] .preview-scene-image){filter:brightness(.65) saturate(.65)}
+:global(.preview-stage[data-weather="shelter"] .preview-scene-image){filter:brightness(.8)}
+:global(.preview-stage .preview-scene-image){transition:filter 1.8s ease}
+#visual-frame:fullscreen{width:100vw;height:100vh;background:#07151b;display:flex;align-items:center;justify-content:center}
+#visual-frame:fullscreen :global(.preview-stage){width:min(100vw,133.3333vh);height:min(100vh,75vw);aspect-ratio:4/3}
+#visual-frame:fullscreen #explore-overlay{width:min(100vw,133.3333vh);height:min(100vh,75vw);inset:auto;border-radius:14px}
+
+.wildlife-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.wildlife-card{padding:0;overflow:hidden;text-align:left;background:#142638;color:#eee9de;border-color:#536979}.wildlife-card img{display:block;width:100%;height:150px;object-fit:contain;background:#07151b}.wildlife-card span{display:block;padding:12px;font-size:.8rem}.photo-credits{margin-top:18px}.photo-credits summary{cursor:pointer;color:#dfbe7e}.photo-credits p{max-width:1000px}
+:global(.bardsey-clouds){position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;clip-path:polygon(0 0,100% 0,100% 40%,45% 41%,0 23%);background:radial-gradient(ellipse at 10% 12%,#394854 0%,#667781 18%,transparent 38%),radial-gradient(ellipse at 60% 8%,#3d4c57 0%,#778994 23%,transparent 45%),linear-gradient(#708391,#adb8be);transition:opacity 1.8s ease}
+:global(.preview-stage[data-weather="clouds"] .bardsey-clouds){opacity:.72}
+:global(.preview-stage[data-weather="shelter"] .bardsey-clouds),:global(.preview-stage[data-weather="storm"] .bardsey-clouds){opacity:.95}
+:global(.preview-stage[data-weather="clearing"] .bardsey-clouds),:global(.preview-stage[data-weather="notebook"] .bardsey-clouds){opacity:.18}
+:global(.preview-stage[data-weather="clouds"] .preview-scene-image){filter:brightness(.82) saturate(.8)}
+:global(.preview-stage .preview-scene-image){object-fit:contain}
+@media(max-width:500px){.wildlife-cards{gap:7px}.wildlife-card img{height:95px}.wildlife-card span{padding:8px;font-size:.72rem}}
+</style>
+</body>
+</html>

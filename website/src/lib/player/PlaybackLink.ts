@@ -1,7 +1,8 @@
+import { sceneDefinitions } from '../../data/assets/SceneRegistry';
 import type { Experience } from '../models/Experience';
 import { isExperience, EXPERIENCE_FORMAT_VERSION } from '../models/ExperienceFormat';
 
-const scenes = new Set(['temple', 'forest', 'ocean', 'christmas', 'storm', 'festival', 'retreat']);
+const scenes = new Set<string>(sceneDefinitions.map(scene=>scene.id));
 const colour = (value: string) => {
     if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error('Invalid colour');
     return value;

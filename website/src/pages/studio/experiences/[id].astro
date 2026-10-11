@@ -887,6 +887,7 @@ const selectedAudioTrack =
     import { prepareBackground, createBackdropHtml } from '../../../lib/player/Background';
     import { createPlaybackUrl } from '../../../lib/player/PlaybackLink';
     import { applyRetreatPreset, type RetreatPreset } from '../../../lib/player/RetreatPresets';
+    import { applyBackground } from '../../../lib/player/ScenePresentation';
     import { backgroundChoices, backgroundSource } from '../../../lib/player/BackgroundChoices';
     import { audioTracks } from '../../../data/audio/tracks';
     import { experiences as defaultExperiences } from '../../../data/experiences';
@@ -1298,9 +1299,7 @@ const selectedAudioTrack =
         smokeAmount.value = String(smoke.amount);
         smokeValue.value = `${smoke.amount}%`;
         if (previewStage instanceof HTMLElement) {
-            previewStage.dataset.scene = coverId === 'retreat' && !selectedExperience.background && (!selectedExperience.backgroundId || selectedExperience.backgroundId === 'retreat-winter') ? 'retreat' : selectedExperience.background || selectedExperience.backgroundId ? 'custom' : coverId;
-            const image = previewStage.querySelector<HTMLImageElement>('.preview-scene-image');
-            if (image) image.src = backgroundSource(selectedExperience);
+            applyBackground(previewStage, selectedExperience);
             previewStage.setAttribute('aria-label', `${selectedExperience.name} atmosphere preview`);
         }
         const choices = backgroundChoices.filter(choice => choice.sceneId === coverId);

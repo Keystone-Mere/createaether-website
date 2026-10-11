@@ -1,17 +1,22 @@
 ---
-interface Props { sceneId: string; name: string; exitButton?: boolean; imageSrc?: string; }
-const { sceneId, name, exitButton = true, imageSrc } = Astro.props;
+import { sceneAsset, sceneAssetForSource } from '../../data/assets/SceneRegistry';
+interface Props { sceneId: string; name: string; exitButton?: boolean; imageSrc?: string; assetId?: string; }
+const { sceneId, name, exitButton = true, imageSrc, assetId } = Astro.props;
+const registered = assetId ? sceneAsset(assetId) : imageSrc ? sceneAssetForSource(imageSrc) : sceneAsset(sceneId);
+const src = imageSrc ?? registered?.src ?? `/images/experience-covers/${sceneId}.jpg`;
+const displayedId = registered?.src === src ? registered.id : 'user-background';
 ---
             <div
                 id="experience-preview-stage"
                 class="preview-stage"
                 data-scene={sceneId}
+                data-asset-id={displayedId}
                 aria-label={`${name} atmosphere preview`}
                 tabindex="-1"
             >
                 {exitButton && <button type="button" id="exit-fullscreen-preview" class="fullscreen-exit" aria-label="Exit full-screen preview">Exit full screen</button>}
                 <div class="preview-scene">
-                <img class="preview-scene-image" src={imageSrc ?? `/images/experience-covers/${sceneId === 'festival' ? 'festival-evening' : sceneId === 'storm' ? 'storm-balcony' : sceneId}.jpg`} alt="" aria-hidden="true" />
+                <img class="preview-scene-image" src={src} alt="" aria-hidden="true" />
                 <div class="scene-tint"></div>
                 <div class="candle-light candle-light--left"></div>
                 <div class="candle-light candle-light--back"></div>

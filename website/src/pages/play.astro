@@ -19,7 +19,7 @@ import SceneStage from '../components/studio/SceneStage.astro';
     </section>
     <script>
         import { isBackground } from '../lib/player/Background';
-        import { backgroundSource } from '../lib/player/BackgroundChoices';
+        import { applyBackground } from '../lib/player/ScenePresentation';
         import { readPlaybackHash } from '../lib/player/PlaybackLink';
         import { createStudioRuntime } from '../lib/studio/StudioRuntime';
         let runtime: ReturnType<typeof createStudioRuntime> | null = null;
@@ -33,9 +33,8 @@ import SceneStage from '../components/studio/SceneStage.astro';
             try {
                 const experience = readPlaybackHash(location.hash);
                 const stage = document.querySelector<HTMLElement>('.preview-stage')!;
-                stage.dataset.scene = experience.sceneId === 'retreat' && (!experience.backgroundId || experience.backgroundId === 'retreat-winter') ? 'retreat' : experience.backgroundId ? 'custom' : experience.sceneId;
+                applyBackground(stage, experience);
                 stage.setAttribute('aria-label', `${experience.name} environment`);
-                stage.querySelector<HTMLImageElement>('.preview-scene-image')!.src = backgroundSource(experience);
                 document.title = `${experience.name} — Aether Playback`;
                 player.hidden = false;
                 runtime = createStudioRuntime({
@@ -53,7 +52,7 @@ import SceneStage from '../components/studio/SceneStage.astro';
         window.addEventListener('message', event => {
             if (event.source !== window.parent || event.data?.type !== 'aether-background' || !isBackground(event.data.image)) return;
             const image = document.querySelector<HTMLImageElement>('.preview-scene-image');
-            if (image) { image.src = event.data.image; image.closest<HTMLElement>('.preview-stage')!.dataset.scene = 'custom'; }
+            if (image) { image.src = event.data.image; const stage = image.closest<HTMLElement>('.preview-stage')!; stage.dataset.scene = 'custom'; stage.dataset.assetId = 'user-background'; }
         });
         load();
         if (window.parent !== window) window.parent.postMessage('aether-background-ready', '*');

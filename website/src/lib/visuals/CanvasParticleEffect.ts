@@ -1,3 +1,6 @@
+import { displayedAssetId } from '../player/ScenePresentation';
+import { particleBoundary } from '../../data/scenes/EffectBoundaries';
+import { clipEffectBoundary } from '../rendering/EffectBoundary';
 import type { ExperienceStateData } from "../ExperienceState";
 
 import type { ParticleSettings } from "../models/Experience";
@@ -73,6 +76,8 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
   private oceanTime = 0;
 
+  private backgroundId: string | undefined;
+
   private settings: ParticleSettings = {
     ...defaultParticleSettings,
   };
@@ -100,6 +105,7 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       this.unsubscribeExperience = this.events.on(
         "experience:loaded",
         ({ experience }) => {
+          this.backgroundId = experience.background ? undefined : experience.backgroundId;
           this.applySettings(experience.particles);
         },
       );
@@ -150,20 +156,9 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       return;
     }
 
-    const retreat = this.stage instanceof HTMLElement && this.stage.dataset.scene === 'retreat';
-    if (retreat) {
-      // Panoramic glass only: preserve timber frame, room, lamp and chair.
-      context.beginPath();
-      context.rect(width * .133, height * .079, width * .744, height * .611);
-      context.clip();
-    }
-    if (!retreat && this.isWindowSnow()) {
-      this.clipChristmasWindow(context, width, height);
-    }
-
-    if (!retreat && this.isStormRain()) {
-      this.clipStormExterior(context, width, height);
-    }
+    const sceneId = this.stage instanceof HTMLElement ? this.stage.dataset.scene : undefined;
+    const boundary = particleBoundary(sceneId, this.settings.preset, this.resolveMotion(), this.backgroundId, displayedAssetId(this.stage));
+    if (boundary) clipEffectBoundary(context, boundary, width, height);
 
     for (const particle of this.particles) {
       this.updateParticle(particle, deltaSeconds, width, height);
@@ -214,50 +209,8 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
     return this.settings.preset === "storm-rain" && this.resolveMotion() === "rain";
   }
 
-  private clipStormExterior(
-    context: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-  ): void {
-    // Open balcony view; keep rain beyond the canopy and foreground rail.
-    const opening = [[0, 0.08], [0.23, 0], [1, 0],
-      [1, 1], [0.69, 1], [0, 0.86]];
-    context.beginPath();
-    opening.forEach(([x, y], index) => {
-      if (index === 0) context.moveTo(x * width, y * height);
-      else context.lineTo(x * width, y * height);
-    });
-    context.closePath();
-    context.clip();
-  }
-
   private isWindowSnow(): boolean {
     return this.settings.preset === "christmas-snow" && this.resolveMotion() === "snow";
-  }
-
-  private clipChristmasWindow(
-    context: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-  ): void {
-    // Glass panes in the current Christmas cover. Leave the wooden frame,
-    // tree and armchair in front of the snowfall.
-    const panes = [
-      [[0.233, 0.015], [0.438, 0.015], [0.438, 0.465],
-       [0.270, 0.465], [0.233, 0.320]],
-      [[0.460, 0.027], [0.562, 0.027], [0.562, 0.218], [0.460, 0.218]],
-      [[0.460, 0.239], [0.562, 0.239], [0.562, 0.405],
-       [0.530, 0.415], [0.520, 0.465], [0.460, 0.465]],
-    ];
-    context.beginPath();
-    for (const pane of panes) {
-      pane.forEach(([x, y], index) => {
-        if (index === 0) context.moveTo(x * width, y * height);
-        else context.lineTo(x * width, y * height);
-      });
-      context.closePath();
-    }
-    context.clip();
   }
 
   private renderOceanWaves(
