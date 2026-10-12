@@ -35,6 +35,8 @@ export class AudioSystem
         RuntimeEvents | null;
 
     private readonly fadeDurationMs = 650;
+    private destroyed = false;
+    private playbackGeneration = 0;
 
     private activeTrackId:
         string | null = null;
@@ -85,16 +87,35 @@ export class AudioSystem
     }
 
     private readonly playLayer = (): void => {
-        if (!this.layerElement || !this.layerElement.src || this.layerElement.volume === 0) return;
-        void this.layerElement.play().catch((error) => console.error('Unable to play atmosphere layer.', error));
+        if (this.destroyed || !this.layerElement || !this.layerElement.src || this.layerElement.volume === 0) return;
+        this.playSafely(this.layerElement, 'Unable to play atmosphere layer.');
     };
 
     private readonly pauseLayer = (): void => {
         this.layerElement?.pause();
     };
 
-    public destroy(): void {
+    private playSafely(element: HTMLAudioElement, message: string): void {
+        const generation = this.playbackGeneration;
+        void element.play().then(() => {
+            // A delayed play promise cannot revive audio after teardown.
+            if (this.destroyed || generation !== this.playbackGeneration) element.pause();
+        }).catch((error) => {
+            if (!this.destroyed && generation === this.playbackGeneration) console.error(message, error);
+        });
+    }
+
+    public stop(): void {
+        ++this.playbackGeneration;
         this.cancelFade();
+        this.audioElement?.pause();
+        this.layerElement?.pause();
+    }
+
+    public destroy(): void {
+        if (this.destroyed) return;
+        this.destroyed = true;
+        this.stop();
         this.audioElement?.removeEventListener('play', this.playLayer);
         this.audioElement?.removeEventListener('pause', this.pauseLayer);
         if (this.layerElement) {
@@ -108,7 +129,7 @@ export class AudioSystem
         targetVolume: number,
         onComplete?: () => void
     ): void {
-        if (!this.audioElement) {
+        if (this.destroyed || !this.audioElement) {
             return;
         }
 
@@ -224,7 +245,7 @@ export class AudioSystem
     public update(
         state: ExperienceStateData
     ): void {
-        if (!this.audioElement) {
+        if (this.destroyed || !this.audioElement) {
             return;
         }
 
@@ -300,14 +321,7 @@ export class AudioSystem
                 wasPlaying &&
                 state.audio.enabled
             ) {
-                void this.audioElement
-                    .play()
-                    .catch((error) => {
-                        console.error(
-                            'Unable to switch audio track.',
-                            error
-                        );
-                    });
+                this.playSafely(this.audioElement, 'Unable to switch audio track.');
             }
         }
 

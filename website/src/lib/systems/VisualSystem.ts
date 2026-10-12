@@ -66,26 +66,28 @@ export class VisualSystem
             return;
         }
 
+        this.startedEffects.delete(effect);
         if (typeof effect.stop === 'function') {
             effect.stop();
         }
 
-        this.startedEffects.delete(effect);
     }
 
     private destroyEffect(
         effect: VisualEffect
     ): void {
-        this.stopEffect(effect);
-
-        if (
-            this.initialisedEffects.has(effect) &&
-            typeof effect.destroy === 'function'
-        ) {
-            effect.destroy();
+        try {
+            this.stopEffect(effect);
+        } finally {
+            try {
+                if (this.initialisedEffects.has(effect) && typeof effect.destroy === 'function') {
+                    effect.destroy();
+                }
+            } finally {
+                this.initialisedEffects.delete(effect);
+                this.startedEffects.delete(effect);
+            }
         }
-
-        this.initialisedEffects.delete(effect);
     }
 
     public register(
@@ -262,7 +264,8 @@ export class VisualSystem
         this.started = false;
 
         this.effects.forEach((effect) => {
-            this.stopEffect(effect);
+            try { this.stopEffect(effect); }
+            catch (error) { console.error(`Visual effect "${effect.id}" failed during stop().`, error); }
         });
     }
 
@@ -271,7 +274,8 @@ export class VisualSystem
         this.initialised = false;
 
         this.effects.forEach((effect) => {
-            this.destroyEffect(effect);
+            try { this.destroyEffect(effect); }
+            catch (error) { console.error(`Visual effect "${effect.id}" failed during destroy().`, error); }
         });
 
         this.effects.clear();

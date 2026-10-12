@@ -1,3 +1,4 @@
+import { registerRuntimeCleanup } from '../runtime/RuntimeLifecycle';
 import { applyStoryAsset } from '../player/ScenePresentation';
 import type { Experience } from '../models/Experience';
 import { StorySequence, type StoryScene } from './StorySequence';
@@ -33,9 +34,11 @@ function listen(target: EventTarget, event: string, handler: () => void) {
   cleanups.push(() => target.removeEventListener(event, handler));
 }
 let destroyed = false;
+let removeLifecycleHooks: (() => void) | undefined;
 function destroy() {
   if (destroyed) return;
   destroyed = true;
+  removeLifecycleHooks?.();
   ++audioAttempt;
   soundEnabled = false;
   stopNarration(); audio.pause();
@@ -53,6 +56,7 @@ function stopNarration() {
   speaking=false; narrate.textContent='Listen to chapter';
 }
 function loadAtmosphere() {
+  if (destroyed) return;
   const experience = structuredClone(sequence.current.experience);
   experience.audio.enabled = soundEnabled;
   runtime.experienceLoader.load(experience);
@@ -63,7 +67,7 @@ async function applySound() {
   sound.textContent = soundEnabled ? 'Sound on' : 'Sound off';
   sound.setAttribute('aria-pressed', String(soundEnabled));
   if (!soundEnabled) { audio.pause(); return; }
-  try { await audio.play(); if(attempt!==audioAttempt && !soundEnabled) audio.pause(); }
+  try { await audio.play(); if(destroyed || (attempt!==audioAttempt && !soundEnabled)) audio.pause(); }
   catch { if(attempt!==audioAttempt) return; soundEnabled=false; loadAtmosphere(); sound.textContent='Sound off'; sound.setAttribute('aria-pressed','false'); get('status').textContent='Sound could not start. You can still explore the full story.'; }
 }
 function render(focus=false) {
@@ -106,7 +110,7 @@ listen(narrate,'click',()=>{
 });
 function silence(){stopNarration();soundEnabled=false;++audioAttempt;audio.pause();loadAtmosphere();sound.textContent='Sound off';sound.setAttribute('aria-pressed','false');}
 listen(document,'visibilitychange',()=>{if(document.hidden)silence();});
-listen(window,'pagehide',destroy);
+removeLifecycleHooks = registerRuntimeCleanup(destroy);
 render();
 return { sequence, destroy };
 }

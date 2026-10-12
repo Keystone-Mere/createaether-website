@@ -38,6 +38,7 @@ export class CanvasRenderer {
         new Map<string, CanvasRenderable>();
 
     private running = false;
+    private destroyed = false;
 
     private startTime = 0;
 
@@ -134,7 +135,7 @@ export class CanvasRenderer {
     }
 
     public start(): void {
-        if (this.running) {
+        if (this.destroyed || this.running) {
             return;
         }
 
@@ -235,6 +236,8 @@ export class CanvasRenderer {
     }
 
     public destroy(): void {
+        if (this.destroyed) return;
+        this.destroyed = true;
         this.stop();
 
         this.resizeObserver?.disconnect();
@@ -283,9 +286,8 @@ export class CanvasRenderer {
             }
         );
 
-        this.animationFrameId =
-            requestAnimationFrame(
-                this.renderFrame
-            );
+        if (this.running && !this.destroyed) {
+            this.animationFrameId = requestAnimationFrame(this.renderFrame);
+        }
     };
 }
