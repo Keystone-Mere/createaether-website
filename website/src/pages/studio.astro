@@ -1,7 +1,5 @@
 ---
 import StudioLayout from '../layouts/StudioLayout.astro';
-import MetricCard from '../components/studio/MetricCard.astro';
-import StatusCard from '../components/studio/StatusCard.astro';
 import ExperienceCard from '../components/studio/ExperienceCard.astro';
 import MyExperiencesPanel from '../components/studio/MyExperiencesPanel.astro';
 import { experiences } from '../data/experiences';
@@ -9,7 +7,7 @@ import { experiences } from '../data/experiences';
 
 <StudioLayout
   title="Aether Atmosphere Composer"
-  description="Create and tune atmospheric experiences in the Aether working MVP."
+  description="Choose a scene and create your own immersive environment."
 >
   <section class="studio-dashboard">
     <header class="studio-dashboard__header">
@@ -27,7 +25,7 @@ import { experiences } from '../data/experiences';
     </header>
 
     <a href="/studio/podcast/" class="podcast-dashboard-card">
-      <span><strong>Podcast &amp; Stream</strong><small>Create a branded setting for your show, with silent OBS playback.</small></span>
+      <span><span class="podcast-dashboard-card__label">Creator workspace</span><strong>Podcast &amp; Stream</strong><small>Create a branded setting for your show, with silent OBS playback.</small></span>
       <span aria-hidden="true">Open creator workspace →</span>
     </a>
 
@@ -50,7 +48,6 @@ import { experiences } from '../data/experiences';
               cover={`/images/experience-covers/${experience.id === 'festival' ? 'festival-evening' : experience.id === 'storm' ? 'storm-balcony' : experience.id}.jpg`}
               title={experience.name}
               description={experience.description}
-              status={experience.status}
               href={experience.href}
             />
           ))
@@ -60,85 +57,6 @@ import { experiences } from '../data/experiences';
 
     </section>
 
-    <section class="studio-dashboard__metrics" aria-label="Workspace overview">
-      <MetricCard
-        title="Experiences"
-        value={String(experiences.length)}
-description="Ready-to-edit experiences"
-      />
-
-      <MetricCard
-        title="Editable systems"
-        value="5"
-        description="Audio, lighting, particles, fog, environment"
-      />
-
-      <MetricCard
-        title="Preview"
-        value="Live"
-        description="See your changes as you edit"
-      />
-
-      <MetricCard
-        title="Storage"
-        value="Local"
-        description="Saved on this browser"
-      />
-    </section>
-
-    <section class="studio-dashboard__runtime">
-      <div class="studio-dashboard__section-heading">
-        <div>
-          <p class="studio-dashboard__workspace-label">Working MVP</p>
-          <h2>Available now</h2>
-        </div>
-
-        <span>Local-first system</span>
-      </div>
-
-      <div class="studio-dashboard__services">
-        <StatusCard
-          title="Atmosphere editor"
-          status="Working"
-          colour="green"
-        />
-
-        <StatusCard
-          title="Live preview"
-          status="Enabled"
-          colour="green"
-        />
-
-        <StatusCard
-          title="Local saving"
-          status="Available"
-          colour="green"
-        />
-
-        <StatusCard
-          title="Save and import"
-          status="Available"
-          colour="green"
-        />
-      </div>
-    </section>
-
-    <section class="studio-dashboard__workspace">
-      <div>
-        <p class="studio-dashboard__workspace-label">Workspace status</p>
-        <h2>Your workspace</h2>
-        <p>
-          Saved experiences stay in this browser. Use Save as Copy to download a
-          backup, or Import experience to load a saved file. Publishing and
-          marketplace features are coming soon.
-        </p>
-      </div>
-
-      <span class="studio-dashboard__status">
-        <span aria-hidden="true"></span>
-        Working MVP
-      </span>
-    </section>
   </section>
 </StudioLayout>
 
@@ -348,6 +266,11 @@ description="Ready-to-edit experiences"
     }
   }
 
+  @media (max-width: 480px) {
+    .studio-dashboard__experience-grid { grid-template-columns: 1fr !important; }
+    .studio-dashboard__experiences { padding: 1rem; }
+  }
+
   @media (max-width: 720px) {
     .studio-dashboard__header,
     .studio-dashboard__workspace {
@@ -371,10 +294,60 @@ description="Ready-to-edit experiences"
 </style>
 
 <style>
-.podcast-dashboard-card { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:22px; margin-bottom:24px; background:linear-gradient(120deg,#112e2a,#101e30); border:1px solid #315e52; border-radius:14px; color:#a9f0d2; text-decoration:none; }
-.podcast-dashboard-card strong { display:block; font-size:18px; margin-bottom:6px; color:#edfdf6; }
-.podcast-dashboard-card small { color:#adc6c4; line-height:1.6; }
+.podcast-dashboard-card { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:22px; margin-bottom:24px; background:linear-gradient(135deg,rgba(15,23,42,.82),rgba(8,15,29,.72)); border:1px solid rgba(148,163,184,.14); border-radius:1.35rem; color:#7dd3fc; text-decoration:none; }
+.podcast-dashboard-card strong { display:block; font-size:18px; margin-bottom:6px; color:#e2e8f0; }
+.podcast-dashboard-card small { color:#94a3b8; line-height:1.6; }
 .podcast-dashboard-card>span:last-child { font-size:12px; }
-.podcast-dashboard-card:hover { border-color:#8ee5c1; }
+.podcast-dashboard-card:hover { border-color:rgba(56,189,248,.55); }
+.podcast-dashboard-card__label { display:block; margin-bottom:.55rem; color:#38bdf8; font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.podcast-dashboard-card:focus-visible { outline:2px solid #7dd3fc; outline-offset:3px; }
 @media(max-width:600px) { .podcast-dashboard-card { flex-direction:column; align-items:flex-start; } }
+</style>
+
+<style is:global>
+  #experience-library .experience-card { display: flex; flex-direction: column; min-width: 0; gap: 0; padding: 0; overflow: hidden; }
+  #experience-library .experience-card__image-link { display: block; flex: 0 0 auto; width: 100%; }
+  #experience-library .experience-card .experience-card__cover { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: center; }
+  #experience-library .experience-card__content { flex: 1; margin: 0; padding: 1.1rem 1.1rem 0; }
+  #experience-library .experience-card h3 { margin: 0; color: #f8fafc; font-size: 1.15rem; line-height: 1.35; }
+  #experience-library .experience-card h3 a,
+  #experience-library .experience-card h3 a:visited { color: #f8fafc; text-decoration: none; }
+  #experience-library .experience-card h3 a:hover { color: #7dd3fc; }
+  #experience-library .experience-card p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 3.2em; margin: .65rem 0 0; line-height: 1.6; }
+  #experience-library .experience-card__footer { display: block; margin: auto 0 0; padding: 1rem 1.1rem 1.1rem; }
+  #experience-library .experience-card__button { display: flex; box-sizing: border-box; align-items: center; justify-content: center; width: 100%; min-height: 2.75rem; padding: .65rem .5rem; line-height: 1.3; font-size: .9rem; text-decoration: none; color: white; background: #2563eb; border-radius: 10px; }
+  #experience-library .experience-card__button:hover { background: #1d4ed8; }
+  #experience-library .experience-card a:focus-visible { outline: 2px solid #7dd3fc; outline-offset: -3px; }
+</style>
+
+<style is:global>
+  #experience-library .experience-card__button {
+    display: inline-flex;
+    width: auto;
+    padding: .65rem 1rem;
+  }
+  .my-experiences .my-experiences__continue {
+    flex: 0 0 auto;
+    width: auto;
+    padding: .65rem 1rem;
+  }
+  .my-experiences .my-experiences__menu { margin-left: auto; }
+</style>
+
+<style is:global>
+  .studio-dashboard a.podcast-dashboard-card {
+    background: linear-gradient(135deg, rgba(15,23,42,.82), rgba(8,15,29,.72));
+    border: 1px solid rgba(148,163,184,.14);
+    border-radius: 1.35rem;
+    color: #7dd3fc;
+    box-shadow: inset 0 1px rgba(255,255,255,.025);
+  }
+  .studio-dashboard a.podcast-dashboard-card:hover { border-color: rgba(56,189,248,.55); }
+  .studio-dashboard a.podcast-dashboard-card strong { color: #e2e8f0; }
+  .studio-dashboard a.podcast-dashboard-card small { color: #94a3b8; }
+  .studio-dashboard a.podcast-dashboard-card .podcast-dashboard-card__label {
+    display: block; margin-bottom: .55rem; color: #38bdf8;
+    font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  }
+  .studio-dashboard a.podcast-dashboard-card > span:last-child { color: #7dd3fc; }
 </style>

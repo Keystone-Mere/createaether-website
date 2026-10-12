@@ -16,6 +16,8 @@
         </span>
     </div>
 
+    <p class="my-experiences__guidance">Saved on this browser. Save as Copy also downloads a backup; use Import experience in the editor to restore one.</p>
+
     <div
         class="my-experiences__grid"
         data-my-experiences-grid
@@ -158,12 +160,6 @@
 
             status.textContent =
                 'Saved locally';
-
-            const details =
-                document.createElement('small');
-
-            details.textContent =
-                `${experience.particles.count} particles · ${experience.audio.enabled ? 'Audio enabled' : 'Audio disabled'}`;
 
             const actions =
                 document.createElement('div');
@@ -387,17 +383,38 @@
             metadata.className =
                 'my-experiences__metadata';
 
-            metadata.append(
-                status,
-                details
-            );
+            metadata.append(status);
 
-            actions.append(
-                renameButton,
-                duplicateButton,
-                deleteButton,
-                continueLink
-            );
+            const menu = document.createElement('details');
+            menu.className = 'my-experiences__menu';
+            const toggle = document.createElement('summary');
+            toggle.textContent = '⋯';
+            toggle.setAttribute('aria-label', `More actions for ${experience.name}`);
+            const menuItems = document.createElement('div');
+            menuItems.className = 'my-experiences__menu-items';
+            menuItems.append(renameButton, duplicateButton, deleteButton);
+            menu.append(toggle, menuItems);
+            menu.addEventListener('toggle', () => {
+                if (menu.open) grid.querySelectorAll<HTMLDetailsElement>('details').forEach(other => {
+                    if (other !== menu) other.open = false;
+                });
+            });
+            menu.addEventListener('keydown', event => {
+                if (event.key === 'Escape') { menu.open = false; toggle.focus(); }
+            });
+            actions.append(continueLink, menu);
+            const imageLink = document.createElement('a');
+            imageLink.href = continueLink.href;
+            imageLink.setAttribute('aria-label', `Continue editing ${experience.name}`);
+            image.replaceWith(imageLink);
+            imageLink.append(image);
+            const titleLink = document.createElement('a');
+            titleLink.href = continueLink.href;
+            titleLink.textContent = experience.name;
+            title.replaceChildren(titleLink);
+            [imageLink, titleLink].forEach(link => link.addEventListener('click', event => {
+                event.preventDefault(); continueLink.click();
+            }));
 
             footer.append(
                 metadata,
@@ -418,6 +435,10 @@
         }
     };
 
+    document.addEventListener('click', event => {
+        if (!(event.target instanceof Element) || event.target.closest('.my-experiences__menu')) return;
+        grid?.querySelectorAll<HTMLDetailsElement>('details[open]').forEach(menu => menu.open = false);
+    });
     renderLibrary();
 
     document.addEventListener(
@@ -631,7 +652,7 @@
 
     @media (max-width: 1100px) {
         .my-experiences__grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
@@ -664,4 +685,23 @@
             text-align: left;
         }
     }
+</style>
+
+<style is:global>
+.my-experiences__guidance { margin: -.35rem 0 1.25rem; color: #94a3b8; font-size: .85rem; line-height: 1.6; max-width: 52rem; }
+.my-experiences__card { gap: 1rem; padding: 1.1rem; }
+.my-experiences__card h4 a { color: inherit; text-decoration: none; }
+.my-experiences__card h4 a:hover { color: #7dd3fc; }
+.my-experiences__card p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 3.2em; }
+.my-experiences__card-footer { margin-top: auto; width: 100%; }
+.my-experiences__actions { flex-wrap: nowrap; width: 100%; }
+.my-experiences__continue { margin-left: 0; flex: 1; min-height: 2.75rem; line-height: 1.3; text-align: center; }
+.my-experiences__menu { position: relative; flex: 0 0 auto; }
+.my-experiences__menu summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: .65rem; background: #243247; color: #e2e8f0; font-size: 1.4rem; }
+.my-experiences__menu summary::-webkit-details-marker { display: none; }
+.my-experiences__menu-items { position: absolute; right: 0; bottom: calc(100% + .5rem); z-index: 10; padding: .4rem; width: 10rem; background: #172238; border: 1px solid #475569; border-radius: .75rem; box-shadow: 0 8px 24px #0008; }
+.my-experiences__menu-items button { display: flex; width: 100%; margin: 0; justify-content: flex-start; min-height: 2.75rem; background: transparent; }
+.my-experiences__menu-items .my-experiences__action--danger { color: #fca5a5; }
+.my-experiences a:focus-visible, .my-experiences button:focus-visible, .my-experiences summary:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 3px; }
+@media (max-width: 480px) { .my-experiences__grid { grid-template-columns: 1fr; } }
 </style>
