@@ -5,8 +5,9 @@ interface Props {
   description: string;
   status?: string;
   href?: string;
+  playHref?: string;
 }
-const { cover, title, description, href } = Astro.props;
+const { cover, title, description, href, playHref } = Astro.props;
 ---
 <article class="experience-card">
   {cover && (href ? (
@@ -19,7 +20,8 @@ const { cover, title, description, href } = Astro.props;
     <p>{description}</p>
   </div>
   <div class="experience-card__footer">
-    {href ? <a class="experience-card__button" href={href}>Open in Studio</a> : <button disabled>Open in Studio</button>}
+    {playHref && <a class="experience-card__button" href={playHref}>Play</a>}
+    {href ? <a class:list={["experience-card__button", {"experience-card__customise": !!playHref}]} href={href}>{playHref ? "Customise" : "Open in Studio"}</a> : <button disabled>Open in Studio</button>}
   </div>
 </article>
 <style>

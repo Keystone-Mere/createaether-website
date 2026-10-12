@@ -6,10 +6,10 @@ function atmosphere(id: string, rain = 0): Experience {
   return { ...base, id: `bardsey-${id}`, name: 'Bardsey: Before the Storm',
     description: 'A coastal learning journey using a real photograph of Bardsey.', status: 'Prototype',
     smoke: { enabled: false, amount: 0 },
-    audio: { enabled: false, volume: rain ? 24 : 20, layerVolume: 0, track: rain ? 'storm' : 'ocean-waves' },
+    audio: { enabled: false, volume: rain ? 24 : 20, layerVolume: 0, track: id === 'storm' ? 'storm' : rain ? 'retreat-rain' : id === 'clouds' ? 'retreat-wind' : 'ocean-waves' },
     atmosphere: { particles: rain > 0, lighting: false, fog: false },
-    particles: { ...base.particles, count: rain, preset: 'storm-rain', motion: 'rain' },
-    transition: { duration: 1800, easing: 'ease-in-out' }
+    particles: { ...base.particles, count: rain, preset: 'storm-rain', motion: 'rain', minRadius: .2, maxRadius: .65, minSpeed: 95, maxSpeed: 145, minOpacity: .18, maxOpacity: .52 },
+    transition: { duration: 6500, easing: 'ease-in-out' }
   };
 }
 const chapter = (id: string, title: string, caption: string, _image: string, rain = 0, nextLabel = 'Continue →'): StoryScene => ({
@@ -22,9 +22,9 @@ const chapter = (id: string, title: string, caption: string, _image: string, rai
 export const bardseyScenes: StoryScene[] = [
   chapter('trail', 'A sunny day on Ynys Enlli', 'Welcome to Bardsey, also called Ynys Enlli. This is a real view photographed on the island. Below the view are three separate wildlife photographs. Look for pink flower clusters, a straight orange-red bill and a curved red bill. Select each field-guide discovery to learn its name. These examples were photographed elsewhere, not in this island scene.', 'sunny', 0, 'Watch the weather change →'),
   chapter('clouds', 'A change in the air', 'Clouds spread across the sky and the light fades. Imagine the wind strengthening and the sea becoming rougher. What has changed since the first scene? Our fictional guide calls the group to shelter before the storm arrives.', 'clouds', 0, 'Follow the guide into shelter →'),
-  chapter('shelter', 'Watching from shelter', 'Imagine watching this same coast from a shelter. The frame is a fictional shelter overlay, not a building photographed at this viewpoint. Rain begins outside. Notice how the shelter changes what you can see. Stay here with the guide as the weather builds.', 'storm', 70, 'Watch the storm build →'),
-  chapter('storm', 'The storm at its strongest', 'Rain sweeps across the opening and the coast looks darker. Listen, if you wish, to the rain and thunder. Which clues suggest the weather has become more intense? You can choose a gentler storm at any time.', 'storm', 190, 'Watch the storm ease →'),
-  chapter('clearing', 'The weather begins to clear', 'The rain eases and the sky brightens. We remain in shelter while our guide checks conditions. Brighter skies alone do not tell us it is time to leave. Think back: which changes did you see, and which discoveries did you make?', 'clearing', 0, 'Open your field notebook →'),
+  chapter('shelter', 'Watching from shelter', 'Imagine watching this same coast from a shelter. The frame is a fictional shelter overlay, not a building photographed at this viewpoint. Rain begins outside. Notice how the shelter changes what you can see. Stay here with the guide as the weather builds.', 'storm', 50, 'Watch the storm build →'),
+  chapter('storm', 'The storm at its strongest', 'Rain sweeps across the opening and the coast looks darker. Listen, if you wish, to the rain and thunder. Which clues suggest the weather has become more intense? You can choose a gentler storm at any time.', 'storm', 170, 'Watch the storm ease →'),
+  chapter('clearing', 'The weather begins to clear', 'The rain eases and the sky brightens. We remain in shelter while our guide checks conditions. Brighter skies alone do not tell us it is time to leave. Think back: which changes did you see, and which discoveries did you make?', 'clearing', 15, 'Open your field notebook →'),
   chapter('notebook', 'Your island field notebook', 'You explored three examples of coastal wildlife and watched a fictional storm approach, build and pass. Tell someone one feature that helps you recognise each species, and two things that changed in the weather.', 'clearing')
 ];
 export const bardseyDetails = [

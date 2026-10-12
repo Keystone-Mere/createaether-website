@@ -4,11 +4,11 @@ const { visitor = false } = Astro.props;
 const showTestDuration = import.meta.env.DEV;
 ---
 
-<section class:list={['temple-journey', visitor && 'temple-journey--visitor']} id="temple-journey" aria-labelledby="temple-journey-title">
+<section class:list={['temple-journey', visitor && 'temple-journey--visitor']} id="temple-journey" data-direct-practice={visitor ? "true" : "false"} aria-labelledby="temple-journey-title">
   <div class="journey-intro">
-    <p class="journey-kicker">Guided relaxation</p>
-    <h2 id="temple-journey-title">A moment in the Temple</h2>
-    <p>Check in, choose a practice, and spend a few minutes with the Temple soundscape. {visitor ? 'Your answers stay on this page.' : 'Your choices shape this session.'}</p>
+    {!visitor && <p class="journey-kicker">Guided relaxation</p>}
+    <h2 id="temple-journey-title">{visitor ? "Choose your session" : "A moment in the Temple"}</h2>
+    <p class:list={[visitor && "visitor-intro-copy"]}>Choose a practice and spend a few minutes with the Temple soundscape. Check in if you would like help choosing. {visitor ? 'Your answers stay on this page.' : 'Your choices shape this session.'}</p>
   </div>
 
   <div id="journey-question" class="journey-step">
@@ -20,10 +20,10 @@ const showTestDuration = import.meta.env.DEV;
   </div>
 
   <div id="journey-session" class="journey-step" hidden>
-    <p class="journey-kicker">Your suggested practice</p>
+    <p class="journey-kicker">Your practice</p>
     <h3 id="journey-practice"></h3>
     <p id="journey-guidance"></p>
-    <p class="journey-note">This suggestion is for reflection. You can choose a different practice.</p>
+    <p class="journey-note">Choose whichever practice feels right for you.</p>
     <div class="journey-practices" aria-label="Choose a practice">
       <button type="button" data-practice="ground">Ground</button>
       <button type="button" data-practice="clarity">Find clarity</button>
@@ -37,16 +37,18 @@ const showTestDuration = import.meta.env.DEV;
       <button type="button" data-duration="900">15 min</button>
       <button type="button" data-duration="1200">20 min</button>
     </div>
+    <div class:list={["session-readout", visitor && "session-readout--scene"]}>
     <div id="journey-clock" class="journey-clock" role="timer" aria-label="Time remaining">05:00</div>
     <div class="journey-cue" aria-live="off">
       <p id="journey-phase" class="journey-kicker">Before you begin</p>
       <p id="journey-cue">Settle in and start whenever you are ready.</p>
     </div>
+    </div>
     <p id="journey-status" role="status" aria-live="polite">Ready when you are.</p>
     <div class="journey-actions">
       <button type="button" id="journey-toggle">Begin session</button>
       <button type="button" id="journey-reset" class="journey-secondary">Reset</button>
-      <button type="button" id="journey-start-over" class="journey-secondary">Change answers</button>
+      <button type="button" id="journey-start-over" class="journey-secondary">Help me choose</button>
     </div>
     <div id="journey-finish" class="journey-finish" hidden>
       <h3>Return slowly</h3>
@@ -57,6 +59,11 @@ const showTestDuration = import.meta.env.DEV;
 </section>
 
 <style>
+  .visitor-intro-copy,.session-readout--scene {display:none;}
+  .temple-journey--visitor .journey-intro {margin-bottom:1rem;}
+  .temple-journey--visitor .journey-note {display:none;}
+  .temple-journey--visitor #journey-guidance {font-size:.9rem;margin:.4rem 0 1rem;}
+  .temple-journey--visitor #journey-toggle {background:#15803d;border-color:#4ade80;font-weight:700;}
   .temple-journey{grid-column:1/-1;background:#10182c;border:1px solid rgba(125,189,245,.26);border-radius:18px;padding:clamp(1.25rem,3vw,2rem);color:#f4f8ff}
   .temple-journey--visitor{background:linear-gradient(150deg,#1b2539,#10182c 52%);border-color:rgba(231,198,122,.55)}
   .temple-journey--visitor .journey-kicker{color:#e7c67a!important}
@@ -271,5 +278,6 @@ const showTestDuration = import.meta.env.DEV;
     root.querySelector<HTMLButtonElement>('[data-duration="300"]')?.setAttribute('aria-pressed','true');
     get<HTMLElement>('#journey-practice').tabIndex=-1;
     showQuestion();showTime();
+    if (root.dataset.directPractice === "true") { setPractice("ground"); questionStage.hidden=true; sessionStage.hidden=false; reset(); }
   }
 </script>

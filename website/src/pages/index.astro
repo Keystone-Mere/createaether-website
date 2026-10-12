@@ -42,8 +42,9 @@ import SiteFooter from '../components/SiteFooter.astro';
 
       <nav aria-label="Primary navigation">
         <a href="#workflow">How it works</a>
-        <a href="/studio/">Studio</a>
-        <a href="/podcasts/">Podcasts & streams</a>
+        <a href="/studio/">Experiences</a>
+        <a href="/studio/guided-relaxation/">Guided relaxation</a>
+        <a href="/studio/podcast/">Podcast &amp; Stream</a>
         <a href="/features/">Features</a>
         <a
           href="https://github.com/Keystone-Mere/createaether-website"
@@ -90,11 +91,18 @@ import SiteFooter from '../components/SiteFooter.astro';
             </a>
           </div>
 
-          <p class="hero-benefits">Six starter scenes · Upload your own background · Use in OBS</p>
+          <p class="hero-benefits">Play a scene · Make it your own · Use in OBS</p>
         </div>
         <div class="hero-visual"><HeroAtmosphere /></div>
       </section>
 
+      <section id="applications" class="homepage-paths" aria-labelledby="paths-title">
+        <h2 id="paths-title">How would you like to use Aether?</h2>
+        <div class="homepage-paths-grid">
+          <article><p class="eyebrow">Relaxation</p><h3>Make space to unwind</h3><p>Enjoy a scene with ambient sound, or take a few minutes for a guided practice.</p><a href="/studio/guided-relaxation/">Choose a guided session →</a><a class="path-secondary" href="/studio/#experience-library">Explore scenes →</a></article>
+          <article><p class="eyebrow">Podcast &amp; Stream</p><h3>Set the scene for your show</h3><p>Personalise an animated backdrop with your show name, camera frames and logo, then add it to OBS.</p><a href="/studio/podcast/">Create your backdrop →</a><small>Silent output · Add your camera sources in OBS</small></article>
+        </div>
+      </section>
       <ExperienceShowcase />
 
       <section
@@ -122,7 +130,7 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>01</span>
             <h3>Choose</h3>
             <p>
-              Choose one of six starter scenes, or upload your own background image.
+              Choose a ready-made scene, or upload your own background image.
             </p>
           </article>
 
@@ -159,28 +167,11 @@ import SiteFooter from '../components/SiteFooter.astro';
       <p class="technology-link">
         Curious about the engine? <a href="/features/#architecture">Explore Aether’s technology →</a>
       </p>
-      <section id="applications" class="workflow-section" aria-labelledby="applications-title">
-        <div class="section-heading">
-          <div><p class="eyebrow">What you can create</p><h2 id="applications-title">One engine. Different experiences.</h2></div>
-          <p>Atmosphere can set the scene for a recording, a quiet moment or a story. Explore working tools and an educational prototype.</p>
-        </div>
-        <div class="workflow-grid applications-grid">
-          <article class="workflow-step">
-            <span>Creative backdrops · Available now</span><h3>Set the scene for your content</h3>
-            <p>Create an animated visual backdrop for podcasts, streams and recordings. Add it to OBS as a Browser source alongside your camera.</p>
-            <a class="workflow-link" href="/podcasts/">Explore podcast backdrops →</a>
-          </article>
-          <article class="workflow-step">
-            <span>Relaxation · Available now</span><h3>Make space to unwind</h3>
-            <p>Shape your own soundscape and visual environment, or try a guided relaxation session in full screen.</p>
-            <a class="workflow-link" href="/studio/guided-relaxation/">Try guided relaxation →</a>
-          </article>
-          <article class="workflow-step">
-            <span>Education and storytelling · Prototype</span><h3>Explore a story through place</h3>
-            <p>Djed-Hor’s Journey explores an interactive educational experience inspired by an ancient Egyptian exhibit. This educational prototype demonstrates a different direction for immersive experiences.</p>
-          </article>
-        </div>
-        <p>OBS exports are silent and require a connection to the Aether player. Your uploaded image is included in the HTML backdrop file. Camera background removal is handled separately in your recording setup.</p>
+      <section class="experimental-stories" aria-labelledby="stories-title">
+        <p class="eyebrow">Experimental stories</p><h2 id="stories-title">Explore a story through place</h2>
+        <p>We are testing educational experiences built around scenes, discoveries and storytelling.</p>
+        <a href="/education/bardsey/">Try Bardsey: Before the Storm →</a>
+        <p class="stories-note">Our separate Djedhor’s Journey museum pilot is available for private testing.</p>
       </section>
     </main>
 
@@ -1249,4 +1240,25 @@ import SiteFooter from '../components/SiteFooter.astro';
   .hero-benefits { margin:24px 0 0; font-size:12px; line-height:1.8; color:#94a3b8; }
   @media(max-width:980px) { .hero { grid-template-columns:1fr; gap:32px; } .hero-visual { max-width:600px; width:100%; } }
   @media(max-width:560px) { .hero { padding:24px 0 32px; } .hero h1 { font-size:clamp(2.8rem,12vw,4rem); } }
+</style>
+
+<style>
+.homepage-paths{padding:32px 0 48px;border-top:1px solid #ffffff18;}
+.homepage-paths>h2{font-size:clamp(24px,3vw,34px);margin:0 0 24px;letter-spacing:-.03em;}
+.homepage-paths-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;}
+.homepage-paths article{padding:28px;border:1px solid #ffffff18;border-radius:16px;background:#101827;}
+.homepage-paths h3{font-size:24px;margin:12px 0;}
+.homepage-paths article>p:not(.eyebrow){color:#cbd5e1;line-height:1.7;}
+.homepage-paths a,.experimental-stories a{display:inline-block;color:#6ee7b7;font-weight:650;line-height:1.7;}
+.homepage-paths .path-secondary{display:block;color:#7dd3fc;font-size:.9rem;margin-top:10px;}
+.homepage-paths small{display:block;margin-top:14px;color:#94a3b8;line-height:1.6;}
+.homepage-paths a:focus-visible,.experimental-stories a:focus-visible{outline:2px solid #7dd3fc;outline-offset:4px;}
+.workflow-section{padding:56px 0;}
+.section-heading{margin-bottom:32px;}
+.technology-link{margin:0 0 32px;}
+.experimental-stories{padding:28px 0 40px;border-top:1px solid #ffffff18;}
+.experimental-stories h2{font-size:28px;letter-spacing:-.03em;margin:12px 0;}
+.experimental-stories>p:not(.eyebrow){color:#94a3b8;line-height:1.7;}
+.experimental-stories .stories-note{font-size:.85rem;}
+@media(max-width:650px){.homepage-paths-grid{grid-template-columns:1fr;}.homepage-paths article{padding:22px;}.workflow-section{padding:36px 0;}}
 </style>

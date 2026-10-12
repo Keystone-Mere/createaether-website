@@ -11,20 +11,19 @@ import { experiences } from '../data/experiences';
     <div>
       <p class="experience-showcase__eyebrow">Playable experiences</p>
       <h2 id="experience-showcase-title">
-        Choose your atmosphere.
+        Find your scene.
       </h2>
     </div>
 
     <p class="experience-showcase__intro">
-      Open a ready-made atmosphere and change its audio, lighting,
-      particles and environmental effects in real time.
+      Try a ready-made scene. Explore the full collection to play or customise your own version.
     </p>
   </div>
 
   <div class="experience-showcase__grid">
     {
-      experiences.map((experience, index) => (
-        <a class="experience-card" href={experience.href}>
+      experiences.filter(experience => ['retreat','forest','ocean'].includes(experience.id)).map((experience, index) => (
+        <a class="experience-card" href={`/studio/listen/?scene=${experience.id}`}>
           <img class="experience-card__cover" src={`/images/experience-covers/${experience.id === 'festival' ? 'festival-evening' : experience.id === 'storm' ? 'storm-balcony' : experience.id}.jpg`} alt="" width="1024" height="576" loading="lazy" />
           <div class="experience-card__body">
           <div class="experience-card__top">
@@ -38,7 +37,7 @@ import { experiences } from '../data/experiences';
           <p>{experience.description}</p>
 
           <span class="experience-card__link">
-            Open in Studio <span aria-hidden="true">→</span>
+            Play scene <span aria-hidden="true">→</span>
           </span>
           </div>
         </a>
@@ -47,13 +46,13 @@ import { experiences } from '../data/experiences';
   </div>
 
   <a class="experience-showcase__action" href="/studio/">
-    Open Aether Studio <span aria-hidden="true">→</span>
+    View all experiences <span aria-hidden="true">→</span>
   </a>
 </section>
 
 <style>
   .experience-showcase {
-    padding: 5rem 0;
+    padding: 3rem 0;
     border-top: 1px solid rgba(148, 163, 184, 0.12);
   }
 
@@ -202,7 +201,7 @@ import { experiences } from '../data/experiences';
 
   @media (max-width: 600px) {
     .experience-showcase {
-      padding: 5rem 0;
+      padding: 3rem 0;
     }
 
     .experience-showcase__grid {

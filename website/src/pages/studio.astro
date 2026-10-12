@@ -13,25 +13,20 @@ import { experiences } from '../data/experiences';
     <header class="studio-dashboard__header">
       <div>
         <p class="studio-dashboard__eyebrow">Aether Atmosphere Composer</p>
-        <h1>Aether Studio</h1>
+        <h1>Experiences</h1>
         <p class="studio-dashboard__intro">
-          Choose an experience and shape it with sound, colour and atmosphere.
+          Play a ready-made scene, customise it, or return to your saved creations.
         </p>
       </div>
 
-      <a href="#experience-library" class="studio-dashboard__action">
-  Choose an experience
-</a>
     </header>
+    <nav class="library-tabs" aria-label="Experience collections">
+      <a href="#experience-library" data-library-tab="explore" aria-current="page">Explore</a>
+      <a href="#my-experiences-title" data-library-tab="saved">My saved</a>
+    </nav>
+    <div id="saved-library-panel" data-library-panel="saved"><MyExperiencesPanel /></div>
 
-    <a href="/studio/podcast/" class="podcast-dashboard-card">
-      <span><span class="podcast-dashboard-card__label">Creator workspace</span><strong>Podcast &amp; Stream</strong><small>Create a branded setting for your show, with silent OBS playback.</small></span>
-      <span aria-hidden="true">Open creator workspace →</span>
-    </a>
-
-    <MyExperiencesPanel />
-
-    <section id="experience-library" class="studio-dashboard__experiences">
+    <section id="experience-library" class="studio-dashboard__experiences" data-library-panel="explore">
       <div class="studio-dashboard__section-heading">
         <div>
           <p class="studio-dashboard__workspace-label">Experience library</p>
@@ -49,6 +44,7 @@ import { experiences } from '../data/experiences';
               title={experience.name}
               description={experience.description}
               href={experience.href}
+              playHref={`/studio/listen/?scene=${experience.id}`}
             />
           ))
         }
@@ -350,4 +346,24 @@ import { experiences } from '../data/experiences';
     font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
   }
   .studio-dashboard a.podcast-dashboard-card > span:last-child { color: #7dd3fc; }
+</style>
+
+<script>
+ const tabs = [...document.querySelectorAll<HTMLAnchorElement>('[data-library-tab]')];
+ function selectCollection() {
+   const saved = location.hash === '#my-experiences-title' || (!location.hash && new URLSearchParams(location.search).has('saved'));
+   document.querySelectorAll<HTMLElement>('[data-library-panel]').forEach(panel => panel.hidden = (panel.dataset.libraryPanel === 'saved') !== saved);
+   tabs.forEach(tab => { if ((tab.dataset.libraryTab === 'saved') === saved) tab.setAttribute('aria-current','page'); else tab.removeAttribute('aria-current'); });
+ }
+ window.addEventListener('hashchange', selectCollection);
+ selectCollection();
+</script>
+<style is:global>
+ [data-library-panel][hidden] {display:none!important;}
+ .library-tabs {display:flex;gap:12px;margin-bottom:20px;}
+ .library-tabs a {padding:12px 20px;border:1px solid #334155;border-radius:10px;color:#cbd5e1;text-decoration:none;}
+ .library-tabs a[aria-current] {background:#193d5a;border-color:#38bdf8;color:#fff;}
+ .library-tabs a:focus-visible {outline:2px solid #7dd3fc;outline-offset:3px;}
+ #experience-library .experience-card__footer {display:flex;gap:10px;flex-wrap:wrap;}
+ #experience-library .experience-card__customise {background:#243247;}
 </style>

@@ -60,7 +60,8 @@ const selectedAudioTrack =
                 <div class="audio-slot"><AudioPanel experience={experience} /></div>
             </details>
             <details class="control-section" open>
-                <summary><span id="effect-section-label">Visual effects</span></summary>
+                <summary>Effects</summary>
+                <h3 class="effect-subheading" id="effect-section-label">Particles</h3>
                 <div class="particles-slot"><ParticlesPanel experience={experience} /></div>
                 <section id="smoke-panel" class="studio-card" hidden style="padding:18px;border-radius:14px;background:#111b2a;color:#cbd5e1">
                     <h2 style="font-size:16px;color:#93c5fd;margin:0 0 14px">Incense smoke</h2>
@@ -70,16 +71,11 @@ const selectedAudioTrack =
                 </section>
             </details>
             <details class="control-section">
-                <summary>Lighting</summary>
+                <summary>Atmosphere</summary>
+                <h3 class="effect-subheading">Lighting</h3>
                 <div class="lighting-slot"><VisualLayerPanel layer="lighting" experience={experience} /></div>
-            </details>
-            <details class="control-section">
-                <summary>Fog</summary>
+                <h3 class="effect-subheading">Fog</h3>
                 <div class="fog-slot"><VisualLayerPanel layer="fog" experience={experience} /></div>
-            </details>
-            <details class="control-section">
-                <summary>Background</summary>
-                <div class="environment-slot"><VisualLayerPanel layer="environment" experience={experience} /></div>
             </details>
         </div>
         <div class="editor-output editor-column">
@@ -107,6 +103,14 @@ const selectedAudioTrack =
                 <small id="preview-experience-description">{experience.description}</small>
             </div>
 
+            <div class="preview-actions">
+                <button type="button" id="audio-playback-toggle" aria-pressed="false">Play Audio</button>
+                <button type="button" id="launch-preview-button" class="button-secondary" aria-controls="experience-preview-stage">Full-screen Preview</button>
+            </div>
+            <span id="audio-track-title" hidden>{selectedAudioTrack.title}</span>
+            <span id="audio-playback-status" role="status" class="transport-status">Ready to play</span>
+            <details class="scene-settings" open>
+                <summary>Scene</summary>
             <fieldset class="background-choices" id="background-choices" hidden>
                 <legend>Choose your background</legend>
                 <div id="background-choice-buttons"></div>
@@ -117,12 +121,11 @@ const selectedAudioTrack =
                 <input id="background-upload" type="file" accept="image/jpeg,image/png,image/webp" hidden />
             </div>
             <p id="background-feedback" role="status" class="save-feedback">JPG, PNG or WebP, up to 15 MB. Images fill the scene and may be cropped.</p>
-            <div class="preview-actions">
-                <button type="button" id="audio-playback-toggle" aria-pressed="false">Play Audio</button>
-                <button type="button" id="launch-preview-button" class="button-secondary" aria-controls="experience-preview-stage">Full-screen Preview</button>
-            </div>
-            <span id="audio-track-title" hidden>{selectedAudioTrack.title}</span>
-            <span id="audio-playback-status" role="status" class="transport-status">Ready to play</span>
+                <details class="scene-tint-settings">
+                    <summary>Scene tint</summary>
+                    <div class="environment-slot"><VisualLayerPanel layer="environment" experience={experience} /></div>
+                </details>
+            </details>
             <div class="preview-features" hidden>
                 <span id="audio-status">Audio enabled</span><span id="particles-status">Particles active</span>
                 <span id="lighting-status">Lighting active</span><span id="fog-status">Fog active</span>
@@ -173,6 +176,10 @@ const selectedAudioTrack =
     }
 </script>
 <style>
+    .effect-subheading { margin:18px 20px 0; font-size:15px; color:#cbd5e1; }
+    .scene-settings { margin-top:18px; border-top:1px solid #334155; padding-top:16px; }
+    .scene-settings > summary { cursor:pointer; font-weight:700; color:#93c5fd; }
+    .scene-tint-settings > summary { cursor:pointer; font-size:13px; color:#cbd5e1; margin-top:12px; }
     .background-choices { margin:16px 0; padding:0; border:0; min-width:0; }
     .background-choices legend { padding:0 0 10px; font-size:14px; font-weight:650; color:#dbeafe; }
     #background-choice-buttons { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr)); gap:10px; }

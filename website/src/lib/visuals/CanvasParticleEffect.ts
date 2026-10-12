@@ -335,7 +335,9 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       y = distributeAcrossScene ? this.randomBetween(0, height) : -8;
       // Faster fall with subtle depth variation and a consistent breeze.
       velocityY = speed * this.randomBetween(2.7, 3.6);
-      velocityX = velocityY * 0.06 + this.randomBetween(-1, 1) * this.settings.drift * 0.25;
+      const coastalWeather = this.stage instanceof HTMLElement ? this.stage.dataset.weather : undefined;
+      const windSlant = coastalWeather === 'storm' ? .2 : coastalWeather === 'shelter' ? .12 : .06;
+      velocityX = velocityY * windSlant + this.randomBetween(-1, 1) * this.settings.drift * 0.25;
     }
 
     if (!retreat && this.isWindowSnow()) {

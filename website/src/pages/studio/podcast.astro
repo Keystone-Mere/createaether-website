@@ -12,11 +12,30 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             <div class="podcast-preview-footer"><label><input id="podcast-guides" type="checkbox" checked /> Show camera placeholders</label><span>1920 × 1080 · 16:9</span></div>
             <p class="podcast-hint">Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.</p>
             <div class="podcast-export">
-                <h2>Use your setting</h2><p>Copy a silent browser-source link, or download an OBS file that includes your logo.</p>
-                <div class="podcast-export-actions"><button id="podcast-copy" type="button" class="podcast-primary">Copy OBS link</button><button id="podcast-download" type="button">Download OBS file</button><button id="podcast-open" type="button">Open output</button></div>
-                <label class="podcast-link-label" for="podcast-link">Your current playback link</label><input id="podcast-link" type="text" readonly spellcheck="false" />
+                <h2>Use your setting</h2>
+                <p>Add your silent backdrop to OBS, or preview the finished output.</p>
+                <div class="podcast-export-actions">
+                    <button id="podcast-add-obs" type="button" class="podcast-primary" aria-expanded="false" aria-controls="podcast-obs-setup">Add to OBS</button>
+                    <button id="podcast-open" type="button">Preview output</button>
+                </div>
                 <p id="podcast-feedback" role="status" aria-live="polite"></p>
-                <details><summary>Set up in OBS</summary><ol><li>Add a <strong>Browser</strong> source. Paste your link, or enable <strong>Local file</strong> and choose the downloaded HTML file.</li><li>Set width to <strong>1920</strong> and height to <strong>1080</strong>.</li><li>Add camera sources above the Aether source. Fit them inside the frames; keep their edges just inside the border.</li></ol><p id="podcast-camera-sizes"></p><p>Your link captures the current settings. Copy a new link or download a new file after making changes. Keep the downloaded file on your computer; it still needs access to Aether online.</p></details>
+                <details id="podcast-obs-setup">
+                    <summary>OBS setup instructions</summary>
+                    <h3>1. Choose how to add your backdrop</h3>
+                    <p><strong>Browser link:</strong> copy the link and paste it into an OBS Browser source. Uploaded logos are included in the downloaded file only.</p>
+                    <button id="podcast-copy" type="button">Copy OBS link</button>
+                    <details class="podcast-link-details"><summary>View playback link</summary>
+                        <label class="podcast-link-label" for="podcast-link">Your current playback link</label><input id="podcast-link" type="text" readonly spellcheck="false" />
+                    </details>
+                    <p><strong>HTML file:</strong> download your backdrop, including your uploaded logo. In an OBS Browser source, enable <strong>Local file</strong> and select it.</p>
+                    <button id="podcast-download" type="button">Download OBS file</button>
+                    <h3>2. Set the source size</h3>
+                    <p>Set width to <strong>1920</strong> and height to <strong>1080</strong>.</p>
+                    <h3>3. Add your cameras</h3>
+                    <p>Add camera sources above the Aether source. Fit them inside the frames; keep their edges just inside the border.</p>
+                    <p id="podcast-camera-sizes"></p>
+                    <p>Copy a new link or download a new file after changing settings. Keep the downloaded file on your computer; it still needs access to Aether online.</p>
+                </details>
             </div>
         </section>
         <form class="podcast-controls" id="podcast-form">
@@ -84,7 +103,7 @@ document.querySelector('#remove-logo')!.addEventListener('click',()=>{logoReques
 document.querySelector('#podcast-reset')!.addEventListener('click',()=>{logoRequest++;logo='';setFields(defaultBroadcast);guides.checked=true;render();feedback.textContent='Demo settings restored.';});
 copyButton.addEventListener('click',async()=>{
     try { await navigator.clipboard.writeText(link.value); feedback.textContent=logo?'Link copied. It includes your text and frames; use the downloaded file for your logo.':'Link copied. Add it as a Browser source in OBS.'; }
-    catch { link.focus();link.select(); feedback.textContent='Copy the selected link with Ctrl+C (or Command+C).'; }
+    catch { document.querySelector<HTMLDetailsElement>('.podcast-link-details')!.open=true;link.focus();link.select(); feedback.textContent='Copy the selected link with Ctrl+C (or Command+C).'; }
 });
 function download(content:string,name:string) {
     const url=URL.createObjectURL(new Blob([content],{type:'text/html'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
@@ -98,7 +117,7 @@ document.querySelector('#podcast-open')!.addEventListener('click',()=>{
 });
 document.querySelector('#podcast-fullscreen')!.addEventListener('click',async()=>{
     try { if(document.fullscreenElement) await document.exitFullscreen(); else await root.requestFullscreen(); }
-    catch { feedback.textContent='Full screen is unavailable. Use Open output for a larger preview.'; }
+    catch { feedback.textContent='Full screen is unavailable. Use Preview output for a larger preview.'; }
 });
 document.querySelector('#podcast-exit-fullscreen')!.addEventListener('click',async()=>{try{await document.exitFullscreen();}catch{feedback.textContent='Press Escape to leave full screen.';}});
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -115,4 +134,15 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){controller.destr
 <style is:global>
 .broadcast-stage:fullscreen{width:min(100vw,177.7778vh);height:min(100vh,56.25vw);margin:auto;border-radius:0;background:#000}
 .broadcast-stage::backdrop{background:#000}
+</style>
+
+<script>
+ const setup = document.querySelector<HTMLDetailsElement>('#podcast-obs-setup')!;
+ const add = document.querySelector<HTMLButtonElement>('#podcast-add-obs')!;
+ add.addEventListener('click', () => { setup.open = !setup.open; });
+ setup.addEventListener('toggle', () => { add.setAttribute('aria-expanded', String(setup.open)); });
+</script>
+<style>
+.podcast-export h3 {font-size:14px;color:#e2e8f0;margin:20px 0 10px;}
+.podcast-export .podcast-link-details {border:0;margin:12px 0 18px;padding:0;}
 </style>

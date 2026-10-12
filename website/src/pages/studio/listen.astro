@@ -1,0 +1,76 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import SceneStage from '../../components/studio/SceneStage.astro';
+---
+<StudioLayout title="Play an experience">
+ <section class="listen">
+  <a href="/studio/#experience-library">← Experiences</a>
+  <h1 id="listen-title">Your experience</h1>
+  <div id="listen-content" hidden>
+   <SceneStage sceneId="temple" name="Your experience" />
+   <div class="listen-controls">
+    <button id="listen-play" type="button" aria-pressed="false">Play Audio</button>
+    <label>Volume <input id="listen-volume" type="range" min="0" max="100" value="40" /></label>
+    <button id="listen-fullscreen" type="button">Full-screen</button>
+    <a id="listen-customise" href="/studio/">Customise</a>
+   </div>
+   <audio id="listen-audio" preload="none"></audio>
+  </div>
+  <p id="listen-status" role="status"></p>
+ </section>
+</StudioLayout>
+<script>
+ import { experiences } from '../../data/experiences';
+ import { ExperienceLibrary } from '../../lib/storage/ExperienceLibrary';
+ import { applyBackground } from '../../lib/player/ScenePresentation';
+ import { createStudioRuntime } from '../../lib/studio/StudioRuntime';
+ const params = new URLSearchParams(location.search);
+ const library = new ExperienceLibrary();
+ const saved = params.get('saved');
+ const experience = saved ? library.get(saved) : experiences.find(item => item.id === params.get('scene'));
+ const status = document.querySelector<HTMLElement>('#listen-status')!;
+ const audio = document.querySelector<HTMLAudioElement>('#listen-audio')!;
+ const button = document.querySelector<HTMLButtonElement>('#listen-play')!;
+ const volume = document.querySelector<HTMLInputElement>('#listen-volume')!;
+ if (!experience) status.textContent = 'This experience is unavailable on this device. Return to Experiences to choose another.';
+ else {
+  document.querySelector<HTMLElement>('#listen-title')!.textContent = experience.name;
+  document.title = `${experience.name} — Aether`;
+  const stage = document.querySelector<HTMLElement>('.preview-stage')!;
+  applyBackground(stage, experience);
+  stage.setAttribute('aria-label', `${experience.name} environment`);
+  document.querySelector<HTMLElement>('#listen-content')!.hidden = false;
+  // Loading prepares sound; playback waits for the user's gesture.
+  experience.audio.enabled = true;
+  volume.value = String(experience.audio.volume);
+  const runtime = createStudioRuntime({audioElement:audio,audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,previewStage:stage,previewCanvas:stage.querySelector('canvas'),particlesStatus:null,lightingStatus:null,fogStatus:null});
+  runtime.experienceLoader.load(experience);
+  button.addEventListener('click', async () => {
+   if (!audio.paused) { audio.pause(); return; }
+   try { await audio.play(); status.textContent = ''; }
+   catch { status.textContent = 'Audio could not start. Please try again.'; }
+  });
+  const updateButton = () => {button.textContent = audio.paused ? 'Play Audio' : 'Pause Audio';button.setAttribute('aria-pressed',String(!audio.paused));};
+  audio.addEventListener('play',updateButton);audio.addEventListener('pause',updateButton);
+  volume.addEventListener('input', () => {experience.audio.volume = Number(volume.value);runtime.experienceLoader.load(experience);});
+  document.querySelector('#listen-fullscreen')!.addEventListener('click',async () => {
+   try { await stage.requestFullscreen(); } catch { status.textContent = 'Full-screen is unavailable in this browser.'; }
+  });
+  document.querySelector('#exit-fullscreen-preview')!.addEventListener('click', () => { if (document.fullscreenElement) void document.exitFullscreen(); });
+  const customise = document.querySelector<HTMLAnchorElement>('#listen-customise')!;
+  const scene = experience.sceneId ?? experience.id.split('-')[0];
+  customise.href = `/studio/experiences/${encodeURIComponent(scene)}/`;
+  if (saved) customise.addEventListener('click',event => { if (!library.stageForEditing(experience)) {event.preventDefault();status.textContent = 'Unable to open this saved experience for editing.';} });
+  audio.addEventListener('error',() => {status.textContent='The audio could not be loaded. You can still enjoy the scene.';});
+ }
+</script>
+<style>
+.listen {max-width:1100px;margin:auto;}
+.listen a {color:#7dd3fc;}
+.listen h1 {font-size:clamp(28px,4vw,48px);}
+.listen-controls {display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:16px;}
+.listen-controls button {padding:12px 18px;border:1px solid #475569;border-radius:10px;background:#243247;color:#fff;font:inherit;cursor:pointer;}
+#listen-play {background:#2563eb;}
+.listen-controls label {display:flex;gap:10px;align-items:center;color:#cbd5e1;}
+.listen-controls :focus-visible {outline:2px solid #7dd3fc;outline-offset:3px;}
+</style>

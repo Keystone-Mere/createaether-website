@@ -23,18 +23,18 @@ const opening = bardseyScenes[0];
   { src: 'oystercatcher.jpg', clue: 'A straight orange-red bill', alt: 'Black-and-white bird with a long straight orange-red bill.' },
   { src: 'chough.jpg', clue: 'A curved red bill', alt: 'Close-up of a dark bird with a curved red bill.' }
 ].map((item,i)=><button class="wildlife-card" data-detail={i}><img src={`/images/bardsey/${item.src}`} alt={item.alt} loading="lazy"/><span>{i+1}. {item.clue}</span></button>)}</div></div>
-<div class="view-controls"><button id="fullscreen">Full-screen scene</button><button id="gentle" aria-pressed="false">Gentler storm</button></div>
+<div class="view-controls"><button id="fullscreen">Full-screen scene</button><label for="weather-intensity">Weather intensity</label><select id="weather-intensity"><option value="full">Full</option><option value="gentle">Gentle</option></select></div>
 </section>
 <section class="story-card" aria-label="Chapter text">
 <p class="eyebrow" id="chapter-label">EXPLORE & NOTICE</p><h2 id="chapter-title" tabindex="-1">{opening.title}</h2><p id="caption">{opening.caption}</p>
-<div id="detail-controls" hidden><p id="found">0 of 3 discoveries explored</p><div class="detail-buttons">{bardseyDetails.map((detail,i) => <button data-detail={i}>{i+1}. {detail.name}</button>)}</div><div id="detail" aria-live="polite"><p>Choose a wildlife photograph below the island view.</p></div></div>
+<div id="detail-controls" hidden><p id="found">0 of 3 discoveries explored</p><div id="detail" aria-live="polite"><p>Choose a wildlife photograph below the island view.</p></div></div>
 <p id="completion" hidden>Your discoveries are listed below. Replay to explore again.</p>
 <ul id="notebook" hidden></ul><nav aria-label="Story navigation"><button id="back" disabled>← Back</button><button id="next">Watch the weather change →</button><button id="replay" hidden>Replay journey</button></nav>
 <p id="status" class="credit" role="status"></p>
 </section>
 </div>
 <footer>Powered by the Aether atmospheric engine. No automatic chapter changes. Text is always available; sound is optional.<br/>Independent educational prototype. The island view is a real photograph. The story, shelter and weather are simulated; this is not a visitor route or weather forecast. Wildlife references: <a href="https://enlli.org/natural-environment/wildlife/">Bardsey Island Trust</a> and <a href="https://www.bbfo.org.uk/about">Bardsey Bird &amp; Field Observatory</a>. General coastal audio is not a recording from the island.<details class="photo-credits"><summary>Photograph credits &amp; licences</summary>
-<p>Island view: <a href="https://commons.wikimedia.org/wiki/File:Bardsey_Island_-_geograph.org.uk_-_6234522.jpg">Bardsey Island</a> by Eirian Evans, 19 May 2019 — <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>. Wikimedia thumbnail reproduced unchanged; simulated cloud, dimming, rain and shelter layers appear over it. This scene presentation is available under the same licence.</p>
+<p>Island view: <a href="https://commons.wikimedia.org/wiki/File:Bardsey_Island_-_geograph.org.uk_-_6234522.jpg">Bardsey Island</a> by Eirian Evans, 19 May 2019 — <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>. Wikimedia thumbnail reproduced unchanged; simulated cloud, dimming, rain and shelter layers appear over it. The storm sky is AI-generated and composited above the original photograph; it is not a photograph of weather observed on Bardsey. This scene presentation is available under the same licence.</p>
 <p>Thrift: <a href="https://commons.wikimedia.org/wiki/File:Armeria_maritima_(flowers).jpg">Armeria maritima (flowers)</a> by Hans Hillewaert, France — <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>. Wikimedia thumbnail reproduced unchanged.</p>
 <p>Oystercatcher: <a href="https://commons.wikimedia.org/wiki/File:Haematopus_ostralegus_-_Bremerhaven_01.jpg">Haematopus ostralegus — Bremerhaven 01</a> by H. Zell, Germany — <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>. Wikimedia thumbnail reproduced unchanged.</p>
 <p>Chough: <a href="https://commons.wikimedia.org/wiki/File:Pyrrhocorax_pyrrhocorax_head.jpg">Pyrrhocorax pyrrhocorax head</a>, Ross Elliott; cropped by Toter Alter Mann, Devon — <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>. Supplied crop reproduced unchanged. Wildlife photographs are identification examples, not sightings documented at this viewpoint. No photographer or island organisation endorses this prototype.</p>
@@ -51,6 +51,7 @@ const stage = get<HTMLDivElement>('experience-preview-stage');
 const audio = get<HTMLAudioElement>('story-audio');
 const runtime = createStudioRuntime({audioElement:audio, previewStage:stage, previewCanvas:stage.querySelector('canvas'), audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,particlesStatus:null,lightingStatus:null,fogStatus:null});
 const clouds = document.createElement('div'); clouds.className='bardsey-clouds'; clouds.setAttribute('aria-hidden','true'); stage.querySelector('.preview-scene')?.append(clouds);
+const haze = document.createElement('div'); haze.className='bardsey-horizon-haze'; haze.setAttribute('aria-hidden','true'); stage.querySelector('.preview-scene')?.append(haze);
 const details = new Set<number>();
 let gentle = false;
 let current = bardseyScenes[0];
@@ -62,9 +63,9 @@ const wrappedLoader = { load(experience: import('../../lib/models/Experience').E
   }
   return runtime.experienceLoader.load(value);
 }};
-get('gentle').addEventListener('click',()=>{
-  gentle = !gentle; get('gentle').setAttribute('aria-pressed', String(gentle));
-  get('gentle').textContent = gentle ? 'Gentler storm on' : 'Gentler storm';
+get<HTMLSelectElement>('weather-intensity').addEventListener('change',()=>{
+  gentle = get<HTMLSelectElement>('weather-intensity').value === 'gentle';
+  stage.dataset.intensity = gentle ? 'gentle' : 'full';
   const value = structuredClone(current.experience);
   value.audio.enabled = get('sound').getAttribute('aria-pressed') === 'true';
   wrappedLoader.load(value);
@@ -118,18 +119,32 @@ footer a{color:#d5bd86}
 :global(.preview-canvas){clip-path:inset(15% 5% 10% 5%)}
 :global(.preview-stage[data-weather="storm"] .preview-scene-image){filter:brightness(.65) saturate(.65)}
 :global(.preview-stage[data-weather="shelter"] .preview-scene-image){filter:brightness(.8)}
-:global(.preview-stage .preview-scene-image){transition:filter 1.8s ease}
+:global(.preview-stage .preview-scene-image){transition:filter 7s ease}
 #visual-frame:fullscreen{width:100vw;height:100vh;background:#07151b;display:flex;align-items:center;justify-content:center}
 #visual-frame:fullscreen :global(.preview-stage){width:min(100vw,133.3333vh);height:min(100vh,75vw);aspect-ratio:4/3}
 #visual-frame:fullscreen #explore-overlay{width:min(100vw,133.3333vh);height:min(100vh,75vw);inset:auto;border-radius:14px}
 
 .wildlife-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.wildlife-card{padding:0;overflow:hidden;text-align:left;background:#142638;color:#eee9de;border-color:#536979}.wildlife-card img{display:block;width:100%;height:150px;object-fit:contain;background:#07151b}.wildlife-card span{display:block;padding:12px;font-size:.8rem}.photo-credits{margin-top:18px}.photo-credits summary{cursor:pointer;color:#dfbe7e}.photo-credits p{max-width:1000px}
-:global(.bardsey-clouds){position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;clip-path:polygon(0 0,100% 0,100% 40%,45% 41%,0 23%);background:radial-gradient(ellipse at 10% 12%,#394854 0%,#667781 18%,transparent 38%),radial-gradient(ellipse at 60% 8%,#3d4c57 0%,#778994 23%,transparent 45%),linear-gradient(#708391,#adb8be);transition:opacity 1.8s ease}
-:global(.preview-stage[data-weather="clouds"] .bardsey-clouds){opacity:.72}
-:global(.preview-stage[data-weather="shelter"] .bardsey-clouds),:global(.preview-stage[data-weather="storm"] .bardsey-clouds){opacity:.95}
-:global(.preview-stage[data-weather="clearing"] .bardsey-clouds),:global(.preview-stage[data-weather="notebook"] .bardsey-clouds){opacity:.18}
-:global(.preview-stage[data-weather="clouds"] .preview-scene-image){filter:brightness(.82) saturate(.8)}
+/* Sky silhouette follows the original 4:3 photograph; terrain remains unchanged. */
+:global(.bardsey-clouds){position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;clip-path:polygon(0 0,100% 0,100% 36.5%,44% 36.5%,35% 39%,29% 36%,22% 32%,14% 28%,6% 25%,0 23%);background:url('/images/bardsey/storm-sky-v1.png') center/100% 100% no-repeat;transition:opacity 8s ease;}
+:global(.preview-stage[data-weather="clouds"] .bardsey-clouds){opacity:.68}
+:global(.preview-stage[data-weather="shelter"] .bardsey-clouds){opacity:.9}
+:global(.preview-stage[data-weather="storm"] .bardsey-clouds){opacity:1}
+:global(.preview-stage[data-weather="clearing"] .bardsey-clouds){opacity:.38}
+:global(.preview-stage[data-weather="notebook"] .bardsey-clouds){opacity:.08}
+:global(.preview-stage[data-weather="clouds"] .preview-scene-image){filter:brightness(.83) saturate(.82)}
+:global(.preview-stage[data-weather="shelter"] .preview-scene-image){filter:brightness(.72) saturate(.72)}
+:global(.preview-stage[data-weather="storm"] .preview-scene-image){filter:brightness(.56) saturate(.62)}
+:global(.preview-stage[data-weather="clearing"] .preview-scene-image){filter:brightness(.85) saturate(.85)}
+:global(.preview-stage[data-weather="storm"][data-intensity="gentle"] .preview-scene-image){filter:brightness(.7) saturate(.75)}
+:global(.bardsey-horizon-haze){position:absolute;inset:0;pointer-events:none;z-index:3;background:linear-gradient(180deg,transparent 27%,#99a9b066 37%,#8295a642 45%,transparent 62%);opacity:0;transition:opacity 7s ease;clip-path:polygon(0 23%,6% 25%,14% 28%,22% 32%,29% 36%,35% 39%,44% 36.5%,100% 36.5%,100% 100%,0 100%);}
+:global(.preview-stage[data-weather="shelter"] .bardsey-horizon-haze){opacity:.35}
+:global(.preview-stage[data-weather="storm"] .bardsey-horizon-haze){opacity:.8}
+:global(.preview-stage[data-weather="clearing"] .bardsey-horizon-haze){opacity:.2}
 :global(.preview-stage .preview-scene-image){object-fit:contain}
+.view-controls {align-items:center;}
+.view-controls label {font-size:.85rem;color:#c0c6d0;}
+.view-controls select {font:inherit;background:#142638;color:#eee9de;border:1px solid #536979;border-radius:8px;padding:10px;}
 @media(max-width:500px){.wildlife-cards{gap:7px}.wildlife-card img{height:95px}.wildlife-card span{padding:8px;font-size:.72rem}}
 </style>
 </body>

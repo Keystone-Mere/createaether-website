@@ -7,7 +7,7 @@
         <div>
             <p>Personal library</p>
             <h3 id="my-experiences-title">
-                My Experiences
+                My saved
             </h3>
         </div>
 
@@ -16,8 +16,11 @@
         </span>
     </div>
 
-    <p class="my-experiences__guidance">Saved on this browser. Save as Copy also downloads a backup; use Import experience in the editor to restore one.</p>
+    <p class="my-experiences__guidance">Saved on this device. Import a backup to restore an experience.</p>
 
+    <button type="button" id="library-import">Import experience</button>
+    <input type="file" id="library-import-file" accept=".json,application/json" hidden />
+    <p id="library-import-status" role="status"></p>
     <div
         class="my-experiences__grid"
         data-my-experiences-grid
@@ -30,6 +33,7 @@
 </section>
 
 <script>
+    import { isExperience, normalizeExperience } from '../../lib/models/ExperienceFormat';
     import { backgroundSource } from '../../lib/player/BackgroundChoices';
     import {
         ExperienceLibrary
@@ -344,7 +348,7 @@
                 `/studio/experiences/${encodeURIComponent(editorRouteId)}/`;
 
             continueLink.textContent =
-                'Continue Editing';
+                'Customise';
 
             continueLink.addEventListener(
                 'click',
@@ -363,7 +367,7 @@
                         window.setTimeout(
                             () => {
                                 continueLink.textContent =
-                                    'Continue Editing';
+                                    'Customise';
                             },
                             1800
                         );
@@ -402,7 +406,12 @@
             menu.addEventListener('keydown', event => {
                 if (event.key === 'Escape') { menu.open = false; toggle.focus(); }
             });
-            actions.append(continueLink, menu);
+            const playLink = document.createElement('a');
+            playLink.className = 'my-experiences__continue';
+            playLink.href = `/studio/listen/?saved=${encodeURIComponent(experience.id)}`;
+            playLink.textContent = 'Play';
+            continueLink.style.background = '#243247';
+            actions.append(playLink, continueLink, menu);
             const imageLink = document.createElement('a');
             imageLink.href = continueLink.href;
             imageLink.setAttribute('aria-label', `Continue editing ${experience.name}`);
@@ -438,6 +447,25 @@
     document.addEventListener('click', event => {
         if (!(event.target instanceof Element) || event.target.closest('.my-experiences__menu')) return;
         grid?.querySelectorAll<HTMLDetailsElement>('details[open]').forEach(menu => menu.open = false);
+    });
+    const importButton = document.querySelector<HTMLButtonElement>('#library-import')!;
+    const importFile = document.querySelector<HTMLInputElement>('#library-import-file')!;
+    const importStatus = document.querySelector<HTMLElement>('#library-import-status')!;
+    importButton.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', async () => {
+      const file = importFile.files?.[0]; if (!file) return;
+      try {
+        if (file.size > 25 * 1024 * 1024) throw new Error('This file is too large.');
+        const value = JSON.parse(await file.text());
+        if (!isExperience(value)) throw new Error('Choose an Aether experience backup.');
+        const library = new ExperienceLibrary();
+        const experience = normalizeExperience(value);
+        experience.sceneId ??= experience.id.split('-')[0];
+        if (library.get(experience.id)) experience.id = `${experience.sceneId ?? experience.id.split('-')[0]}-${crypto.randomUUID()}`;
+        if (!library.save(experience)) throw new Error('Unable to save. Device storage may be full.');
+        renderLibrary(); importStatus.textContent = 'Experience imported.';
+      } catch (error) { importStatus.textContent = error instanceof Error ? error.message : 'Unable to import this file.'; }
+      finally { importFile.value = ''; }
     });
     renderLibrary();
 
@@ -704,4 +732,10 @@
 .my-experiences__menu-items .my-experiences__action--danger { color: #fca5a5; }
 .my-experiences a:focus-visible, .my-experiences button:focus-visible, .my-experiences summary:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 3px; }
 @media (max-width: 480px) { .my-experiences__grid { grid-template-columns: 1fr; } }
+</style>
+
+<style is:global>
+ #library-import {padding:10px 16px;background:#243247;border:1px solid #475569;border-radius:8px;color:#e2e8f0;font:inherit;cursor:pointer;margin-bottom:12px;}
+ .my-experiences__actions {flex-wrap:wrap;}
+ .my-experiences__continue {flex:0 0 auto;}
 </style>
