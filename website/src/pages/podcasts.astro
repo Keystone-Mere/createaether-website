@@ -40,6 +40,11 @@ const scenes = [forest, temple, ocean].map(scene => ({
         <p class="hero-note">One host or two people · Your show branding · Silent visuals for OBS</p>
       </section>
 
+      <figure class="show-demo">
+        <img src="/images/podcast/aether-podcast-demo.webp" alt="Illustrative two-person podcast composition with fictional presenters, gold camera frames and The Evening Conversation branding against a Liverpool waterfront setting." width="1672" height="941" fetchpriority="high" decoding="async" />
+        <figcaption>Illustrative demo with AI-generated presenters. This still mockup shows the concept; the interactive preview below uses the actual Aether player.</figcaption>
+      </figure>
+
       <section id="show-preview" class="preview-section" aria-labelledby="show-preview-title">
         <div class="section-heading"><div><p class="eyebrow">Your show, in context</p><h2 id="show-preview-title">Picture your next episode.</h2></div><p>A reusable setting with a show title, camera frames and names. Try the layouts below, then personalise your own in Podcast Studio.</p></div>
         <BroadcastStage />
@@ -173,6 +178,9 @@ const scenes = [forest, temple, ocean].map(scene => ({
   .button:hover { border-color:#66e3ff; }
   .hero-note,.caption { color:#9fa6b5; line-height:1.7; font-size:.9rem; }
   .hero-note { margin-top:24px; }
+  .show-demo { margin:0 0 32px; }
+  .show-demo img { display:block; width:100%; height:auto; border:1px solid #ffffff25; border-radius:20px; }
+  .show-demo figcaption { margin-top:14px; color:#9fa6b5; font-size:.9rem; line-height:1.7; }
   .preview-section,.section { padding:70px 0; border-bottom:1px solid #ffffff1a; }
   .section-heading { display:grid; grid-template-columns:1.1fr 1fr; align-items:end; gap:70px; margin-bottom:36px; }
   h2 { margin:0; font-size:clamp(2rem,4.5vw,3.7rem); letter-spacing:-.045em; line-height:1.1; }
