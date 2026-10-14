@@ -1,0 +1,111 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import SceneStage from '../../components/studio/SceneStage.astro';
+---
+<StudioLayout title="Sensory environment · Staff prototype" privacyMode>
+ <section class="sensory-pilot">
+  <p class="pilot-label">STAFF FEEDBACK PROTOTYPE</p>
+  <h1>A setting you can adjust</h1>
+  <p class="pilot-intro">Explore a visual and sound environment for a quiet-space session. Start still and silent, then adjust one element at a time.</p>
+  <div class="pilot-layout">
+   <div id="sensory-display">
+    <div id="sensory-scene">
+     <SceneStage sceneId="forest" name="Sensory environment" exitButton={false} />
+     <div id="sensory-neutral" hidden aria-label="Neutral screen"></div>
+    </div>
+    <div class="display-controls">
+     <button id="pilot-sound" type="button" aria-pressed="false">Play sound</button>
+     <button id="pilot-neutral" type="button" aria-pressed="false">Neutral screen + mute</button>
+     <button id="pilot-fullscreen" type="button">Full-screen</button>
+    </div>
+   </div>
+   <aside class="pilot-settings" aria-label="Environment controls">
+    <label for="pilot-scene">Setting</label>
+    <select id="pilot-scene"><option value="abstract">Soft colour</option><option value="forest">Forest</option><option value="ocean">Ocean</option></select>
+    <label for="pilot-motion">Motion <output id="pilot-motion-value">Off</output></label>
+    <input id="pilot-motion" type="range" min="0" max="100" step="10" value="0" />
+    <p class="control-note">Zero keeps the scene still. Higher values add more gentle movement.</p>
+    <label for="pilot-brightness">Visual brightness <output id="pilot-brightness-value">65%</output></label>
+    <input id="pilot-brightness" type="range" min="20" max="100" value="65" />
+    <p class="control-note">Adjust your TV or projector brightness separately.</p>
+    <label for="pilot-volume">Sound level <output id="pilot-volume-value">15%</output></label>
+    <input id="pilot-volume" type="range" min="0" max="50" value="15" />
+    <p class="control-note">No sound starts automatically. Check the equipment volume before playback.</p>
+    <div class="setting-actions"><button id="pilot-save" type="button">Save this setting</button><button id="pilot-load" type="button">Load saved setting</button><button id="pilot-reset" type="button">Reset</button></div>
+    <p class="control-note">One setting is saved on this browser. No learner names or records are collected.</p>
+   </aside>
+  </div>
+  <p id="pilot-status" role="status" aria-live="polite">Ready: still and silent.</p>
+  <details class="feedback-prompts"><summary>Questions for staff feedback</summary><ol><li>When would you use this during a normal day?</li><li>What do you use now, and what would this need to do better?</li><li>Which controls are useful or missing?</li><li>Does it work with your display and network?</li><li>Who would decide whether to pay for a trial?</li></ol><p>This prototype is for staff evaluation. Individual suitability and any sessions with learners should be agreed by the setting and its practitioners.</p></details>
+ </section>
+ <audio id="pilot-audio" preload="none"></audio>
+</StudioLayout>
+<script>
+ import { applyBackground } from '../../lib/player/ScenePresentation';
+ import { createStudioRuntime } from '../../lib/studio/StudioRuntime';
+ import { pilotDefaults,readPilotSettings,pilotExperience } from '../../lib/sensory/PilotSettings';
+ const get=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
+ const audio=get<HTMLAudioElement>('pilot-audio');
+ const stage=document.querySelector<HTMLElement>('.preview-stage')!;
+ const display=get('sensory-display');
+ const status=get('pilot-status');
+ const scene=get<HTMLSelectElement>('pilot-scene');
+ const motion=get<HTMLInputElement>('pilot-motion');
+ const brightness=get<HTMLInputElement>('pilot-brightness');
+ const volume=get<HTMLInputElement>('pilot-volume');
+ const sound=get<HTMLButtonElement>('pilot-sound');
+ const neutral=get<HTMLButtonElement>('pilot-neutral');
+ const preference=matchMedia('(prefers-reduced-motion: reduce)');
+ let settings={...pilotDefaults};
+ let neutralOn=false;
+ let disposed=false;
+ let playbackAttempt=0;
+ function silence(){playbackAttempt++;audio.pause();}
+ const runtime=createStudioRuntime({audioElement:audio,audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,previewStage:stage,previewCanvas:stage.querySelector('canvas'),particlesStatus:null,lightingStatus:null,fogStatus:null});
+ function syncInputs(){scene.value=settings.scene;motion.value=String(settings.motion);brightness.value=String(settings.brightness);volume.value=String(settings.volume);}
+ function apply(){
+  const experience=pilotExperience(settings,!audio.paused&&!neutralOn,preference.matches);
+  applyBackground(stage,experience);
+  stage.classList.toggle('pilot-abstract',settings.scene==='abstract');
+  stage.style.filter=`brightness(${settings.brightness/100})`;
+  stage.setAttribute('aria-label', `${experience.name}, ${settings.motion===0||preference.matches?'still':'gentle motion'}`);
+  runtime.experienceLoader.load(experience);
+  get('pilot-motion-value').textContent=settings.motion===0?'Off':`${settings.motion}%`;
+  get('pilot-brightness-value').textContent=`${settings.brightness}%`;
+  get('pilot-volume-value').textContent=`${settings.volume}%`;
+  motion.disabled=preference.matches;
+  if(preference.matches)status.textContent='Your device requests reduced motion. Motion is off.';
+ }
+ function transport(){sound.textContent=audio.paused?'Play sound':'Mute sound';sound.setAttribute('aria-pressed',String(!audio.paused));}
+ function showNeutral(value:boolean){neutralOn=value;get('sensory-neutral').hidden=!value;neutral.textContent=value?'Return to scene':'Neutral screen + mute';neutral.setAttribute('aria-pressed',String(value));sound.disabled=value;if(value)silence();apply();if(value){const experience=pilotExperience(settings,false,preference.matches);experience.atmosphere.particles=false;runtime.experienceLoader.load(experience);}}
+ for(const control of [scene,motion,brightness,volume])control.addEventListener('input',()=>{
+  if(control===scene)silence();
+  settings=readPilotSettings({scene:scene.value,motion:Number(motion.value),brightness:Number(brightness.value),volume:Number(volume.value)});
+  apply();status.textContent=preference.matches?'Motion is off for your device preference.':'Setting updated.';
+ });
+ sound.addEventListener('click',async()=>{
+  if(!audio.paused){silence();return;}
+  const attempt=++playbackAttempt;
+  const experience=pilotExperience(settings,true,preference.matches);runtime.experienceLoader.load(experience);
+  try{await audio.play();if(disposed||neutralOn||attempt!==playbackAttempt)audio.pause();else status.textContent='Sound playing.';}catch{status.textContent='Sound could not start. The visual scene is still available.';}
+ });
+ audio.addEventListener('play',transport);audio.addEventListener('pause',transport);
+ audio.addEventListener('error',()=>{status.textContent='Sound could not load. The visual scene is still available.';});
+ neutral.addEventListener('click',()=>{showNeutral(!neutralOn);status.textContent=neutralOn?'Neutral screen. Sound off.':'Scene restored. Sound stays off.';});
+ get('pilot-save').addEventListener('click',()=>{try{localStorage.setItem('aether.sensory-pilot.v1',JSON.stringify(settings));status.textContent='Setting saved on this browser.';}catch{status.textContent='Unable to save on this browser.';}});
+ get('pilot-load').addEventListener('click',()=>{try{const saved=localStorage.getItem('aether.sensory-pilot.v1');if(!saved){status.textContent='No setting saved yet.';return;}silence();settings=readPilotSettings(JSON.parse(saved));syncInputs();apply();status.textContent='Saved setting loaded. Sound stays off.';}catch{status.textContent='Unable to load this setting.';}});
+ get('pilot-reset').addEventListener('click',()=>{silence();showNeutral(false);settings={...pilotDefaults};syncInputs();apply();status.textContent='Reset: still and silent.';});
+ const full=get<HTMLButtonElement>('pilot-fullscreen');
+ full.addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await display.requestFullscreen();}catch{status.textContent='Full-screen is unavailable on this display.';}});
+ document.addEventListener('fullscreenchange',()=>{full.textContent=document.fullscreenElement?'Exit full-screen':'Full-screen';});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)silence();});
+ preference.addEventListener('change',apply);
+ window.addEventListener('pagehide',()=>{disposed=true;silence();preference.removeEventListener('change',apply);},{once:true});
+ syncInputs();apply();
+</script>
+<style>
+.sensory-pilot{max-width:1250px;margin:auto;}.pilot-label{color:#7dd3fc;font-size:12px;letter-spacing:.12em;}h1{font-size:clamp(28px,4vw,46px);margin:12px 0;}.pilot-intro{color:#cbd5e1;line-height:1.7;max-width:75ch;margin-bottom:24px;}.pilot-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:24px;align-items:start;}#sensory-display{background:#101827;border-radius:16px;overflow:hidden;}#sensory-scene{position:relative;}#sensory-neutral{position:absolute;inset:0;z-index:20;background:#172128;}#sensory-neutral[hidden]{display:none;}.display-controls,.setting-actions{display:flex;gap:10px;flex-wrap:wrap;padding:16px;}button,select{font:inherit;color:#e2e8f0;background:#243247;border:1px solid #52657a;border-radius:9px;padding:12px;min-height:44px;cursor:pointer;}#pilot-neutral{border-color:#7dd3fc;}button:disabled{opacity:.6;cursor:default;}.pilot-settings{padding:20px;background:#101827;border-radius:16px;}.pilot-settings label{display:flex;justify-content:space-between;gap:10px;margin:20px 0 10px;}.pilot-settings label:first-child{margin-top:0;}.pilot-settings input,.pilot-settings select{width:100%;accent-color:#7dd3fc;}.control-note{color:#94a3b8;font-size:12px;line-height:1.6;}.setting-actions{padding:12px 0;}.setting-actions button{font-size:13px;}output{color:#7dd3fc;}.feedback-prompts{padding:20px;background:#101827;border-radius:12px;color:#cbd5e1;line-height:1.7;}.feedback-prompts summary{cursor:pointer;}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #7dd3fc;outline-offset:3px;}
+:global(.pilot-abstract .preview-scene-image){visibility:hidden;}:global(.pilot-abstract .preview-scene){background:radial-gradient(ellipse at 28% 40%,#344f65 0%,transparent 55%),radial-gradient(ellipse at 75% 65%,#294d48 0%,transparent 55%),#182733;}
+#sensory-display:fullscreen{width:100vw;height:100vh;border-radius:0;display:flex;flex-direction:column;justify-content:center;background:#000;}#sensory-display:fullscreen #sensory-scene{width:min(100vw,calc((100vh - 90px)*16/9));margin:auto;}#sensory-display:fullscreen .display-controls{justify-content:center;background:#101827;}
+@media(max-width:900px){.pilot-layout{grid-template-columns:1fr;}}
+</style>

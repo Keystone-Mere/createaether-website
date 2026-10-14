@@ -1,12 +1,29 @@
+import { sceneAsset } from '../../data/assets/SceneRegistry';
+export const studioBackgroundIds = ['warm-studio', 'liverpool-waterfront', 'botanical-observatory'] as const;
+export const broadcastBackgroundIds = [...studioBackgroundIds, 'wirral-liverpool', 'retreat', 'temple', 'ocean'] as const;
+export type BroadcastBackground = typeof broadcastBackgroundIds[number];
+export const broadcastBackgrounds = broadcastBackgroundIds.map(id => {
+    const asset = sceneAsset(id);
+    if (!asset) throw new Error(`Unregistered broadcast background: ${id}`);
+    return asset;
+});
+export const broadcastBackgroundGroups = [
+    { name: 'Studio collection', assets: broadcastBackgrounds.filter(asset => studioBackgroundIds.some(id => id === asset.id)) },
+    { name: 'Experience backgrounds', assets: broadcastBackgrounds.filter(asset => !studioBackgroundIds.some(id => id === asset.id)) },
+];
+export function broadcastFraming(background?: BroadcastBackground): 'presenter-safe' | 'legacy' {
+    return studioBackgroundIds.some(id => id === background) ? 'presenter-safe' : 'legacy';
+}
 export type Layout = 'duo' | 'solo' | 'background';
 export type Motion = 'still' | 'subtle' | 'atmospheric';
 export interface BroadcastSettings {
     show: string; episode: string; host: string; guest: string;
+    background: BroadcastBackground;
     accent: string; layout: Layout; motion: Motion;
 }
 export const defaultBroadcast: BroadcastSettings = {
     show: 'The Evening Conversation', episode: 'Good conversations. A little space to unwind.',
-    host: 'Host', guest: 'Guest', accent: '#d6ad72', layout: 'duo', motion: 'subtle',
+    background: 'wirral-liverpool', host: 'Host', guest: 'Guest', accent: '#d6ad72', layout: 'duo', motion: 'subtle',
 };
 export function validateBroadcast(value: unknown): BroadcastSettings {
     if (!value || typeof value !== 'object') throw new Error('Invalid show settings');
@@ -17,7 +34,9 @@ export function validateBroadcast(value: unknown): BroadcastSettings {
     };
     if (typeof v.accent !== 'string' || !/^#[0-9a-f]{6}$/i.test(v.accent)) throw new Error('Invalid accent');
     if (!['duo', 'solo', 'background'].includes(v.layout as string) || !['still', 'subtle', 'atmospheric'].includes(v.motion as string)) throw new Error('Invalid layout or motion');
-    return { show: text('show', 80), episode: text('episode', 120), host: text('host', 40), guest: text('guest', 40), accent: v.accent, layout: v.layout as Layout, motion: v.motion as Motion };
+    const background = v.background === undefined ? 'wirral-liverpool' : v.background;
+    if (!broadcastBackgrounds.some(asset => asset.id === background)) throw new Error('Invalid background');
+    return { background: background as BroadcastBackground, show: text('show', 80), episode: text('episode', 120), host: text('host', 40), guest: text('guest', 40), accent: v.accent, layout: v.layout as Layout, motion: v.motion as Motion };
 }
 export function createBroadcastUrl(settings: BroadcastSettings, origin: string): string {
     const json = JSON.stringify({ v: 1, show: validateBroadcast(settings) });

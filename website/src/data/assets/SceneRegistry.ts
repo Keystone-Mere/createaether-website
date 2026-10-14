@@ -83,6 +83,9 @@ export const sceneAssets: readonly SceneAsset[] = [
   asset('night-garden','Night garden','/images/experience-covers/night-garden.jpg',undefined,'story','custom',null,'outdoor'),
   asset('djedhor-display','Djedhor museum display','/images/museum-lab/djedhor-display.jpeg',undefined,'story','story'),
   asset('djedhor-interpretation','Heart weighing interpretation','/images/museum-lab/djedhor-interpretation.png',undefined,'story','story'),
+  asset('warm-studio','Warm Studio','/images/podcast/warm-studio.webp',undefined,'broadcast','custom',null,'none',{status:'documented',creator:'AI-generated for Aether',note:'Generated with OpenAI image generation, October 2026. Empty contemporary studio.'},'illustration'),
+  asset('liverpool-waterfront','Liverpool Waterfront','/images/podcast/liverpool-waterfront.webp',undefined,'broadcast','custom',null,'none',{status:'documented',creator:'AI-generated for Aether',note:'Generated with OpenAI image generation, October 2026. Artistic Liverpool skyline interpretation; not a documentary photograph.'},'illustration'),
+  asset('botanical-observatory','Botanical Observatory','/images/podcast/botanical-observatory.webp',undefined,'broadcast','custom',null,'none',{status:'documented',creator:'AI-generated for Aether',note:'Generated with OpenAI image generation, October 2026. Imagined conservatory and waterfront setting.'},'illustration'),
   asset('wirral-liverpool','Liverpool from the Wirral','/images/podcast/wirral-liverpool.jpg',undefined,'broadcast','custom',{kind:'rectangle',x:.08,y:.14,width:.84,height:.58},'existing'),
 ];
 export function isSceneId(value: unknown): value is SceneId { return typeof value === 'string' && sceneDefinitions.some(scene=>scene.id===value); }

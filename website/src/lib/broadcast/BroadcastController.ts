@@ -1,5 +1,6 @@
+import { sceneAsset } from '../../data/assets/SceneRegistry';
 import type { Experience } from '../models/Experience';
-import type { BroadcastSettings } from './BroadcastSettings';
+import { broadcastFraming, type BroadcastSettings } from './BroadcastSettings';
 import { createStudioRuntime } from '../studio/StudioRuntime';
 import storm from '../../data/experiences/storm.json';
 
@@ -12,13 +13,21 @@ export function createBroadcastController(root: HTMLElement) {
     function update(settings: BroadcastSettings, logo = '', guides = false) {
         currentSettings = settings;
         root.dataset.layout = settings.layout; root.dataset.guides = String(guides);
+        root.dataset.framing = broadcastFraming(settings.background);
         root.style.setProperty('--show-accent', settings.accent);
         for (const [selector, text] of [['[data-show-title]', settings.show], ['[data-episode]', settings.episode], ['[data-host]', settings.host], ['[data-guest]', settings.guest]]) {
             root.querySelector<HTMLElement>(selector)!.textContent = text;
         }
         const logoImage = root.querySelector<HTMLImageElement>('.broadcast-logo')!;
         logoImage.hidden = !logo; if (logo) logoImage.src = logo; else logoImage.removeAttribute('src');
-        const effectiveMotion = reducedMotion.matches ? 'still' : settings.motion;
+        const asset = sceneAsset(settings.background)!;
+        stage.dataset.assetId = asset.id;
+        stage.dataset.scene = 'custom';
+        stage.setAttribute('aria-label', `${asset.name} show background`);
+        const image = stage.querySelector<HTMLImageElement>('.preview-scene-image')!;
+        if (image.getAttribute('src') !== asset.src) image.src = asset.src;
+        root.querySelector<HTMLElement>('.broadcast-scene-credit')!.textContent = asset.name;
+        const effectiveMotion = reducedMotion.matches || settings.background !== 'wirral-liverpool' ? 'still' : settings.motion;
         root.dataset.motion = effectiveMotion;
         if (motion === effectiveMotion) return;
         motion = effectiveMotion;
