@@ -8,20 +8,46 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
     <header class="podcast-header"><div><p class="podcast-eyebrow">A setting for your show</p><h1>Podcast &amp; Stream</h1><p>Make it yours. Add it to OBS. Reuse it every episode.</p></div><span class="podcast-silent">Silent playback</span></header>
     <div class="podcast-grid">
         <section class="podcast-preview" aria-label="Show preview">
-            <div class="podcast-preview-heading"><div><h2>Your show preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><button id="podcast-fullscreen" type="button">Full screen</button></div>
+            <div class="podcast-preview-heading"><div><h2>Your show preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><button id="podcast-fullscreen" type="button">Full-screen editor</button></div>
             <BroadcastStage />
-            <div class="podcast-preview-footer"><label><input id="podcast-guides" type="checkbox" checked /> Show camera placeholders</label><span>1920 × 1080 · 16:9</span></div>
+            <div class="podcast-preview-footer"><label><input id="podcast-guides" type="checkbox" checked /> Show camera guides in editor</label><span>1920 × 1080 · 16:9</span></div>
+            <p id="podcast-save-status" class="podcast-save-status" role="status">Saved in this browser.</p>
+            <p id="podcast-obs-status" class="podcast-field-help" role="status">Copy a link when you are ready to use this setting in OBS.</p>
             <p class="podcast-hint">Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.</p>
             <div class="podcast-export">
                 <h2>Use your setting</h2>
                 <p>Add your silent backdrop to OBS, or preview the finished output.</p>
                 <div class="podcast-export-actions">
-                    <button id="podcast-add-obs" type="button" class="podcast-primary" aria-expanded="false" aria-controls="podcast-obs-setup">Add to OBS</button>
-                    <button id="podcast-open" type="button">Preview output</button>
+                    <button id="podcast-add-obs" type="button" class="podcast-primary">Copy OBS link</button>
+                    <button id="podcast-open" type="button">Open clean output ↗</button>
+                    <button id="podcast-download" type="button">Download OBS file</button>
                 </div>
                 <p id="podcast-feedback" role="status" aria-live="polite"></p>
-                <details id="podcast-obs-setup">
-                    <summary>OBS setup instructions</summary>
+
+            </div>
+        </section>
+        <form class="podcast-controls" id="podcast-form">
+            <h2>Personalise your show</h2>
+            <details class="podcast-control-section" open><summary>Background</summary>
+            <div class="selected-background"><img id="selected-background-image" src="" alt="" /><span id="selected-background-label"></span></div>
+            <button id="background-change" type="button">Change background</button>
+                        <dialog id="podcast-background-dialog" aria-labelledby="background-dialog-title"><div class="gallery-heading"><h2 id="background-dialog-title">Choose your background</h2><button id="background-close" type="button" autofocus>Done</button></div>{broadcastBackgroundGroups.map(group => <div class="podcast-background-group"><h3>{group.name}</h3><div class="podcast-backgrounds">{group.assets.map(asset => <label><input type="radio" name="background" value={asset.id} checked={asset.id === 'wirral-liverpool'} /><span><img src={asset.src} alt="" loading="lazy" /><span>{asset.name}</span></span></label>)}</div></div>)}<p class="podcast-field-help">Switch scenes while keeping your branding and camera layout. Copy a fresh link to update OBS.</p></dialog></details>
+            <details class="podcast-control-section" open><summary>Layout</summary>            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span>Two people</span></label><label><input type="radio" name="layout" value="background" /><span>No frames</span></label></div></fieldset>
+            <div class="podcast-names"><div><label for="host-name">Host name</label><input id="host-name" name="host" maxlength="40" value="Host" /></div><div id="guest-name-field"><label for="guest-name">Guest name</label><input id="guest-name" name="guest" maxlength="40" value="Guest" /></div></div></details>
+            <details class="podcast-control-section" open><summary>Branding</summary>
+            <label for="show-name">Show name</label><input id="show-name" name="show" maxlength="80" value="The Evening Conversation" />
+            <label for="show-episode">Episode title or tagline</label><textarea id="show-episode" name="episode" maxlength="120" rows="2">Good conversations. A little space to unwind.</textarea>
+
+            <label for="show-accent">Accent colour</label><div class="podcast-colour"><input id="show-accent" type="color" name="accent" value="#d6ad72" /><span id="show-accent-value">#d6ad72</span></div>
+            <label for="show-logo">Show logo <span class="podcast-optional">optional</span></label><input id="show-logo" type="file" accept="image/png,image/jpeg,image/webp" /><p class="podcast-field-help">PNG, JPG or WebP, up to 5 MB. Use the downloaded OBS file to include your logo.</p><button id="remove-logo" type="button" hidden>Remove logo</button>
+            </details>
+            <details class="podcast-control-section"><summary>Motion</summary><fieldset><legend class="sr-only">Background motion</legend><div class="podcast-motion"><label><input type="radio" name="motion" value="still" /><span>Still</span></label><label><input type="radio" name="motion" value="subtle" checked /><span>Subtle</span></label><label><input type="radio" name="motion" value="atmospheric" /><span>Atmospheric</span></label></div><p class="podcast-field-help"><span id="podcast-motion-help">Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.</span></p><p id="podcast-reduced" hidden>Your device requests reduced motion, so this preview stays still.</p></fieldset></details>
+
+            <button id="podcast-reset" type="button">Reset to demo</button>
+        </form>
+    </div>
+    <section class="podcast-export podcast-setup-guide" aria-label="OBS setup">                <details id="podcast-obs-setup">
+                    <summary>First time? Set up OBS</summary>
                     <h3>1. Choose how to add your backdrop</h3>
                     <p><strong>Browser link:</strong> copy the link and paste it into an OBS Browser source. Uploaded logos are included in the downloaded file only.</p>
                     <button id="podcast-copy" type="button">Copy OBS link</button>
@@ -29,7 +55,6 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                         <label class="podcast-link-label" for="podcast-link">Your current playback link</label><input id="podcast-link" type="text" readonly spellcheck="false" />
                     </details>
                     <p><strong>HTML file:</strong> download your backdrop, including your uploaded logo. In an OBS Browser source, enable <strong>Local file</strong> and select it.</p>
-                    <button id="podcast-download" type="button">Download OBS file</button>
                     <h3>2. Set the source size</h3>
                     <p>In OBS <strong>Settings → Video</strong>, use a <strong>Base (Canvas) Resolution of 1920 × 1080</strong> for these placement values. Your recording output resolution can differ.</p><p>In the Aether Browser source properties, set <strong>Width 1920</strong> and <strong>Height 1080</strong>. Then right-click that source → <strong>Transform → Fit to screen</strong>, and lock it in the Sources list.</p>
                     <h3>3. Add your cameras</h3>
@@ -42,23 +67,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                     <p>Make a short test recording. Check the logo, titles, camera positions and microphone sound. Aether's backdrop is silent; your microphone is a separate OBS source.</p>
                     <p id="podcast-export-state" role="status">Create a fresh export after changing settings.</p>
                     <p>Copy a new link or download a new file after changing settings. Keep the downloaded file on your computer; it still needs access to Aether online.</p>
-                </details>
-            </div>
-        </section>
-        <form class="podcast-controls" id="podcast-form">
-            <h2>Personalise your show</h2>
-            <fieldset><legend>Background</legend>{broadcastBackgroundGroups.map(group => <div class="podcast-background-group"><h3>{group.name}</h3><div class="podcast-backgrounds">{group.assets.map(asset => <label><input type="radio" name="background" value={asset.id} checked={asset.id === 'wirral-liverpool'} /><span><img src={asset.src} alt="" loading="lazy" /><span>{asset.name}</span></span></label>)}</div></div>)}<p class="podcast-field-help">Switch scenes while keeping your branding and camera layout. Copy a fresh link to update OBS.</p></fieldset>
-            <label for="show-name">Show name</label><input id="show-name" name="show" maxlength="80" value="The Evening Conversation" />
-            <label for="show-episode">Episode title or tagline</label><input id="show-episode" name="episode" maxlength="120" value="Good conversations. A little space to unwind." />
-            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span>Two people</span></label><label><input type="radio" name="layout" value="background" /><span>No frames</span></label></div></fieldset>
-            <div class="podcast-names"><div><label for="host-name">Host name</label><input id="host-name" name="host" maxlength="40" value="Host" /></div><div id="guest-name-field"><label for="guest-name">Guest name</label><input id="guest-name" name="guest" maxlength="40" value="Guest" /></div></div>
-            <label for="show-accent">Accent colour</label><div class="podcast-colour"><input id="show-accent" type="color" name="accent" value="#d6ad72" /><span id="show-accent-value">#d6ad72</span></div>
-            <label for="show-logo">Show logo <span class="podcast-optional">optional</span></label><input id="show-logo" type="file" accept="image/png,image/jpeg,image/webp" /><p class="podcast-field-help">PNG, JPG or WebP, up to 5 MB. Use the downloaded OBS file to include your logo.</p><button id="remove-logo" type="button" hidden>Remove logo</button>
-            <fieldset><legend>Motion</legend><div class="podcast-motion"><label><input type="radio" name="motion" value="still" /><span>Still</span></label><label><input type="radio" name="motion" value="subtle" checked /><span>Subtle</span></label><label><input type="radio" name="motion" value="atmospheric" /><span>Atmospheric</span></label></div><p class="podcast-field-help"><span id="podcast-motion-help">Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.</span></p><p id="podcast-reduced" hidden>Your device requests reduced motion, so this preview stays still.</p></fieldset>
-            <p id="podcast-save-status" class="podcast-save-status" role="status">Changes are saved on this browser.</p>
-            <button id="podcast-reset" type="button">Reset to demo</button>
-        </form>
-    </div>
+                </details></section>
 </section>
 </StudioLayout>
 <script>
@@ -87,7 +96,11 @@ function render(persist=true) {
     const s=settings(); controller.update(s,logo,guides.checked);
     document.querySelector<HTMLElement>('#podcast-background-name')!.textContent=broadcastBackgrounds.find(asset=>asset.id===s.background)!.name;
     for(const input of form.querySelectorAll<HTMLInputElement>('input[name=motion]')) input.disabled=s.background!=='wirral-liverpool';
-    document.querySelector<HTMLElement>('#podcast-motion-help')!.textContent=s.background==='wirral-liverpool'?'Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.':'This background is a still scene. Your Liverpool rain preference is retained when you switch back.';
+    document.querySelector<HTMLElement>('#podcast-motion-help')!.textContent=s.background==='wirral-liverpool'?'Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.':'Motion isn’t available for this background.';
+    const asset=broadcastBackgrounds.find(asset=>asset.id===s.background)!;
+    document.querySelector<HTMLImageElement>('#selected-background-image')!.src=asset.src;
+    document.querySelector<HTMLElement>('#selected-background-label')!.textContent=asset.name;
+    document.querySelector<HTMLElement>('.podcast-motion')!.hidden=s.background!=='wirral-liverpool';
     link.value=createBroadcastUrl(s,location.origin);
     document.querySelector<HTMLElement>('#show-accent-value')!.textContent=s.accent;
     document.querySelector<HTMLElement>('#guest-name-field')!.hidden=s.layout!=='duo';
@@ -107,9 +120,10 @@ function render(persist=true) {
       for(const placement of placements){const row=body.insertRow();for(const value of [placement.label,placement.x,placement.y,placement.width,placement.height])row.insertCell().textContent=String(value);}
       placementPanel.append(table);
     }
+    if(persist)document.querySelector<HTMLElement>('#podcast-obs-status')!.textContent='OBS export needs updating.';
     if(persist)document.querySelector<HTMLElement>('#podcast-export-state')!.textContent='Settings changed. Copy a new link or download a new file to update OBS.';
     if(persist) {
-        try { localStorage.setItem(key,JSON.stringify({settings:s,logo})); saveStatus.textContent='Changes are saved on this browser.'; }
+        try { localStorage.setItem(key,JSON.stringify({settings:s,logo})); saveStatus.textContent='Saved in this browser.'; }
         catch { saveStatus.textContent='Browser storage is unavailable or full. Download your OBS file to keep this setting.'; }
     }
 }
@@ -126,14 +140,19 @@ document.querySelector('#show-logo')!.addEventListener('change',async e=>{
 });
 document.querySelector('#remove-logo')!.addEventListener('click',()=>{logoRequest++;logo='';render();feedback.textContent='Logo removed.';});
 document.querySelector('#podcast-reset')!.addEventListener('click',()=>{logoRequest++;logo='';setFields(defaultBroadcast);guides.checked=true;render();feedback.textContent='Demo settings restored.';});
-copyButton.addEventListener('click',async()=>{
-    try { await navigator.clipboard.writeText(link.value); document.querySelector<HTMLElement>('#podcast-export-state')!.textContent='Link copied for the current settings.'; feedback.textContent=logo?'Link copied. It includes your text and frames; use the downloaded file for your logo.':'Link copied. Add it as a Browser source in OBS.'; }
-    catch { document.querySelector<HTMLDetailsElement>('.podcast-link-details')!.open=true;link.focus();link.select(); feedback.textContent='Copy the selected link with Ctrl+C (or Command+C).'; }
-});
+async function copyObsLink(){
+    try { await navigator.clipboard.writeText(link.value); document.querySelector<HTMLElement>('#podcast-obs-status')!.textContent=logo?'Link copied without logo. Download the OBS file to include it.':'OBS link copied for the current settings.'; document.querySelector<HTMLElement>('#podcast-export-state')!.textContent='Link copied for the current settings.'; feedback.textContent=logo?'Link copied. It includes your text and frames; use the downloaded file for your logo.':'Link copied. Add it as a Browser source in OBS.'; }
+    catch { document.querySelector<HTMLDetailsElement>('#podcast-obs-setup')!.open=true; document.querySelector<HTMLDetailsElement>('.podcast-link-details')!.open=true;link.focus();link.select(); feedback.textContent='Copy the selected link with Ctrl+C (or Command+C).'; }
+}
+copyButton.addEventListener('click',copyObsLink);
+document.querySelector('#podcast-add-obs')!.addEventListener('click',copyObsLink);
+const gallery=document.querySelector<HTMLDialogElement>('#podcast-background-dialog')!;
+document.querySelector('#background-change')!.addEventListener('click',()=>gallery.showModal());
+document.querySelector('#background-close')!.addEventListener('click',()=>gallery.close());
 function download(content:string,name:string) {
     const url=URL.createObjectURL(new Blob([content],{type:'text/html'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
-document.querySelector('#podcast-download')!.addEventListener('click',()=>{download(createBroadcastHtml(link.value,logo),'aether-podcast-show.html');document.querySelector<HTMLElement>('#podcast-export-state')!.textContent='File downloaded for the current settings.';feedback.textContent='OBS file downloaded. In a Browser source, enable Local file and select it.';});
+document.querySelector('#podcast-download')!.addEventListener('click',()=>{download(createBroadcastHtml(link.value,logo),'aether-podcast-show.html');document.querySelector<HTMLElement>('#podcast-obs-status')!.textContent='OBS file downloaded for the current settings.';document.querySelector<HTMLElement>('#podcast-export-state')!.textContent='File downloaded for the current settings.';feedback.textContent='OBS file downloaded. In a Browser source, enable Local file and select it.';});
 document.querySelector('#podcast-open')!.addEventListener('click',()=>{
     const url=logo?URL.createObjectURL(new Blob([createBroadcastHtml(link.value,logo)],{type:'text/html'})):link.value;
     window.open(url,'_blank','noopener,noreferrer');
@@ -161,12 +180,6 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){controller.destr
 .broadcast-stage::backdrop{background:#000}
 </style>
 
-<script>
- const setup = document.querySelector<HTMLDetailsElement>('#podcast-obs-setup')!;
- const add = document.querySelector<HTMLButtonElement>('#podcast-add-obs')!;
- add.addEventListener('click', () => { setup.open = !setup.open; });
- setup.addEventListener('toggle', () => { add.setAttribute('aria-expanded', String(setup.open)); });
-</script>
 <style>
 .podcast-export h3 {font-size:14px;color:#e2e8f0;margin:20px 0 10px;}
 .podcast-export .podcast-link-details {border:0;margin:12px 0 18px;padding:0;}
@@ -182,4 +195,11 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){controller.destr
 
 <style>
 .podcast-background-group h3{font-size:12px;font-weight:500;color:#becbd8;margin:12px 0 8px}.podcast-backgrounds{display:grid;grid-template-columns:1fr 1fr;gap:8px}.podcast-backgrounds label{position:relative;cursor:pointer}.podcast-backgrounds input{position:absolute;opacity:0}.podcast-backgrounds label>span{display:block;border:1px solid #293d55;border-radius:8px;overflow:hidden;color:#becbd8;font-size:11px}.podcast-backgrounds img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}.podcast-backgrounds span>span{display:block;padding:8px}.podcast-backgrounds input:checked+span{border-color:#71cba5;background:#18352e;color:#b4f4d8}.podcast-backgrounds input:focus-visible+span{outline:2px solid #8ee5c1;outline-offset:3px}.podcast-motion input:disabled+span{opacity:.45;cursor:default}
+</style>
+
+<style>
+.podcast-control-section{border-bottom:1px solid #223247;padding:17px 0}.podcast-control-section>summary{font-size:14px;font-weight:600;color:#b4f4d8;cursor:pointer}.podcast-control-section label:not(.podcast-layouts label):not(.podcast-motion label):not(.podcast-backgrounds label){display:block;font-size:12px;color:#becbd8;margin:16px 0 8px}.podcast-controls textarea{width:100%;box-sizing:border-box;border:1px solid #293d55;border-radius:8px;background:#07101c;color:#e2e8f0;padding:11px;font-family:inherit;font-size:13px;resize:vertical;min-height:65px}.podcast-controls textarea:focus-visible{outline:2px solid #8ee5c1;outline-offset:3px}.selected-background{display:flex;align-items:center;gap:12px;font-size:12px;color:#becbd8;margin:16px 0 12px}.selected-background img{width:88px;aspect-ratio:16/9;object-fit:cover;border-radius:6px}.podcast-save-status{border:0;padding:0;margin:12px 0 0;color:#a2e7c9}.podcast-setup-guide{margin-top:24px}.podcast-setup-guide>details{margin:0;border:0;padding:0}.podcast-controls #podcast-reset{margin-top:18px}.podcast-motion[hidden]{display:none}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+#podcast-background-dialog{background:#0b1422;color:#e2e8f0;border:1px solid #324359;border-radius:16px;padding:24px;width:min(760px,calc(100vw - 48px));max-height:80vh;box-sizing:border-box;overflow:auto}#podcast-background-dialog::backdrop{background:rgb(0 0 0 / .75)}.gallery-heading{display:flex;justify-content:space-between;align-items:center;gap:20px}.podcast-backgrounds{grid-template-columns:repeat(3,minmax(0,1fr))}.podcast-backgrounds span>span{font-size:12px}
+@media(min-width:1151px){.podcast-controls{position:sticky;top:24px;max-height:calc(100dvh - 48px);overflow-y:auto;scrollbar-gutter:stable}.podcast-preview{position:sticky;top:24px}.podcast-export{padding:16px}.podcast-hint{margin-bottom:12px}.podcast-grid{grid-template-columns:minmax(0,1fr) 330px}}
+@media(max-width:600px){.podcast-backgrounds{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
