@@ -1109,15 +1109,7 @@ const selectedAudioTrack =
     smokeToggle.addEventListener('change', updateSmoke);
     smokeAmount.addEventListener('input', updateSmoke);
 
-    const canonicalExperienceIds = new Set([
-        'retreat',
-        'temple',
-        'forest',
-        'ocean',
-        'christmas',
-        'storm',
-        'festival'
-    ]);
+    const canonicalExperienceIds = new Set(defaultExperiences.map(item => item.id));
 
     const isCanonicalExperience = (
         experience: Experience

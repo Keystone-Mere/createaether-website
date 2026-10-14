@@ -13,6 +13,7 @@ export interface SceneAsset {
   geometry: { status: 'existing' | 'measured' | 'outdoor' | 'none'; particles: EffectBoundary | null };
 }
 export const sceneDefinitions = [
+  { id:'desert', defaultAssetId:'desert', defaultAudioTrackId:'desert-wind' },
   { id:'temple', defaultAssetId:'temple', defaultAudioTrackId:'temple-echoes' },
   { id:'forest', defaultAssetId:'forest', defaultAudioTrackId:'forest-ambience' },
   { id:'ocean', defaultAssetId:'ocean', defaultAudioTrackId:'ocean-waves' },
@@ -58,6 +59,17 @@ const asset = (id:string, name:string, src:string, sceneId:SceneId | undefined, 
   credit:AssetCredit=unverified, provenance:SceneAsset['provenance']='unverified', aspectRatio='16 / 9'): SceneAsset =>
   ({ id,name,src,sceneId,role,visualScene,aspectRatio,credit,provenance,geometry:{status,particles} });
 export const sceneAssets: readonly SceneAsset[] = [
+  asset('desert','Desert','/images/experience-covers/desert-valley-dusk.webp','desert','original','custom',null,'none'),
+  asset('lighthouse-retreat','Lighthouse retreat','/images/experience-covers/lighthouse-retreat.webp','ocean','alternative','custom',{kind:'rectangle',x:0.37,y:0.43,width:0.26,height:0.17},'measured'),
+  asset('misty-marshes','Misty marshes','/images/experience-covers/misty-marshes.webp','forest','alternative','custom',null,'none'),
+  asset('mountain-sanctuary','Mountain sanctuary','/images/experience-covers/mountain-sanctuary.webp','temple','alternative','custom',null,'none'),
+  asset('ocean-pod','Ocean pod','/images/experience-covers/ocean-pod.webp','ocean','alternative','custom',{kind:'rectangle',x:0.42,y:0.5,width:0.27,height:0.13},'measured'),
+  asset('outback-veranda','Outback veranda','/images/experience-covers/outback-veranda.webp','desert','alternative','custom',null,'none'),
+  asset('outside-lake-day','Lakeside daylight','/images/experience-covers/outside-lake-day.webp','retreat','alternative','custom',null,'none'),
+  asset('waterfall-tropical-day','Tropical waterfall','/images/experience-covers/waterfall-tropical-day.webp','forest','alternative','custom',null,'none'),
+  asset('japanese-garden-day','Japanese garden','/images/experience-covers/japanese-garden-day.webp','forest','alternative','custom',null,'none'),
+  asset('kerala-houseboat','Kerala houseboat','/images/experience-covers/kerala-houseboat.webp','retreat','alternative','custom',null,'none'),
+
   asset('temple','Temple','/images/experience-covers/temple.jpg','temple','original','temple',null,'none'),
   asset('forest','Forest','/images/experience-covers/forest.jpg','forest','original','forest',null,'none'),
   asset('ocean','Ocean','/images/experience-covers/ocean.jpg','ocean','original','ocean',null,'none'),

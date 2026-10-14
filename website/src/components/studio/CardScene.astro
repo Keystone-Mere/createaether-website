@@ -1,0 +1,40 @@
+---
+import SceneStage from './SceneStage.astro';
+interface Props { sceneId:string; name:string; }
+const {sceneId,name}=Astro.props;
+---
+<div class="card-scene" data-card-scene={sceneId} aria-hidden="true" inert>
+  <SceneStage sceneId={sceneId} name={name} exitButton={false} stageId={`card-stage-${sceneId}`} />
+</div>
+<style>
+.card-scene {width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;pointer-events:none;}
+.card-scene :global(.preview-stage) {position:absolute;inset:0;min-height:0;height:100%;border:0;border-radius:0;}
+@media(prefers-reduced-motion:reduce) { .card-scene :global(*) {animation:none!important;transition:none!important;} }
+</style>
+<script>
+import {experiences} from '../../data/experiences';
+import {createStudioRuntime} from '../../lib/studio/StudioRuntime';
+import {registerRuntimeCleanup} from '../../lib/runtime/RuntimeLifecycle';
+const cards=Array.from(document.querySelectorAll<HTMLElement>('[data-card-scene]'));
+const running=new Map<Element,ReturnType<typeof createStudioRuntime>>();
+const visible=new Set<Element>();
+const motion=matchMedia('(prefers-reduced-motion: reduce)');
+function sync(card:Element) {
+ const shouldRun=visible.has(card)&&!document.hidden&&!motion.matches;
+ if(!shouldRun){running.get(card)?.destroy();running.delete(card);return;}
+ if(running.has(card))return;
+ const id=(card as HTMLElement).dataset.cardScene;
+ const experience=experiences.find(item=>item.id===id);
+ const stage=card.querySelector<HTMLElement>('.preview-stage');
+ if(!experience||!stage)return;
+ const runtime=createStudioRuntime({audioElement:null,audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,previewStage:stage,previewCanvas:stage.querySelector('canvas'),particlesStatus:null,lightingStatus:null,fogStatus:null});
+ const silent=structuredClone(experience);silent.audio.enabled=false;
+ runtime.experienceLoader.load(silent);running.set(card,runtime);
+}
+const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting)visible.add(entry.target);else visible.delete(entry.target);sync(entry.target);}});
+cards.forEach(card=>observer.observe(card));
+const syncAll=()=>cards.forEach(sync);
+document.addEventListener('visibilitychange',syncAll);
+motion.addEventListener('change',syncAll);
+registerRuntimeCleanup(()=>{observer.disconnect();document.removeEventListener('visibilitychange',syncAll);motion.removeEventListener('change',syncAll);running.forEach(runtime=>runtime.destroy());running.clear();});
+</script>

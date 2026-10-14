@@ -1,5 +1,6 @@
 ---
 import { experiences } from '../data/experiences';
+import CardScene from './studio/CardScene.astro';
 ---
 
 <section
@@ -22,9 +23,9 @@ import { experiences } from '../data/experiences';
 
   <div class="experience-showcase__grid">
     {
-      experiences.filter(experience => ['retreat','forest','ocean'].includes(experience.id)).map((experience, index) => (
+      experiences.filter(experience => ['desert','forest','ocean'].includes(experience.id)).map((experience, index) => (
         <a class="experience-card" href={`/studio/listen/?scene=${experience.id}`}>
-          <img class="experience-card__cover" src={`/images/experience-covers/${experience.id === 'festival' ? 'festival-evening' : experience.id === 'storm' ? 'storm-balcony' : experience.id}.jpg`} alt="" width="1024" height="576" loading="lazy" />
+          <CardScene sceneId={experience.id} name={experience.name} />
           <div class="experience-card__body">
           <div class="experience-card__top">
             <span class="experience-card__number">

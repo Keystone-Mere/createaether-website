@@ -1,5 +1,7 @@
 ---
+import CardScene from './CardScene.astro';
 interface Props {
+  sceneId?: string;
   cover?: string;
   title: string;
   description: string;
@@ -7,14 +9,14 @@ interface Props {
   href?: string;
   playHref?: string;
 }
-const { cover, title, description, href, playHref } = Astro.props;
+const { sceneId, cover, title, description, href, playHref } = Astro.props;
 ---
 <article class="experience-card">
   {cover && (href ? (
     <a class="experience-card__image-link" href={href} aria-label={`Open ${title} in Studio`}>
-      <img class="experience-card__cover" src={cover} alt="" width="1024" height="576" loading="lazy" />
+      {sceneId ? <CardScene sceneId={sceneId} name={title} /> : <img class="experience-card__cover" src={cover} alt="" width="1024" height="576" loading="lazy" />}
     </a>
-  ) : <img class="experience-card__cover" src={cover} alt="" width="1024" height="576" loading="lazy" />)}
+  ) : (sceneId ? <CardScene sceneId={sceneId} name={title} /> : <img class="experience-card__cover" src={cover} alt="" width="1024" height="576" loading="lazy" />))}
   <div class="experience-card__content">
     <h3>{href ? <a href={href}>{title}</a> : title}</h3>
     <p>{description}</p>

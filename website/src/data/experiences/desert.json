@@ -1,0 +1,57 @@
+{
+  "id": "desert",
+  "name": "Desert",
+  "description": "Unwind in a warmly lit desert cave, with gentle wind and slowly drifting dust above a mountain valley.",
+  "status": "MVP",
+  "audio": {
+    "enabled": true,
+    "volume": 25,
+    "layerVolume": 0,
+    "track": "desert-wind"
+  },
+  "atmosphere": {
+    "particles": true,
+    "lighting": true,
+    "fog": false
+  },
+  "environment": {
+    "colour": "#39291e"
+  },
+  "particles": {
+    "preset": "desert-dust",
+    "motion": "flow",
+    "count": 44,
+    "colour": "#fff1d6",
+    "glow": 3,
+    "minRadius": 1,
+    "maxRadius": 2,
+    "minSpeed": 2,
+    "maxSpeed": 5,
+    "drift": 2,
+    "minOpacity": 0.45,
+    "maxOpacity": 0.8,
+    "minLifetime": 18,
+    "maxLifetime": 32
+  },
+  "lighting": {
+    "preset": "desert-gold",
+    "colour": "#e9a34e",
+    "intensity": 0.55,
+    "pulse": true,
+    "speed": 0.12
+  },
+  "fog": {
+    "preset": "ritual-haze",
+    "colour": "#c9b58a",
+    "density": 0.18,
+    "speed": 0.12
+  },
+  "transition": {
+    "duration": 1800,
+    "easing": "ease-in-out"
+  },
+  "smoke": {
+    "enabled": false,
+    "amount": 35
+  }
+}

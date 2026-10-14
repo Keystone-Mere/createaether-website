@@ -150,15 +150,16 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
     const deltaSeconds = Math.min(deltaTime / 1000, 0.1);
 
+    const sceneId = this.stage instanceof HTMLElement ? this.stage.dataset.scene : undefined;
+    const boundary = particleBoundary(sceneId, this.settings.preset, this.resolveMotion(), this.backgroundId, displayedAssetId(this.stage));
+    if (boundary) clipEffectBoundary(context, boundary, width, height);
+
     if (this.settings.preset === "ocean-spray" && this.resolveMotion() === "flow") {
       this.renderOceanWaves(context, deltaSeconds, width, height);
       context.restore();
       return;
     }
 
-    const sceneId = this.stage instanceof HTMLElement ? this.stage.dataset.scene : undefined;
-    const boundary = particleBoundary(sceneId, this.settings.preset, this.resolveMotion(), this.backgroundId, displayedAssetId(this.stage));
-    if (boundary) clipEffectBoundary(context, boundary, width, height);
 
     for (const particle of this.particles) {
       this.updateParticle(particle, deltaSeconds, width, height);

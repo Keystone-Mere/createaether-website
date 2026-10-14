@@ -7,12 +7,14 @@ import christmas from './christmas.json';
 import storm from './storm.json';
 import festival from './festival.json';
 import retreat from './retreat.json';
+import desert from './desert.json';
 
 export interface ExperienceLibraryItem extends Experience {
   href: string;
 }
 
 export const experiences: ExperienceLibraryItem[] = [
+  { ...desert, href: '/studio/experiences/desert/' },
   { ...retreat, href: '/studio/retreat/' },
   {
     ...temple,

@@ -1,0 +1,137 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import SceneStage from '../../components/studio/SceneStage.astro';
+---
+<StudioLayout privacyMode title="Morning in the Forest" description="Five gentle minutes in a woodland clearing at dawn.">
+  <section class="wind-down">
+    <a href="/studio/guided-relaxation/">← Guided relaxation</a>
+    <p class="eyebrow">FOREST DAWN · FIVE MINUTES</p>
+    <h1>Morning in the Forest</h1>
+    <p class="intro">Ease into your day. Follow gentle on-screen guidance, or simply enjoy the woodland.</p>
+    <div id="forest-player">
+      <SceneStage sceneId="custom" name="Forest Dawn" imageSrc="/images/experience-covers/forest-dawn.webp" exitButton={false} />
+      <div class="guidance" id="forest-guidance" aria-live="polite"><strong id="cue-title">Your quiet moment</strong><p id="cue-text">Start whenever you are ready.</p></div>
+      <div class="controls">
+        <button id="session-toggle" type="button">Start five-minute session</button>
+        <button id="session-end" type="button" hidden>End session</button>
+        <button id="forest-fullscreen" type="button">Enter full screen</button>
+        <span id="session-clock" role="timer" aria-label="Time remaining">05:00</span>
+        <label><input id="show-guidance" type="checkbox" checked /> Show guidance</label>
+        <label><input id="forest-sound" type="checkbox" /> Sound</label>
+        <label><input id="forest-mist" type="checkbox" checked /> Mist</label>
+        <label><input id="forest-fireflies" type="checkbox" checked /> Fireflies</label>
+        <label>Wind volume <input id="forest-volume" type="range" min="0" max="100" value="25" /></label>
+      </div>
+    </div>
+    <p id="session-status" role="status">Five minutes of text guidance. Switch sound on for gentle forest wind, or enjoy a silent session.</p>
+    <audio id="forest-audio" src="/audio/forest_wind.mp3" preload="none" loop></audio>
+  </section>
+</StudioLayout>
+<script>
+  import forest from '../../data/experiences/forest.json';
+  import { createStudioRuntime } from '../../lib/studio/StudioRuntime';
+  import type { Experience } from '../../lib/models/Experience';
+  import { morningForest, cueAt } from '../../data/sessions/morningForest';
+  const player = document.querySelector<HTMLElement>('#forest-player')!;
+  const stage = player.querySelector<HTMLElement>('#experience-preview-stage')!;
+  const audio = document.querySelector<HTMLAudioElement>('#forest-audio')!;
+  const toggle = document.querySelector<HTMLButtonElement>('#session-toggle')!;
+  const end = document.querySelector<HTMLButtonElement>('#session-end')!;
+  const clock = document.querySelector<HTMLElement>('#session-clock')!;
+  const title = document.querySelector<HTMLElement>('#cue-title')!;
+  const text = document.querySelector<HTMLElement>('#cue-text')!;
+  const status = document.querySelector<HTMLElement>('#session-status')!;
+  const fullscreen = document.querySelector<HTMLButtonElement>('#forest-fullscreen')!;
+  const volume = document.querySelector<HTMLInputElement>('#forest-volume')!;
+  const sound = document.querySelector<HTMLInputElement>('#forest-sound')!;
+  const mist = document.querySelector<HTMLInputElement>('#forest-mist')!;
+  const fireflies = document.querySelector<HTMLInputElement>('#forest-fireflies')!;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const runtime = createStudioRuntime({ audioElement:null, audioEnabledToggle:null,
+    volumeControl:null, layerVolumeControl:null, volumeValue:null, particlesToggle:fireflies,
+    lightingToggle:null, fogToggle:mist, previewStage:stage, previewCanvas:stage.querySelector('canvas'),
+    particlesStatus:null, lightingStatus:null, fogStatus:null });
+  runtime.experienceLoader.load({ ...forest, id:'forest-dawn', name:'Forest Dawn',
+    audio:{ ...forest.audio, enabled:false }, atmosphere:{ particles:!reducedMotion, lighting:true, fog:!reducedMotion },
+    particles:{ ...forest.particles, count:12, colour:'#e8d99c', glow:4, minRadius:0.6, maxRadius:1.4, minSpeed:3, maxSpeed:7, minOpacity:0.15, maxOpacity:0.45 },
+    lighting:{ ...forest.lighting, colour:'#f0c985', intensity:0.14, pulse:false },
+    fog:{ ...forest.fog, density:0.12, speed:0.08, colour:'#d0dfcf' },
+    transition:{ ...forest.transition, duration:700 },
+  } as Experience);
+  audio.volume = 0.25;
+  let running = false, elapsed = 0, startedAt = 0, timer: number | undefined, generation = 0;
+  let lastCue = -1;
+  const elapsedNow = () => Math.min(morningForest.durationSeconds, elapsed + (running ? (performance.now()-startedAt)/1000 : 0));
+  const clearTimer = () => { window.clearInterval(timer); timer = undefined; };
+  function render() {
+    const seconds = elapsedNow();
+    const remaining = Math.ceil(morningForest.durationSeconds-seconds);
+    clock.textContent = `${Math.floor(remaining/60).toString().padStart(2,'0')}:${(remaining%60).toString().padStart(2,'0')}`;
+    const cue = cueAt(seconds);
+    if (cue.at !== lastCue) { title.textContent = cue.title; text.textContent = cue.text; lastCue = cue.at; }
+    if (running && remaining === 0) finish(true);
+  }
+  function finish(completed = false) {
+    generation++; running = false; elapsed = 0; clearTimer(); audio.pause(); audio.currentTime = 0;
+    toggle.textContent = 'Start five-minute session'; end.hidden = true; lastCue = -1;
+    clock.textContent = completed ? '00:00' : '05:00';
+    title.textContent = completed ? 'Your session is complete' : 'Your quiet moment';
+    text.textContent = completed ? 'Take your time. Stay in the forest, or return whenever you like.' : 'Start whenever you are ready.';
+    status.textContent = completed ? 'Five-minute session complete.' : 'Session ended. You can start again whenever you like.';
+  }
+  toggle.addEventListener('click', () => {
+    if (running) {
+      elapsed = elapsedNow(); running = false; generation++; clearTimer(); audio.pause();
+      toggle.textContent = 'Resume session'; status.textContent = 'Session paused.'; return;
+    }
+    running = true; startedAt = performance.now(); const attempt = ++generation;
+    toggle.textContent = 'Pause session'; end.hidden = false; status.textContent = 'Session playing.';
+    render(); timer = window.setInterval(render,250);
+    if (sound.checked) playWind(attempt);
+  });
+  function playWind(attempt: number) {
+    void audio.play().then(() => {
+      if (disposed || !running || !sound.checked || generation !== attempt) audio.pause();
+    }).catch(() => {
+      if (!disposed && generation === attempt) status.textContent = 'Audio could not play. You can continue with the on-screen guidance.';
+    });
+  }
+  sound.addEventListener('change', () => {
+    generation++;
+    if (!sound.checked) audio.pause();
+    else if (running) playWind(generation);
+  });
+  mist.addEventListener('change', () => runtime.experienceState.update());
+  fireflies.addEventListener('change', () => runtime.experienceState.update());
+  end.addEventListener('click', () => finish());
+  volume.addEventListener('input', () => { audio.volume = Number(volume.value)/100; });
+  document.querySelector<HTMLInputElement>('#show-guidance')!.addEventListener('change', event => {
+    document.querySelector<HTMLElement>('#forest-guidance')!.hidden = !(event.target as HTMLInputElement).checked;
+  });
+  fullscreen.addEventListener('click', async () => {
+    try { if (document.fullscreenElement === player) await document.exitFullscreen(); else await player.requestFullscreen(); }
+    catch { status.textContent = 'Full screen is unavailable in this browser.'; }
+  });
+  const onFullscreen = () => { fullscreen.textContent = document.fullscreenElement === player ? 'Exit full screen' : 'Enter full screen'; };
+  document.addEventListener('fullscreenchange',onFullscreen);
+  let disposed = false;
+  const dispose = () => { if(disposed)return; disposed=true; generation++; running=false; clearTimer(); audio.pause();
+    runtime.destroy(); document.removeEventListener('fullscreenchange',onFullscreen); };
+  window.addEventListener('pagehide',dispose,{once:true});
+  document.addEventListener('astro:before-swap',dispose,{once:true});
+</script>
+<style>
+.wind-down{max-width:1100px;margin:auto;padding:2rem 1rem;color:#dce5ec}.wind-down>a{color:#afdbcb}.eyebrow{margin-top:2rem;letter-spacing:.15em;color:#a4c9b8;font-size:.8rem}h1{font-size:clamp(2rem,5vw,3.5rem);margin:.6rem 0}.intro{line-height:1.7;max-width:65ch;margin-bottom:2rem}
+#forest-player{background:#08110f;border-radius:18px;overflow:hidden}#forest-player :global(.preview-stage){border:0;border-radius:0;aspect-ratio:16/9;min-height:0}
+/* Soft central banks of mist fade naturally before the rocks at the sides. */
+#forest-player :global(.preview-fog){left:25%;width:50%;height:15%;filter:blur(14px);background:radial-gradient(ellipse,color-mix(in srgb,var(--aether-fog-colour) 58%,transparent),transparent 70%)}
+#forest-player :global(.preview-fog--one){bottom:24%}
+#forest-player :global(.preview-fog--two){left:34%;width:32%;height:10%;bottom:40%}
+.guidance{padding:1rem 1.3rem;background:#0b1b17;color:#fff;min-height:88px;box-sizing:border-box}.guidance p{line-height:1.6;margin:.5rem 0 0}.guidance[hidden]{display:none}
+.controls{display:flex;align-items:center;flex-wrap:wrap;gap:.8rem;padding:1rem;background:#0b1b17}.controls button{font:inherit;min-height:44px;padding:.6rem 1rem;border:1px solid #759e8d;border-radius:9px;background:#173c2e;color:#fff;cursor:pointer}.controls button[hidden]{display:none}.controls label{display:flex;align-items:center;gap:.4rem;font-size:.9rem;min-height:32px}.controls input[type=range]{width:100px}.controls button:focus-visible,.controls input:focus-visible{outline:3px solid #c7efdc;outline-offset:3px}#session-clock{font-variant-numeric:tabular-nums}#session-status{line-height:1.6;color:#b3c6be}
+#forest-player:fullscreen{width:100vw;height:100dvh;border-radius:0;display:flex;flex-direction:column;background:#000;overflow:auto}
+#forest-player:fullscreen :global(.preview-stage){flex:1;min-height:120px;width:100%;aspect-ratio:auto;container-type:size;display:grid;place-items:center;background:#000}
+#forest-player:fullscreen :global(.preview-scene){position:relative;inset:auto;width:min(100cqw,177.777778cqh);height:min(100cqh,56.25cqw)}
+#forest-player:fullscreen .controls,#forest-player:fullscreen .guidance{flex-shrink:0}
+@media(max-width:700px){.controls{gap:.6rem}.wind-down{padding:1.25rem .5rem}.guidance{min-height:110px}}
+</style>

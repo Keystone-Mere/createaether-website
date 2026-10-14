@@ -2,6 +2,7 @@ import { audioSource } from '../assets/SceneRegistry';
 import type { AudioTrack } from '../../lib/models/AudioTrack';
 
 export const audioTracks: AudioTrack[] = [
+  { id:'desert-wind', title:'Desert Wind', description:'Gentle wind for the desert sanctuary.', src:audioSource('wind'), loop:true },
   { id: 'retreat-wind', title: 'Gentle woodland wind', description: 'A quiet natural soundscape for the cabin.', src: audioSource('forest_wind'), loop: true },
   { id: 'retreat-rain', title: 'Gentle rain', description: 'Steady woodland rain without thunder.', src: audioSource('forest_rain'), loop: true },
   {
