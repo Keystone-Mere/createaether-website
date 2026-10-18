@@ -3,18 +3,6 @@ import SiteHeader from '../components/SiteHeader.astro';
 import BroadcastStage from '../components/studio/BroadcastStage.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import PostHog from '../components/posthog.astro';
-import { createPlaybackUrl } from '../lib/player/PlaybackLink';
-import type { Experience } from '../lib/models/Experience';
-import forest from '../data/experiences/forest.json';
-import temple from '../data/experiences/temple.json';
-import ocean from '../data/experiences/ocean.json';
-
-const scenes = [forest, temple, ocean].map(scene => ({
-  name: scene.name,
-  id: scene.id,
-  image: `/images/experience-covers/${scene.id}.jpg`,
-  playback: createPlaybackUrl(scene as Experience, ''),
-}));
 ---
 <!doctype html>
 <html lang="en">
@@ -39,10 +27,17 @@ const scenes = [forest, temple, ocean].map(scene => ({
 
 
       <section id="show-preview" class="preview-section" aria-labelledby="show-preview-title">
-        <div class="section-heading"><div><p class="eyebrow">Try your show setting</p><h2 id="show-preview-title">Your show belongs here.</h2></div><p>Explore the actual Aether preview. Switch between one host, two people or a clean backdrop, then add your own branding in Podcast & Stream.</p></div>
-        <BroadcastStage />
+        <div class="section-heading"><div><p class="eyebrow">Try your show setting</p><h2 id="show-preview-title">One show. Four matching screens.</h2></div><p>Preview each part of your broadcast, from the opening screen to the sign-off. Personalise the set in Podcast & Stream, then download all four OBS scenes.</p></div>
+        <div class="screen-picker" role="group" aria-label="Choose a broadcast screen">
+          <button type="button" data-show-screen="starting" aria-pressed="false" aria-controls="broadcast-example"><strong>Starting Soon</strong><span>Welcome viewers before you begin</span></button>
+          <button type="button" data-show-screen="live" aria-pressed="true" aria-controls="broadcast-example"><strong>Live</strong><span>Your show and camera layout</span></button>
+          <button type="button" data-show-screen="break" aria-pressed="false" aria-controls="broadcast-example"><strong>Be Right Back</strong><span>Keep your setting during a pause</span></button>
+          <button type="button" data-show-screen="ending" aria-pressed="false" aria-controls="broadcast-example"><strong>Ending</strong><span>Give your show a closing screen</span></button>
+        </div>
+        <div id="broadcast-example"><BroadcastStage /></div>
+        <p id="screen-description" class="caption" role="status">Live: your show with camera guides. Add your own cameras in OBS.</p>
         <div class="preview-controls">
-          <div class="scene-buttons" role="group" aria-label="Choose an example camera layout">
+          <div id="live-layouts" class="scene-buttons" role="group" aria-label="Choose an example camera layout">
             <button type="button" class="scene-button show-layout" data-layout="solo" aria-pressed="false">One host</button>
             <button type="button" class="scene-button show-layout" data-layout="duo" aria-pressed="true">Two people</button>
             <button type="button" class="scene-button show-layout" data-layout="background" aria-pressed="false">No frames</button>
@@ -52,21 +47,6 @@ const scenes = [forest, temple, ocean].map(scene => ({
         <p class="caption">Live Aether preview with camera guides. Your camera appears here when you add it in OBS; Aether does not capture or request access to your camera on this page. This example uses the Liverpool setting; motion is silent and respects your device’s reduced-motion preference.</p>
       </section>
 
-      <section id="backdrop-preview" class="preview-section" aria-labelledby="preview-title">
-        <div class="section-heading"><div><p class="eyebrow">Explore the ambience tools</p><h2 id="preview-title">Explore more backdrops.</h2></div><p>These separate ambience scenes show Aether’s adjustable environments. They are backdrop-only previews; the Podcast Studio above adds show branding and camera layouts.</p></div>
-        <div class="preview-frame">
-          <img id="scene-poster" src={scenes[0].image} alt="Forest backdrop: a woodland clearing at dusk" width="1920" height="1080" />
-          <iframe id="scene-player" title="Silent Forest backdrop preview" hidden loading="lazy"></iframe>
-        </div>
-        <div class="preview-controls">
-          <div class="scene-buttons" role="group" aria-label="Choose a backdrop preview">
-            {scenes.map((scene, i) => <button type="button" class="scene-button" data-name={scene.name} data-image={scene.image} data-playback={scene.playback} aria-pressed={i === 0 ? 'true' : 'false'}>{scene.name}</button>)}
-          </div>
-          <button type="button" id="preview-toggle" class="button secondary" aria-controls="scene-player" aria-pressed="false">Play silent preview</button>
-        </div>
-        <p class="caption">Live Aether visuals, rendered in your browser. No camera is included in this preview.</p>
-        <noscript><p>Open Studio to customise your setting and use it in OBS.</p></noscript>
-      </section>
 
       <section class="section" aria-labelledby="make-title">
         <div class="section-heading"><div><p class="eyebrow">Your scene, your style</p><h2 id="make-title">Give your content a setting.</h2></div><p>Keep a consistent setting across episodes. Podcast Studio brings your show identity and camera layout together around a gently animated backdrop.</p></div>
@@ -108,15 +88,21 @@ const scenes = [forest, temple, ocean].map(scene => ({
     <SiteFooter />
     <script>
       import { createBroadcastController } from '../lib/broadcast/BroadcastController';
-      import { defaultBroadcast } from '../lib/broadcast/BroadcastSettings';
+      import { defaultBroadcast, broadcastScreens, screenLabels } from '../lib/broadcast/BroadcastSettings';
       const showRoot = document.querySelector<HTMLElement>('#show-preview .broadcast-stage')!;
       const showController = createBroadcastController(showRoot);
       const layoutButtons = document.querySelectorAll<HTMLButtonElement>('.show-layout');
+      const screenButtons = document.querySelectorAll<HTMLButtonElement>('[data-show-screen]');
+      const liveLayouts = document.querySelector<HTMLElement>('#live-layouts')!;
+      const screenDescription = document.querySelector<HTMLElement>('#screen-description')!;
       const motionButton = document.querySelector<HTMLButtonElement>('#show-motion')!;
       let showSettings = { ...defaultBroadcast, motion: 'still' as const };
       let showPlaying = false;
       function renderShow() {
         showController.update({ ...showSettings, motion: showPlaying ? 'subtle' : 'still' }, '', true);
+        screenButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.showScreen === showSettings.screen)));
+        liveLayouts.hidden = showSettings.screen !== 'live';
+        screenDescription.textContent = showSettings.screen === 'live' ? 'Live: your show with camera guides. Add your own cameras in OBS.' : `${screenLabels[showSettings.screen]}: the same background and branding, with a message for your viewers.`;
         layoutButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.layout === showSettings.layout)));
         motionButton.setAttribute('aria-pressed', String(showPlaying));
         motionButton.textContent = showPlaying ? 'Stop motion' : 'Play subtle motion';
@@ -127,29 +113,13 @@ const scenes = [forest, temple, ocean].map(scene => ({
           showSettings = { ...showSettings, layout }; renderShow();
         }
       }));
+      screenButtons.forEach(button => button.addEventListener('click', () => {
+        const screen = broadcastScreens.find(value => value === button.dataset.showScreen);
+        if (screen) { showSettings = { ...showSettings, screen }; renderShow(); }
+      }));
       motionButton.addEventListener('click', () => { showPlaying = !showPlaying; renderShow(); });
       renderShow();
       window.addEventListener('pagehide', event => { if (!event.persisted) showController.destroy(); });
-      const poster = document.querySelector<HTMLImageElement>('#scene-poster')!;
-      const player = document.querySelector<HTMLIFrameElement>('#scene-player')!;
-      const toggle = document.querySelector<HTMLButtonElement>('#preview-toggle')!;
-      const buttons = document.querySelectorAll<HTMLButtonElement>('#backdrop-preview .scene-button');
-      let selected = buttons[0];
-      let playing = false;
-      function render() {
-        poster.src = selected.dataset.image!;
-        poster.alt = `${selected.dataset.name} backdrop scene`;
-        player.title = `Silent ${selected.dataset.name} backdrop preview`;
-        player.hidden = !playing;
-        poster.hidden = playing;
-        if (playing) player.src = selected.dataset.playback!;
-        else player.removeAttribute('src');
-        toggle.textContent = playing ? 'Stop preview' : 'Play silent preview';
-        toggle.setAttribute('aria-pressed', String(playing));
-        buttons.forEach(button => button.setAttribute('aria-pressed', String(button === selected)));
-      }
-      buttons.forEach(button => button.addEventListener('click', () => { selected = button; render(); }));
-      toggle.addEventListener('click', () => { playing = !playing; render(); });
     </script>
   </body>
 </html>
@@ -209,3 +179,13 @@ const scenes = [forest, temple, ocean].map(scene => ({
 </style>
 
 <style>#show-preview{padding-top:24px}#show-preview .section-heading{margin-bottom:24px}</style>
+
+<style>
+.screen-picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 20px}
+.screen-picker button{font:inherit;text-align:left;padding:16px;border:1px solid #334155;border-radius:12px;color:#e2e8f0;background:#101827;cursor:pointer;min-width:0}
+.screen-picker strong{display:block;font-size:15px;line-height:1.4}.screen-picker span{display:block;color:#a9b8cc;font-size:12px;line-height:1.6;margin-top:6px}
+.screen-picker button[aria-pressed="true"]{border-color:#6ee7b7;background:#12302b}.screen-picker button:hover{border-color:#7dd3fc}.screen-picker button:focus-visible{outline:3px solid #7dd3fc;outline-offset:3px}
+#live-layouts[hidden]{display:none}
+@media(max-width:700px){.screen-picker{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.screen-picker button{transition:none}}
+</style>
