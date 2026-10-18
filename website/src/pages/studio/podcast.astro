@@ -8,24 +8,14 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
     <header class="podcast-header"><div><p class="podcast-eyebrow">A setting for your show</p><h1>Podcast &amp; Stream</h1><p>Make it yours. Add it to OBS. Reuse it every episode.</p></div><span class="podcast-silent">Silent playback</span></header>
     <div class="podcast-grid">
         <section class="podcast-preview" aria-label="Show preview">
-            <div class="podcast-preview-heading"><div><h2>Your show preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><button id="podcast-fullscreen" type="button">Full-screen editor</button></div>
+            <div class="podcast-preview-heading"><div><h2>Your show preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><div class="preview-heading-actions"><button id="podcast-preview-toggle" type="button" aria-expanded="true" aria-controls="podcast-preview-body" hidden>Hide preview</button><button id="podcast-fullscreen" type="button">Full-screen editor</button></div></div>
+            <div id="podcast-preview-body">
             <fieldset class="podcast-screen-tabs"><legend>Broadcast screen</legend>{broadcastScreens.map(screen => <label><input form="podcast-form" type="radio" name="screen" value={screen} checked={screen === 'live'} /><span>{screenLabels[screen]}</span></label>)}</fieldset>
             <BroadcastStage />
             <div class="podcast-preview-footer"><label><input id="podcast-guides" type="checkbox" checked /> Show camera guides in editor</label><span>1920 × 1080 · 16:9</span></div>
             <p id="podcast-save-status" class="podcast-save-status" role="status">Saved in this browser.</p>
             <p id="podcast-obs-status" class="podcast-field-help" role="status">Copy a link when you are ready to use this setting in OBS.</p>
             <p class="podcast-hint">Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.</p>
-            <div class="podcast-export">
-                <h2>Use your setting</h2>
-                <p id="podcast-export-description">Export your Live screen. Branding and background are shared across all four screens.</p>
-                <button id="podcast-collection" type="button" class="podcast-primary">Download all four OBS scenes</button>
-                <p>Import the JSON through OBS → Scene Collection → Import, then select the new Aether collection. Add your camera and microphone to Main Show. Uses your current design for all four screens.</p>
-                <div class="podcast-export-actions">
-                    <button id="podcast-add-obs" type="button" class="podcast-primary">Copy OBS link</button>
-                    <button id="podcast-open" type="button">Open clean output ↗</button>
-                    <button id="podcast-download" type="button">Download OBS file</button>
-                </div>
-                <p id="podcast-feedback" role="status" aria-live="polite"></p>
 
             </div>
         </section>
@@ -59,6 +49,19 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 
             <button id="podcast-reset" type="button">Reset to demo</button>
         </form>
+            <div class="podcast-export podcast-export-panel">
+                <h2>Use your setting</h2>
+                <p id="podcast-export-description">Export your Live screen. Branding and background are shared across all four screens.</p>
+                <button id="podcast-collection" type="button" class="podcast-primary">Download all four OBS scenes</button>
+                <p>Import the JSON through OBS → Scene Collection → Import, then select the new Aether collection. Add your camera and microphone to Main Show. Uses your current design for all four screens.</p>
+                <div class="podcast-export-actions">
+                    <button id="podcast-add-obs" type="button" class="podcast-primary">Copy OBS link</button>
+                    <button id="podcast-open" type="button">Open clean output ↗</button>
+                    <button id="podcast-download" type="button">Download OBS file</button>
+                </div>
+                <p id="podcast-feedback" role="status" aria-live="polite"></p>
+
+            </div>
     </div>
     <section class="podcast-export podcast-setup-guide" aria-label="OBS setup">                <details id="podcast-obs-setup">
                     <summary>First time? Set up OBS</summary>
@@ -87,6 +90,21 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 </section>
 </StudioLayout>
 <script>
+const previewToggle=document.querySelector<HTMLButtonElement>('#podcast-preview-toggle')!;
+const previewBody=document.querySelector<HTMLElement>('#podcast-preview-body')!;
+const previewViewport=window.matchMedia('(max-width: 1150px)');
+let previewCollapsed=false;
+function syncPreviewVisibility(){
+    previewToggle.hidden=!previewViewport.matches;
+    previewBody.hidden=previewViewport.matches&&previewCollapsed;
+    previewToggle.setAttribute('aria-expanded',String(!previewBody.hidden));
+    previewToggle.textContent=previewBody.hidden?'Show preview':'Hide preview';
+}
+previewToggle.addEventListener('click',()=>{previewCollapsed=!previewCollapsed;syncPreviewVisibility();});
+previewViewport.addEventListener('change',syncPreviewVisibility);
+syncPreviewVisibility();
+window.addEventListener('pagehide',event=>{if(!event.persisted)previewViewport.removeEventListener('change',syncPreviewVisibility);});
+
 import { broadcastBackgrounds, broadcastScreens, screenLabels, defaultBroadcast, validateBroadcast, createBroadcastUrl, prepareLogo, isLogo, createBroadcastHtml } from '../../lib/broadcast/BroadcastSettings';
 import { createObsCollection } from '../../lib/broadcast/ObsCollection';
 import { cameraPlacement } from '../../lib/broadcast/CameraPlacement';
@@ -267,4 +285,35 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){controller.destr
 .podcast-controls .countdown-toggle{display:flex!important;align-items:center;gap:8px}.podcast-controls input[type=checkbox]{width:auto!important}.podcast-controls input[type=range]{padding:0!important;accent-color:#7de0b4}#countdown-restart{margin-top:12px}#brand-size-value{float:right;color:#a2e7c9}
 [hidden]{display:none!important}
 @media(max-width:600px){.podcast-screen-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+
+<style>
+/* Keep editing controls and exports in document flow; pin only the preview. */
+.podcast-grid{grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:24px;align-items:start}
+.podcast-controls{grid-column:1;grid-row:1;position:static;max-height:none;overflow:visible;min-width:0}
+.podcast-preview{grid-column:2;grid-row:1 / span 2;position:sticky;top:16px;align-self:start;height:fit-content;max-height:calc(100dvh - 32px);overflow-y:auto;background:#07101cf5;border:1px solid #223247;border-radius:16px;padding:16px;box-sizing:border-box;scrollbar-gutter:stable}
+.podcast-export-panel{grid-column:1;grid-row:2;min-width:0}
+.preview-heading-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.preview-heading-actions button[hidden],#podcast-preview-body[hidden]{display:none}
+.podcast-preview :global(.broadcast-stage){max-width:calc((100dvh - 260px) * 16 / 9);margin-inline:auto}
+@media(max-width:1150px){
+ .podcast-grid{grid-template-columns:minmax(0,1fr)}
+ .podcast-preview{grid-column:1;grid-row:1;top:8px;z-index:15;max-height:50dvh;padding:12px}
+ .podcast-controls{grid-column:1;grid-row:2;position:static;max-height:none;overflow:visible}
+ .podcast-export-panel{grid-column:1;grid-row:3}
+ .podcast-preview :global(.broadcast-stage){max-width:calc(27dvh * 16 / 9)}
+ .podcast-preview-heading{margin-bottom:8px}.podcast-preview-heading h2{font-size:14px}
+ .podcast-preview-footer{margin-top:8px;font-size:11px}
+ .podcast-preview .podcast-hint{display:none}
+ .podcast-preview .podcast-save-status{margin-top:6px}
+ .podcast-preview .podcast-screen-tabs{margin-top:8px;margin-bottom:8px}
+ .podcast-preview .podcast-field-help{margin:5px 0}
+}
+@media(max-width:600px){
+ .podcast-preview-heading{align-items:flex-start}.preview-heading-actions{max-width:145px}
+ .preview-heading-actions button{padding:7px 9px;font-size:11px}
+ .podcast-preview .podcast-screen-tabs{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+ .podcast-preview .podcast-screen-tabs span{font-size:10px;padding:8px 3px}
+}
+@media(max-height:500px) and (max-width:1150px){.podcast-preview{position:static;max-height:none}.podcast-preview :global(.broadcast-stage){max-width:440px}}
 </style>
