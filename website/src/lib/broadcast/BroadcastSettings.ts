@@ -15,13 +15,21 @@ export function broadcastFraming(background?: BroadcastBackground): 'presenter-s
     return studioBackgroundIds.some(id => id === background) ? 'presenter-safe' : 'legacy';
 }
 export type Layout = 'duo' | 'solo' | 'background';
+export const broadcastScreens = ['starting', 'live', 'break', 'ending'] as const;
+export type BroadcastScreen = typeof broadcastScreens[number];
+export const screenLabels: Record<BroadcastScreen, string> = { starting: 'Starting Soon', live: 'Live', break: 'Be Right Back', ending: 'Ending' };
+export const defaultScreenMessages = { starting: 'Starting soon', live: '', break: 'Be right back', ending: 'Thanks for watching' };
 export type Motion = 'still' | 'subtle' | 'atmospheric';
 export interface BroadcastSettings {
     show: string; episode: string; host: string; guest: string;
     background: BroadcastBackground;
     accent: string; layout: Layout; motion: Motion;
+    screen: BroadcastScreen; messages: Record<BroadcastScreen, string>;
+    social: string; brandPosition: 'left' | 'center' | 'right'; brandSize: number;
+    countdown: boolean; countdownSeconds: number;
 }
 export const defaultBroadcast: BroadcastSettings = {
+    screen: 'live', messages: { ...defaultScreenMessages }, social: '', brandPosition: 'left', brandSize: 100, countdown: false, countdownSeconds: 300,
     show: 'The Evening Conversation', episode: 'Good conversations. A little space to unwind.',
     background: 'wirral-liverpool', host: 'Host', guest: 'Guest', accent: '#d6ad72', layout: 'duo', motion: 'subtle',
 };
@@ -36,7 +44,27 @@ export function validateBroadcast(value: unknown): BroadcastSettings {
     if (!['duo', 'solo', 'background'].includes(v.layout as string) || !['still', 'subtle', 'atmospheric'].includes(v.motion as string)) throw new Error('Invalid layout or motion');
     const background = v.background === undefined ? 'wirral-liverpool' : v.background;
     if (!broadcastBackgrounds.some(asset => asset.id === background)) throw new Error('Invalid background');
-    return { background: background as BroadcastBackground, show: text('show', 80), episode: text('episode', 120), host: text('host', 40), guest: text('guest', 40), accent: v.accent, layout: v.layout as Layout, motion: v.motion as Motion };
+    const screen = v.screen ?? 'live';
+    const brandPosition = v.brandPosition ?? 'left';
+    if (!broadcastScreens.includes(screen as BroadcastScreen)) throw new Error('Invalid screen');
+    if (!['left', 'center', 'right'].includes(brandPosition as string)) throw new Error('Invalid branding position');
+    const number = (key: string, fallback: number, min: number, max: number) => {
+        const value = v[key] === undefined ? fallback : Number(v[key]);
+        if (!Number.isFinite(value) || value < min || value > max) throw new Error('Invalid ' + key);
+        return Math.round(value);
+    };
+    const messages = { ...defaultScreenMessages };
+    if (v.messages !== undefined) {
+        if (!v.messages || typeof v.messages !== 'object' || Array.isArray(v.messages)) throw new Error('Invalid screen text');
+        for (const id of broadcastScreens) {
+            const message = (v.messages as Record<string, unknown>)[id];
+            if (typeof message !== 'string') throw new Error('Invalid screen text');
+            messages[id] = message.replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 100);
+        }
+    }
+    if (v.countdown !== undefined && typeof v.countdown !== 'boolean') throw new Error('Invalid countdown');
+    const social = v.social === undefined ? '' : text('social', 80);
+    return { screen: screen as BroadcastScreen, messages, social, brandPosition: brandPosition as BroadcastSettings['brandPosition'], brandSize: number('brandSize', 100, 70, 140), countdown: v.countdown === true, countdownSeconds: number('countdownSeconds', 300, 10, 3600), background: background as BroadcastBackground, show: text('show', 80), episode: text('episode', 120), host: text('host', 40), guest: text('guest', 40), accent: v.accent, layout: v.layout as Layout, motion: v.motion as Motion };
 }
 export function createBroadcastUrl(settings: BroadcastSettings, origin: string): string {
     const json = JSON.stringify({ v: 1, show: validateBroadcast(settings) });
@@ -45,7 +73,7 @@ export function createBroadcastUrl(settings: BroadcastSettings, origin: string):
 }
 export function readBroadcastHash(hash: string): BroadcastSettings {
     const encoded = hash.replace(/^#/, '');
-    if (!encoded || encoded.length > 4000 || !/^[A-Za-z0-9_-]+$/.test(encoded)) throw new Error('Invalid show link');
+    if (!encoded || encoded.length > 8000 || !/^[A-Za-z0-9_-]+$/.test(encoded)) throw new Error('Invalid show link');
     const data = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0))));
     if (data?.v !== 1) throw new Error('Unsupported show link');
     return validateBroadcast(data.show);

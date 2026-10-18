@@ -10,8 +10,32 @@ export function createBroadcastController(root: HTMLElement) {
     let motion: string | null = null;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let currentSettings: BroadcastSettings | null = null;
+    let countdownKey = '';
+    let countdownEnd = 0;
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const countdownNode = root.querySelector<HTMLElement>('[data-countdown]')!;
+    function clearTimer() { if (timer !== null) clearInterval(timer); timer = null; }
+    function tick() {
+        const remaining = Math.max(0, Math.ceil((countdownEnd - Date.now()) / 1000));
+        countdownNode.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`;
+        if (remaining === 0) clearTimer();
+    }
+    function syncCountdown(settings: BroadcastSettings, restart = false) {
+        const enabled = settings.screen === 'starting' && settings.countdown;
+        const key = `${enabled}:${settings.countdownSeconds}`;
+        countdownNode.hidden = !enabled;
+        if (!restart && countdownKey === key) return;
+        countdownKey = key; clearTimer();
+        if (enabled) { countdownEnd = Date.now() + settings.countdownSeconds * 1000; tick(); timer = setInterval(tick, 250); }
+    }
     function update(settings: BroadcastSettings, logo = '', guides = false) {
         currentSettings = settings;
+        root.dataset.screen = settings.screen;
+        root.dataset.brandPosition = settings.brandPosition;
+        root.style.setProperty('--brand-scale', String(settings.brandSize / 100));
+        root.querySelector<HTMLElement>('[data-screen-message]')!.textContent = settings.messages[settings.screen];
+        root.querySelector<HTMLElement>('[data-social]')!.textContent = settings.social;
+        syncCountdown(settings);
         root.dataset.layout = settings.layout; root.dataset.guides = String(guides);
         root.dataset.framing = broadcastFraming(settings.background);
         root.style.setProperty('--show-accent', settings.accent);
@@ -46,5 +70,5 @@ export function createBroadcastController(root: HTMLElement) {
     }
     function preferenceChanged() { motion = null; if (currentSettings) update(currentSettings, root.querySelector<HTMLImageElement>('.broadcast-logo')?.getAttribute('src') ?? '', root.dataset.guides === 'true'); }
     reducedMotion.addEventListener('change', preferenceChanged);
-    return { update, stop() { runtime?.destroy(); runtime=null; motion=null; }, destroy() { runtime?.destroy(); runtime=null; motion=null; reducedMotion.removeEventListener('change', preferenceChanged); } };
+    return { update, restartCountdown() { if (currentSettings) syncCountdown(currentSettings, true); }, stop() { clearTimer(); countdownKey=""; runtime?.destroy(); runtime=null; motion=null; }, destroy() { clearTimer(); countdownKey=""; runtime?.destroy(); runtime=null; motion=null; reducedMotion.removeEventListener('change', preferenceChanged); } };
 }

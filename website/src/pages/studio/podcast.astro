@@ -1,6 +1,6 @@
 ---
 import StudioLayout from '../../layouts/StudioLayout.astro';
-import { broadcastBackgroundGroups } from '../../lib/broadcast/BroadcastSettings';
+import { broadcastBackgroundGroups, broadcastScreens, screenLabels } from '../../lib/broadcast/BroadcastSettings';
 import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 ---
 <StudioLayout title="Podcast & Stream" description="Create a personalised, gently animated setting for your show.">
@@ -9,6 +9,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
     <div class="podcast-grid">
         <section class="podcast-preview" aria-label="Show preview">
             <div class="podcast-preview-heading"><div><h2>Your show preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><button id="podcast-fullscreen" type="button">Full-screen editor</button></div>
+            <fieldset class="podcast-screen-tabs"><legend>Broadcast screen</legend>{broadcastScreens.map(screen => <label><input form="podcast-form" type="radio" name="screen" value={screen} checked={screen === 'live'} /><span>{screenLabels[screen]}</span></label>)}</fieldset>
             <BroadcastStage />
             <div class="podcast-preview-footer"><label><input id="podcast-guides" type="checkbox" checked /> Show camera guides in editor</label><span>1920 × 1080 · 16:9</span></div>
             <p id="podcast-save-status" class="podcast-save-status" role="status">Saved in this browser.</p>
@@ -16,7 +17,9 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             <p class="podcast-hint">Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.</p>
             <div class="podcast-export">
                 <h2>Use your setting</h2>
-                <p>Add your silent backdrop to OBS, or preview the finished output.</p>
+                <p id="podcast-export-description">Export your Live screen. Branding and background are shared across all four screens.</p>
+                <button id="podcast-collection" type="button" class="podcast-primary">Download all four OBS scenes</button>
+                <p>Import the JSON through OBS → Scene Collection → Import, then select the new Aether collection. Add your camera and microphone to Main Show. Uses your current design for all four screens.</p>
                 <div class="podcast-export-actions">
                     <button id="podcast-add-obs" type="button" class="podcast-primary">Copy OBS link</button>
                     <button id="podcast-open" type="button">Open clean output ↗</button>
@@ -28,16 +31,27 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
         </section>
         <form class="podcast-controls" id="podcast-form">
             <h2>Personalise your show</h2>
+            <details class="podcast-control-section" open><summary>Screen message</summary>
+                <p id="podcast-screen-help" class="podcast-field-help">Your Live screen shows your camera layout.</p>
+                <div id="podcast-message-field" hidden><label for="screen-message">Screen heading</label><input id="screen-message" maxlength="100" /></div>
+                <div id="podcast-countdown-field" hidden><label class="countdown-toggle"><input id="show-countdown" type="checkbox" /> Show countdown</label>
+                <label for="countdown-seconds">Countdown length (seconds)</label><input id="countdown-seconds" type="number" min="10" max="3600" step="1" value="300" />
+                <button id="countdown-restart" type="button">Restart preview countdown</button>
+                <p class="podcast-field-help">Starts when this screen loads in OBS. Stops at 00:00; switch to Live in OBS when ready. Enable “Refresh browser when scene becomes active” in OBS to restart it on each visit.</p></div>
+            </details>
             <details class="podcast-control-section" open><summary>Background</summary>
             <div class="selected-background"><img id="selected-background-image" src="" alt="" /><span id="selected-background-label"></span></div>
             <button id="background-change" type="button">Change background</button>
                         <dialog id="podcast-background-dialog" aria-labelledby="background-dialog-title"><div class="gallery-heading"><h2 id="background-dialog-title">Choose your background</h2><button id="background-close" type="button" autofocus>Done</button></div>{broadcastBackgroundGroups.map(group => <div class="podcast-background-group"><h3>{group.name}</h3><div class="podcast-backgrounds">{group.assets.map(asset => <label><input type="radio" name="background" value={asset.id} checked={asset.id === 'wirral-liverpool'} /><span><img src={asset.src} alt="" loading="lazy" /><span>{asset.name}</span></span></label>)}</div></div>)}<p class="podcast-field-help">Switch scenes while keeping your branding and camera layout. Copy a fresh link to update OBS.</p></dialog></details>
-            <details class="podcast-control-section" open><summary>Layout</summary>            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span>Two people</span></label><label><input type="radio" name="layout" value="background" /><span>No frames</span></label></div></fieldset>
+            <details id="podcast-layout-section" class="podcast-control-section" open><summary>Layout</summary>            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span>Two people</span></label><label><input type="radio" name="layout" value="background" /><span>No frames</span></label></div></fieldset>
             <div class="podcast-names"><div><label for="host-name">Host name</label><input id="host-name" name="host" maxlength="40" value="Host" /></div><div id="guest-name-field"><label for="guest-name">Guest name</label><input id="guest-name" name="guest" maxlength="40" value="Guest" /></div></div></details>
             <details class="podcast-control-section" open><summary>Branding</summary>
             <label for="show-name">Show name</label><input id="show-name" name="show" maxlength="80" value="The Evening Conversation" />
             <label for="show-episode">Episode title or tagline</label><textarea id="show-episode" name="episode" maxlength="120" rows="2">Good conversations. A little space to unwind.</textarea>
 
+            <label for="show-social">Social handle or website <span class="podcast-optional">optional</span></label><input id="show-social" name="social" maxlength="80" placeholder="@yourshow" />
+            <label for="brand-position">Branding position</label><select id="brand-position" name="brandPosition"><option value="left">Top left</option><option value="center">Top centre</option><option value="right">Top right</option></select>
+            <label for="brand-size">Branding size <span id="brand-size-value">100%</span></label><input id="brand-size" name="brandSize" type="range" min="70" max="140" step="5" value="100" />
             <label for="show-accent">Accent colour</label><div class="podcast-colour"><input id="show-accent" type="color" name="accent" value="#d6ad72" /><span id="show-accent-value">#d6ad72</span></div>
             <label for="show-logo">Show logo <span class="podcast-optional">optional</span></label><input id="show-logo" type="file" accept="image/png,image/jpeg,image/webp" /><p class="podcast-field-help">PNG, JPG or WebP, up to 5 MB. Use the downloaded OBS file to include your logo.</p><button id="remove-logo" type="button" hidden>Remove logo</button>
             </details>
@@ -57,13 +71,15 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                     <p><strong>HTML file:</strong> download your backdrop, including your uploaded logo. In an OBS Browser source, enable <strong>Local file</strong> and select it.</p>
                     <h3>2. Set the source size</h3>
                     <p>In OBS <strong>Settings → Video</strong>, use a <strong>Base (Canvas) Resolution of 1920 × 1080</strong> for these placement values. Your recording output resolution can differ.</p><p>In the Aether Browser source properties, set <strong>Width 1920</strong> and <strong>Height 1080</strong>. Then right-click that source → <strong>Transform → Fit to screen</strong>, and lock it in the Sources list.</p>
-                    <h3>3. Add your cameras</h3>
+                    <h3>3. Create your matching screen set</h3>
+                    <p>Create four scenes in OBS: <strong>Starting Soon, Live, Be Right Back and Ending</strong>. Select each matching screen in Aether, then copy its link or download its file into a separate Browser source in the corresponding OBS scene. All four use the same branding and background. Export each again after changing the shared design.</p>
+                    <h3>4. Add your cameras to Live</h3>
                     <p>Add each camera source <strong>above Aether</strong> in the Sources list. Unlock the camera, right-click it → <strong>Transform → Edit Transform</strong> (Ctrl+E on Windows).</p>
                     <p>Set <strong>Positional Alignment: Top Left</strong>, <strong>Rotation: 0</strong>, <strong>Bounds: Fit (Scale to inner bounds in older versions)</strong>, and <strong>Alignment in Bounding Box: Center</strong>. Enter the Position and Bounding Box Size values below. Lock the camera when finished.</p>
                     <div id="podcast-camera-sizes" aria-live="polite"></div>
                     <p>These values preserve the camera image proportions. A 16:9 camera feed fills the space; other proportions leave space rather than stretch the image. Existing crop settings affect the result.</p>
                     <details><summary>If your camera looks wrong</summary><ul><li>Check that the camera is above Aether in Sources.</li><li>Check the canvas is 1920 × 1080 and Aether is fitted to it.</li><li>Check Position, Top Left alignment and Bounding Box Size, rather than changing the source Size.</li><li>If you intend to start fresh, reset the camera transform before entering these values; this removes previous positioning and crop settings.</li></ul></details>
-                    <h3>4. Check the finished scene</h3>
+                    <h3>5. Check the finished scene</h3>
                     <p>Make a short test recording. Check the logo, titles, camera positions and microphone sound. Aether's backdrop is silent; your microphone is a separate OBS source.</p>
                     <p id="podcast-export-state" role="status">Create a fresh export after changing settings.</p>
                     <p>Copy a new link or download a new file after changing settings. Keep the downloaded file on your computer; it still needs access to Aether online.</p>
@@ -71,7 +87,8 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 </section>
 </StudioLayout>
 <script>
-import { broadcastBackgrounds, defaultBroadcast, validateBroadcast, createBroadcastUrl, prepareLogo, isLogo, createBroadcastHtml } from '../../lib/broadcast/BroadcastSettings';
+import { broadcastBackgrounds, broadcastScreens, screenLabels, defaultBroadcast, validateBroadcast, createBroadcastUrl, prepareLogo, isLogo, createBroadcastHtml } from '../../lib/broadcast/BroadcastSettings';
+import { createObsCollection } from '../../lib/broadcast/ObsCollection';
 import { cameraPlacement } from '../../lib/broadcast/CameraPlacement';
 import { createBroadcastController } from '../../lib/broadcast/BroadcastController';
 const form=document.querySelector<HTMLFormElement>('#podcast-form')!;
@@ -84,16 +101,36 @@ const saveStatus=document.querySelector<HTMLElement>('#podcast-save-status')!;
 const copyButton=document.querySelector<HTMLButtonElement>('#podcast-copy')!;
 const key='aether:podcast-show:v1';
 let logo='', logoRequest=0;
+let messages = { ...defaultBroadcast.messages };
+let countdownSeconds=defaultBroadcast.countdownSeconds;
 function field(name:string) { return form.elements.namedItem(name) as HTMLInputElement | RadioNodeList; }
-function setFields(settings:typeof defaultBroadcast) { for(const [name,value] of Object.entries(settings)) field(name).value=value; }
+function setFields(settings:typeof defaultBroadcast) {
+    for(const name of ['show','episode','host','guest','background','accent','layout','motion','screen','social','brandPosition','brandSize'] as const) field(name).value=String(settings[name]);
+    messages = { ...settings.messages };
+    countdownSeconds=settings.countdownSeconds;
+    document.querySelector<HTMLInputElement>('#show-countdown')!.checked=settings.countdown;
+    document.querySelector<HTMLInputElement>('#countdown-seconds')!.value=String(settings.countdownSeconds);
+}
 setFields(defaultBroadcast);
 try {
     const saved=localStorage.getItem(key);
     if(saved) { const project=JSON.parse(saved); setFields(validateBroadcast(project.settings)); if(isLogo(project.logo)) logo=project.logo; }
 } catch { saveStatus.textContent='Saved settings could not be read. You can still create and export your show.'; }
-function settings() { return validateBroadcast({...Object.fromEntries(new FormData(form)), motion:field('motion').value}); }
+function settings() {
+    const seconds=document.querySelector<HTMLInputElement>('#countdown-seconds')!;
+    if(seconds.value!=='' && seconds.validity.valid) countdownSeconds=seconds.valueAsNumber;
+    return validateBroadcast({...Object.fromEntries(new FormData(form)), motion:field('motion').value, messages, countdown:document.querySelector<HTMLInputElement>('#show-countdown')!.checked, countdownSeconds}); }
 function render(persist=true) {
     const s=settings(); controller.update(s,logo,guides.checked);
+    document.querySelector<HTMLInputElement>('#screen-message')!.value=messages[s.screen];
+    document.querySelector<HTMLElement>('#podcast-message-field')!.hidden=s.screen==='live';
+    document.querySelector<HTMLElement>('#podcast-countdown-field')!.hidden=s.screen!=='starting';
+    document.querySelector<HTMLElement>('#podcast-layout-section')!.hidden=s.screen!=='live';
+    document.querySelector<HTMLElement>('#podcast-screen-help')!.textContent=s.screen==='live'?'Your Live screen shows your camera layout.':'Set the heading for this screen. Your branding and background are shared across the set.';
+    document.querySelector<HTMLElement>('#podcast-export-description')!.textContent=`Export ${screenLabels[s.screen]}. Branding and background are shared across all four screens.`;
+    document.querySelector<HTMLElement>('#brand-size-value')!.textContent=`${s.brandSize}%`;
+    document.querySelector<HTMLElement>('#podcast-guides')!.closest('label')!.hidden=s.screen!=='live';
+    document.querySelector<HTMLElement>('.podcast-hint')!.textContent=s.screen==='live'?'Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.':'Export this screen into its own OBS scene. Switch screens in OBS during your broadcast.';
     document.querySelector<HTMLElement>('#podcast-background-name')!.textContent=broadcastBackgrounds.find(asset=>asset.id===s.background)!.name;
     for(const input of form.querySelectorAll<HTMLInputElement>('input[name=motion]')) input.disabled=s.background!=='wirral-liverpool';
     document.querySelector<HTMLElement>('#podcast-motion-help')!.textContent=s.background==='wirral-liverpool'?'Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.':'Motion isn’t available for this background.';
@@ -103,14 +140,15 @@ function render(persist=true) {
     document.querySelector<HTMLElement>('.podcast-motion')!.hidden=s.background!=='wirral-liverpool';
     link.value=createBroadcastUrl(s,location.origin);
     document.querySelector<HTMLElement>('#show-accent-value')!.textContent=s.accent;
-    document.querySelector<HTMLElement>('#guest-name-field')!.hidden=s.layout!=='duo';
-    document.querySelector<HTMLElement>('.podcast-names')!.hidden=s.layout==='background';
+    document.querySelector<HTMLElement>('#guest-name-field')!.hidden=s.screen!=='live'||s.layout!=='duo';
+    document.querySelector<HTMLElement>('.podcast-names')!.hidden=s.screen!=='live'||s.layout==='background';
     document.querySelector<HTMLButtonElement>('#remove-logo')!.hidden=!logo;
     copyButton.textContent=logo?'Copy link (without logo)':'Copy OBS link';
-    const placements=cameraPlacement(s.layout,s.background);
+    document.querySelector<HTMLButtonElement>('#podcast-add-obs')!.textContent=copyButton.textContent;
+    const placements=s.screen==='live'?cameraPlacement(s.layout,s.background):[];
     const placementPanel=document.querySelector<HTMLElement>('#podcast-camera-sizes')!;
     placementPanel.replaceChildren();
-    if(!placements.length)placementPanel.textContent='No frames: position camera sources wherever you prefer.';
+    if(!placements.length)placementPanel.textContent=s.screen==='live'?'No frames: position camera sources wherever you prefer.':'This screen has no camera frames. Add your cameras to the Live scene in OBS.';
     else {
       const table=document.createElement('table');table.className='camera-placement-table';
       const caption=document.createElement('caption');caption.textContent='Camera placement · 1920 × 1080 canvas';table.append(caption);
@@ -129,7 +167,18 @@ function render(persist=true) {
 }
 render(false);
 form.addEventListener('submit',e=>e.preventDefault());
-form.addEventListener('input',e=>{ if((e.target as HTMLInputElement).type==='file') return; feedback.textContent=''; render(); });
+function formInput(e:Event) {
+    const input=e.target as HTMLInputElement;
+    if(input.type==='file') return;
+    if(input.id==='countdown-seconds' && !input.validity.valid) return;
+    if(input.id==='screen-message') messages[settings().screen]=input.value;
+    feedback.textContent=''; render();
+}
+form.addEventListener('input',formInput);
+// The screen tabs sit above the preview but belong to the editor form.
+for (const tab of document.querySelectorAll<HTMLInputElement>('.podcast-screen-tabs input')) tab.addEventListener('input',formInput);
+document.querySelector('#countdown-seconds')!.addEventListener('change',()=>{document.querySelector<HTMLInputElement>('#countdown-seconds')!.value=String(countdownSeconds);});
+document.querySelector('#countdown-restart')!.addEventListener('click',()=>controller.restartCountdown());
 guides.addEventListener('change',()=>render(false));
 document.querySelector('#show-logo')!.addEventListener('change',async e=>{
     const input=e.target as HTMLInputElement, file=input.files?.[0], request=++logoRequest;
@@ -149,10 +198,17 @@ document.querySelector('#podcast-add-obs')!.addEventListener('click',copyObsLink
 const gallery=document.querySelector<HTMLDialogElement>('#podcast-background-dialog')!;
 document.querySelector('#background-change')!.addEventListener('click',()=>gallery.showModal());
 document.querySelector('#background-close')!.addEventListener('click',()=>gallery.close());
-function download(content:string,name:string) {
-    const url=URL.createObjectURL(new Blob([content],{type:'text/html'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
+document.querySelector('#podcast-collection')!.addEventListener('click',()=>{
+    try {
+        const collection=createObsCollection(settings(),location.origin,logo);
+        download(JSON.stringify(collection,null,2),'aether-show-scenes.json','application/json');
+        feedback.textContent='Four scenes downloaded, including your logo if added. In OBS: Scene Collection → Import, select the JSON, then choose the new Aether collection. Add your cameras and microphone before recording. Your existing collection remains available.';
+    } catch { feedback.textContent='The collection could not be created. Please check your show settings and try again.'; }
+});
+function download(content:string,name:string,type='text/html') {
+    const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
-document.querySelector('#podcast-download')!.addEventListener('click',()=>{download(createBroadcastHtml(link.value,logo),'aether-podcast-show.html');document.querySelector<HTMLElement>('#podcast-obs-status')!.textContent='OBS file downloaded for the current settings.';document.querySelector<HTMLElement>('#podcast-export-state')!.textContent='File downloaded for the current settings.';feedback.textContent='OBS file downloaded. In a Browser source, enable Local file and select it.';});
+document.querySelector('#podcast-download')!.addEventListener('click',()=>{download(createBroadcastHtml(link.value,logo),`aether-${settings().screen}.html`);document.querySelector<HTMLElement>('#podcast-obs-status')!.textContent='OBS file downloaded for the current settings.';document.querySelector<HTMLElement>('#podcast-export-state')!.textContent='File downloaded for the current settings.';feedback.textContent='OBS file downloaded. In a Browser source, enable Local file and select it.';});
 document.querySelector('#podcast-open')!.addEventListener('click',()=>{
     const url=logo?URL.createObjectURL(new Blob([createBroadcastHtml(link.value,logo)],{type:'text/html'})):link.value;
     window.open(url,'_blank','noopener,noreferrer');
@@ -202,4 +258,13 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){controller.destr
 #podcast-background-dialog{background:#0b1422;color:#e2e8f0;border:1px solid #324359;border-radius:16px;padding:24px;width:min(760px,calc(100vw - 48px));max-height:80vh;box-sizing:border-box;overflow:auto}#podcast-background-dialog::backdrop{background:rgb(0 0 0 / .75)}.gallery-heading{display:flex;justify-content:space-between;align-items:center;gap:20px}.podcast-backgrounds{grid-template-columns:repeat(3,minmax(0,1fr))}.podcast-backgrounds span>span{font-size:12px}
 @media(min-width:1151px){.podcast-controls{position:sticky;top:24px;max-height:calc(100dvh - 48px);overflow-y:auto;scrollbar-gutter:stable}.podcast-preview{position:sticky;top:24px}.podcast-export{padding:16px}.podcast-hint{margin-bottom:12px}.podcast-grid{grid-template-columns:minmax(0,1fr) 330px}}
 @media(max-width:600px){.podcast-backgrounds{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+
+<style>
+.podcast-screen-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;border:0;padding:0;margin:0 0 14px}
+.podcast-screen-tabs legend{font-size:12px;color:#becbd8;margin-bottom:10px}.podcast-screen-tabs label{position:relative;cursor:pointer}.podcast-screen-tabs input{position:absolute;opacity:0}.podcast-screen-tabs span{display:block;padding:11px 6px;border:1px solid #293d55;border-radius:8px;text-align:center;font-size:12px;color:#becbd8;background:#0b1422}.podcast-screen-tabs input:checked+span{background:#18352e;border-color:#71cba5;color:#b4f4d8}.podcast-screen-tabs input:focus-visible+span{outline:2px solid #8ee5c1;outline-offset:3px}
+.podcast-controls select{width:100%;box-sizing:border-box;border:1px solid #293d55;border-radius:8px;background:#07101c;color:#e2e8f0;padding:11px;font-size:13px}.podcast-controls select:focus-visible{outline:2px solid #8ee5c1;outline-offset:3px}
+.podcast-controls .countdown-toggle{display:flex!important;align-items:center;gap:8px}.podcast-controls input[type=checkbox]{width:auto!important}.podcast-controls input[type=range]{padding:0!important;accent-color:#7de0b4}#countdown-restart{margin-top:12px}#brand-size-value{float:right;color:#a2e7c9}
+[hidden]{display:none!important}
+@media(max-width:600px){.podcast-screen-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>

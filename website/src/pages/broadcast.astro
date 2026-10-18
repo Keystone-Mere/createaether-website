@@ -15,7 +15,14 @@ let logo='';
 function load() {
     const player=document.querySelector<HTMLElement>('#show-player')!, error=document.querySelector<HTMLElement>('#show-error')!;
     try {
-        const settings=readBroadcastHash(location.hash);
+        const [showHash, logoPart] = location.hash.split('&logo=');
+        if (logoPart !== undefined) {
+            if (logoPart.length > 140000) throw new Error('Invalid logo');
+            const embeddedLogo=decodeURIComponent(logoPart);
+            if (!isLogo(embeddedLogo)) throw new Error('Invalid logo');
+            logo=embeddedLogo;
+        }
+        const settings=readBroadcastHash(showHash);
         player.hidden=false; error.hidden=true;
         controller.update(settings,logo,false); document.title=`${settings.show || 'Your show'} - Aether`;
     } catch { player.hidden=true; error.hidden=false; controller.stop(); }
