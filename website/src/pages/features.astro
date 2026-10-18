@@ -1,91 +1,13 @@
 ---
-import PlatformLayers from "../components/PlatformLayers.astro";
-import ArchitectureFlow from "../components/ArchitectureFlow.astro";
+import SiteHeader from '../components/SiteHeader.astro';
+
+
 import '../styles/design-system.css';
 import '../styles/animations.css';
 import '../styles/components.css';
 import PostHog from '../components/posthog.astro';
 
-const features = [
-  {
-    number: '01',
-    id: 'audio',
-    eyebrow: 'Experience Audio',
-    title: 'Ambient soundscapes you can control.',
-    text: 'Aether coordinates ambient soundscapes, playback state, volume and user interaction through one consistent experience system.',
-    items: [
-      'Experience soundscapes',
-  'Play and pause controls',
-  'Adjustable volume',
-  'Locally saved settings',
-    ],
-  },
-  {
-    number: '02',
-    id: 'lighting',
-    eyebrow: 'Experience Lighting',
-    title: 'Create atmosphere through light.',
-    text: 'Lighting reinforces mood, guides attention and gives every digital experience a distinctive visual identity.',
-    items: [
-      'Dynamic glow',
-      'Colour themes',
-      'Responsive intensity',
-      'Atmospheric transitions',
-    ],
-  },
-  {
-    number: '03',
-    id: 'particles',
-    eyebrow: 'Experience Particles',
-    title: 'Bring digital environments to life.',
-    text: 'Subtle movement adds depth and atmosphere while remaining connected to the active experience configuration.',
-    items: [
-      'Dust and embers',
-      'Mist and atmospheric drift',
-      'Weather effects',
-      'Reusable presets',
-    ],
-  },
-  {
-    number: '04',
-    id: 'runtime',
-    eyebrow: 'Experience Runtime',
-    title: 'One orchestration layer for every system.',
-    text: 'Aether coordinates audio, lighting, particles and configuration through a modular event-driven runtime.',
-    items: [
-      'Event dispatcher',
-      'Module registry',
-      'Services registry',
-      'Experience Manager',
-    ],
-  },
-  {
-    number: '05',
-    id: 'studio',
-    eyebrow: 'Aether Studio',
-    title: 'Design and preview experiences visually.',
-    text: 'Studio provides a live environment for configuring, testing and refining immersive experiences before publishing.',
-    items: [
-      'Live preview',
-      'Experience presets',
-      'Real-time controls',
-      'Runtime feedback',
-    ],
-  },
-  {
-  number: '06',
-  id: 'developers',
-  eyebrow: 'Configuration Foundation',
-  title: 'Readable, reusable experience configuration.',
-  text: 'Aether uses structured experience data and modular runtime systems as a foundation for future developer tooling.',
-  items: [
-    'JSON-based presets',
-    'Modular runtime systems',
-    'Lifecycle events',
-    'Extensible foundation',
-  ],
-},
-];
+const features = [{"number": "01", "id": "scenes", "eyebrow": "Scene library", "title": "Find a setting that feels right.", "text": "Start with a ready-made environment or upload a background in the scene editor.", "items": ["Background choices", "Your own image uploads", "Live scene preview", "Full-screen viewing"]}, {"number": "02", "id": "podcast", "eyebrow": "Podcast & Stream", "title": "Give your show a consistent look.", "text": "Create a reusable show setting and bring it into OBS for recording or streaming.", "items": ["One host, two people or no frames", "Show titles, names, colour and logo", "Starting Soon, Live, Be Right Back and Ending", "Four-scene OBS collection export"]}, {"number": "03", "id": "relaxation", "eyebrow": "Relaxation", "title": "Make time for a quiet moment.", "text": "Choose a setting, duration and optional on-screen guidance in the relaxation session builder.", "items": ["5, 10 or 20 minutes, or untimed", "Relax, focus or rest", "Optional guidance and sound where available", "Immersive underwater view and creature controls"]}, {"number": "04", "id": "atmosphere", "eyebrow": "Atmosphere controls", "title": "Shape the mood of your scene.", "text": "Adjust the effects available for your chosen experience and see the result as you edit.", "items": ["Layered audio and volume controls", "Lighting and colour", "Fog, weather and particles", "Scene-specific presets and settings"]}, {"number": "05", "id": "saved", "eyebrow": "Your experiences", "title": "Keep a version of your own.", "text": "Save an edited experience as a copy, then find it again in My Experiences in the same browser.", "items": ["Name your creation", "Rename or delete saved copies", "Import an exported experience", "Local browser storage on this device"]}, {"number": "06", "id": "obs", "eyebrow": "OBS workflow", "title": "Take your setting into your show.", "text": "Export silent browser-rendered visuals, then add your cameras and microphone in OBS.", "items": ["Copy an OBS playback link", "Download an HTML backdrop file", "Include a logo with the supported file export", "Export again after editing"]}];
 import SiteFooter from '../components/SiteFooter.astro';
 ---
 
@@ -99,7 +21,7 @@ import SiteFooter from '../components/SiteFooter.astro';
     />
     <meta
       name="description"
-      content="Explore Aether's audio, lighting, particle, runtime, Studio and developer capabilities."
+      content="Explore Aether’s relaxation sessions, scene editor, podcast branding and silent OBS exports."
     />
     <title>Features — Aether</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -107,49 +29,24 @@ import SiteFooter from '../components/SiteFooter.astro';
   </head>
 
   <body>
-    <header class="site-header">
-      <a class="brand" href="/" aria-label="Aether home">
-        <img
-          src="/brand/aether-mark.svg"
-          alt=""
-          class="brand-logo"
-          width="80"
-          height="80"
-        />
-        <span>Aether</span>
-      </a>
+    <SiteHeader />
 
-      <nav aria-label="Primary navigation">
-        <a href="/">Overview</a>
-        <a href="/features/" aria-current="page">Features</a>
-        <a href="/studio/">Studio</a>
-        <a
-          href="https://github.com/Benchelt/createaether-website"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Developers
-        </a>
-      </nav>
-    </header>
-
-    <main>
+    <main id="main">
       <section class="features-hero">
         <div class="features-hero-grid" aria-hidden="true"></div>
 
         <div class="features-hero-content">
           <p class="eyebrow">Aether Features</p>
 
-          <h1>Build immersive digital experiences.</h1>
+          <h1>Scenes to unwind in. Settings to create with.</h1>
 
           <p class="features-intro">
-            Aether combines controllable audio, atmospheric visuals and an
-            event-driven runtime into one unified experience platform.
+            Build a relaxation session, personalise a podcast setting, or shape an environment with sound, lighting and animated effects.
           </p>
 
           <div class="actions">
             <a class="button primary" href="#platform">
-              Explore the platform ↓
+              Explore the features ↓
             </a>
 
             <a class="button secondary" href="/studio/">
@@ -160,14 +57,12 @@ import SiteFooter from '../components/SiteFooter.astro';
       </section>
 
       <section class="platform-introduction" id="platform">
-        <p class="eyebrow">One unified platform</p>
+        <p class="eyebrow">Create in your browser</p>
 
-        <h2>Immersion without complexity.</h2>
+        <h2>Choose your scene. Make it yours.</h2>
 
         <p>
-          Aether does not treat sound, lighting and particles as disconnected
-          effects. Every capability works through a shared runtime so complete
-          experiences remain consistent, maintainable and extensible.
+          Start with a ready-made setting and use the controls available for that experience. Enjoy it in full screen, save your own version, or export its visuals to OBS.
         </p>
       </section>
 
@@ -194,32 +89,14 @@ import SiteFooter from '../components/SiteFooter.astro';
         }
       </section>
 
-      <section class="developer-example">
-        <div>
-          <p class="eyebrow">Designed for clarity</p>
-          <h2>A readable developer experience.</h2>
 
-          <p>
-            Experiences are controlled through a predictable runtime API,
-            allowing systems to communicate without becoming tightly coupled.
-          </p>
-        </div>
-
-        <pre><code>{`Aether.Experience.load('Temple');
-
-const audio = Aether.Services.get('audio');
-
-Aether.Events.on('experience:loaded', (experience) => {
-  console.log(experience);
-});`}</code></pre>
-      </section>
 
       <section class="features-cta">
         <p class="eyebrow">Start creating</p>
-        <h2>One platform. Infinite atmospheres.</h2>
+        <h2>What would you like to create?</h2>
 
         <p>
-          Build digital experiences that people do not just use—they remember.
+          Set the scene for your next episode, or take a moment to unwind.
         </p>
 
         <div class="actions">
@@ -229,16 +106,15 @@ Aether.Events.on('experience:loaded', (experience) => {
 
           <a
             class="button secondary"
-            href="https://github.com/Benchelt/createaether-website"
+            href="/studio/guided-relaxation/"
             target="_blank"
             rel="noreferrer"
           >
-            View GitHub
+            Try relaxation
           </a>
         </div>
       </section>
-      <section class="engine-layers" aria-label="Aether runtime layers"><h2>Inside the atmosphere engine.</h2><PlatformLayers /></section>
-      <ArchitectureFlow />
+      <section class="technology-note" id="architecture"><h2>Built on the Aether atmosphere engine</h2><p>A shared browser runtime brings scenes, audio and visual effects together. For technical details and the current source, visit <a href="https://github.com/Keystone-Mere/createaether-website" target="_blank" rel="noopener noreferrer">GitHub ↗</a>.</p></section>
     </main>
 
     <SiteFooter />
@@ -497,3 +373,5 @@ Aether.Events.on('experience:loaded', (experience) => {
   }
 .engine-layers { padding:64px 0; }
 </style>
+
+<style>.technology-note{width:min(1180px,calc(100% - 3rem));margin:48px auto;color:#cbd5e1;line-height:1.8}.technology-note a{color:#7dd3fc}.features-hero{min-height:auto;padding:56px max(24px,calc((100% - 1180px)/2)) 64px}.features-hero h1{font-size:clamp(2.7rem,6vw,5.5rem)}.platform-introduction{padding:48px 0}.feature-card{min-height:0;padding:28px}.feature-number{margin-bottom:24px}.features-grid{padding-bottom:48px}</style>

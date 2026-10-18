@@ -1,0 +1,19 @@
+---
+const path = Astro.url.pathname;
+const links = [
+ {label:'Experiences',href:'/studio/'},
+ {label:'Relaxation',href:'/studio/guided-relaxation/'},
+ {label:'Podcast & Stream',href:'/podcasts/'},
+ {label:'Features',href:'/features/'},
+];
+---
+<a class="aether-skip" href="#main">Skip to content</a>
+<header class="aether-header">
+ <a class="aether-brand" href="/" aria-label="Aether home"><img src="/brand/aether-mark.svg" alt="" width="64" height="64"/><span>Aether</span></a>
+ <nav aria-label="Primary navigation">{links.map(link => <a href={link.href} aria-current={path.replace(/\/$/,'')===link.href.replace(/\/$/,'')?'page':undefined}>{link.label}</a>)}</nav>
+</header>
+<style>
+.aether-header{box-sizing:border-box;width:min(1180px,calc(100% - 40px));margin:auto;padding:24px 0;display:flex;align-items:center;justify-content:space-between;gap:24px;color:#f8fafc}
+.aether-header a{text-decoration:none;color:inherit}.aether-brand{display:inline-flex;align-items:center;gap:12px;font-size:30px;font-weight:700;letter-spacing:-.04em}.aether-brand img{display:block;flex-shrink:0}.aether-header nav{display:flex;flex-wrap:wrap;gap:12px 24px}.aether-header nav a{font-size:14px;color:#b8c7dc;padding:10px 0}.aether-header nav a:hover,.aether-header nav a[aria-current]{color:#7dd3fc}.aether-header a:focus-visible{outline:2px solid #7dd3fc;outline-offset:5px;border-radius:3px}.aether-skip{position:fixed;top:8px;left:12px;z-index:1000;transform:translateY(-180%);background:#f8fafc;color:#050914;padding:12px;border-radius:8px}.aether-skip:focus{transform:none}
+@media(max-width:760px){.aether-header{align-items:flex-start;flex-direction:column;gap:12px;padding:18px 0}.aether-brand img{width:44px;height:44px}.aether-brand{font-size:26px}.aether-header nav{gap:6px 18px;width:100%}}
+</style>

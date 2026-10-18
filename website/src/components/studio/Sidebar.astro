@@ -1,7 +1,7 @@
 ---
 const navigation = [
   { label: 'Experiences', href: '/studio', active: Astro.url.pathname === '/studio' || Astro.url.pathname === '/studio/' || Astro.url.pathname.startsWith('/studio/experiences') || Astro.url.pathname.startsWith('/studio/listen') },
-  { label: 'Guided relaxation', href: '/studio/guided-relaxation/', active: ['/studio/guided-relaxation', '/studio/temple-relaxation', '/studio/evening-wind-down'].some(path => Astro.url.pathname.startsWith(path)) },
+  { label: 'Guided relaxation', href: '/studio/guided-relaxation/', active: ['/studio/guided-relaxation', '/studio/temple-relaxation', '/studio/evening-wind-down', '/studio/relaxation-player', '/studio/morning-in-the-forest', '/studio/underwater-sanctuary'].some(path => Astro.url.pathname.startsWith(path)) },
   { label: 'Podcast & Stream', href: '/studio/podcast/', active: Astro.url.pathname.startsWith('/studio/podcast') },
 ];
 
@@ -9,7 +9,7 @@ const secondaryNavigation = [
   { label: 'About Aether', href: '/features/' },
   {
     label: 'Documentation',
-    href: 'https://github.com/Keystone-Mere/createaether-website/tree/main/docs',
+    href: 'https://github.com/Keystone-Mere/createaether-website',
   },
 ];
 ---
@@ -21,7 +21,7 @@ const secondaryNavigation = [
 
       <span class="studio-sidebar__identity">
         <strong>Create Aether</strong>
-        <small>Atmosphere Composer</small>
+        <small>Scenes · Relaxation · Broadcast</small>
       </span>
     </a>
   </div>
@@ -76,14 +76,7 @@ const secondaryNavigation = [
     </ul>
   </nav>
 
-  <div class="studio-sidebar__profile">
-    <span class="studio-sidebar__avatar">BR</span>
-
-    <span class="studio-sidebar__profile-details">
-      <strong>Ben Roberts</strong>
-      <small>Workspace owner</small>
-    </span>
-  </div>
+  <div class="studio-sidebar__profile"><span class="studio-sidebar__profile-details"><strong>Your browser workspace</strong><small>Saved locally on this device</small></span></div>
 </aside>
 
 <style>

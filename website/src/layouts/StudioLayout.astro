@@ -9,8 +9,8 @@ interface Props {
 }
 
 const {
-  title = 'Aether Atmosphere Composer',
-  description = 'Build and shape immersive atmospheres in a local MVP workspace.',
+  title = 'Aether Studio',
+  description = 'Create scenes, build relaxation sessions and design silent podcast settings for OBS.',
   privacyMode = false,
 } = Astro.props;
 ---
@@ -29,10 +29,11 @@ const {
   </head>
 
   <body>
+    <a class="studio-skip" href="#studio-main">Skip to workspace</a>
     <div class="studio-shell">
       <Sidebar />
 
-      <main class="studio-main">
+      <main id="studio-main" class="studio-main">
         <slot />
       </main>
     </div>
@@ -104,3 +105,5 @@ const {
     }
   }
 </style>
+
+<style>.studio-skip{position:fixed;top:8px;left:12px;z-index:100;transform:translateY(-180%);background:#f8fafc;color:#050914;padding:12px;border-radius:8px}.studio-skip:focus{transform:none}</style>

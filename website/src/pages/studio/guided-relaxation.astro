@@ -1,11 +1,21 @@
 ---
 import StudioLayout from '../../layouts/StudioLayout.astro';
 ---
-<StudioLayout title="Guided relaxation" description="Choose a quiet guided session." privacyMode>
+<StudioLayout title="Guided relaxation" description="Build a relaxation session with your choice of scene, duration and optional on-screen guidance." privacyMode>
  <section class="sessions">
   <p class="eyebrow">AETHER / GUIDED RELAXATION</p>
   <h1>Take a moment for yourself</h1>
   <p class="intro">Choose a setting and follow gentle on-screen guidance. Sound is optional.</p>
+  <section class="builder" aria-labelledby="builder-title">
+   <div class="builder-heading"><p class="eyebrow">PERSONALISE YOUR SESSION</p><h2 id="builder-title">Create your moment of calm</h2><p>Choose your environment, duration and guidance, then begin your personalised session.</p></div>
+   <div class="builder-fields">
+    <fieldset><legend>1. What would you like to do?</legend><div class="choices"><label><input type="radio" name="goal" value="relax" checked /> Relax</label><label><input type="radio" name="goal" value="focus" /> Focus</label><label><input type="radio" name="goal" value="rest" /> Rest</label></div></fieldset>
+    <fieldset><legend>2. Choose your environment</legend><div class="choices scene-choices"><label><input type="radio" name="scene" value="underwater" checked /> Underwater</label><label><input type="radio" name="scene" value="forest" /> Forest</label><label><input type="radio" name="scene" value="temple" /> Temple</label><label><input type="radio" name="scene" value="garden" /> Night Garden</label></div></fieldset>
+    <div class="setting-row"><label for="session-duration">3. Duration <select id="session-duration"><option>5 minutes</option><option selected>10 minutes</option><option>20 minutes</option><option>Untimed</option></select></label><label for="session-guidance">4. Guidance <select id="session-guidance"><option selected>On-screen guidance</option><option>Silent relaxation</option></select></label></div>
+   </div>
+   <div class="builder-footer"><p id="session-summary" aria-live="polite">Relax · Underwater · 10 minutes · On-screen guidance</p><a id="session-open" class="builder-cta" href="/studio/relaxation-player/?goal=relax&amp;scene=underwater&amp;duration=10%20minutes&amp;guidance=On-screen%20guidance">Begin my session →</a></div>
+  </section>
+  <h2 class="library-heading">Or explore the existing experiences</h2>
   <div class="session-grid">
    <a class="session-card" href="/studio/underwater-sanctuary/">
     <img src="/images/experience-covers/underwater-sanctuary.png" alt="Wooden sanctuary overlooking an underwater window" width="664" height="441" />
@@ -41,4 +51,46 @@ h1 {font-size:clamp(32px,5vw,54px);margin:14px 0;line-height:1.1;}
 .session-card:hover {border-color:#7dd3fc;}
 .session-card:focus-visible {outline:3px solid #7dd3fc;outline-offset:4px;}
 @media(max-width:650px){.session-grid {grid-template-columns:1fr;}}
+</style>
+
+<script>
+ const routes: Record<string,string> = {underwater:'/studio/underwater-sanctuary/',forest:'/studio/morning-in-the-forest/',temple:'/studio/temple-relaxation/',garden:'/studio/evening-wind-down/'};
+ const names: Record<string,string> = {underwater:'Underwater',forest:'Forest',temple:'Temple',garden:'Night Garden'};
+ const section = document.querySelector<HTMLElement>('.builder');
+ if(section){
+  const update=()=>{
+   const goal=section.querySelector<HTMLInputElement>('input[name="goal"]:checked')?.value ?? 'relax';
+   const scene=section.querySelector<HTMLInputElement>('input[name="scene"]:checked')?.value ?? 'underwater';
+   const duration=section.querySelector<HTMLSelectElement>('#session-duration')?.value ?? '10 minutes';
+   const guidance=section.querySelector<HTMLSelectElement>('#session-guidance')?.value ?? 'On-screen guidance';
+   const summary=section.querySelector<HTMLElement>('#session-summary');
+   const link=section.querySelector<HTMLAnchorElement>('#session-open');
+   if(summary) summary.textContent=`${goal.charAt(0).toUpperCase()+goal.slice(1)} · ${names[scene]} · ${duration} · ${guidance}`;
+   if(link) link.href=`/studio/relaxation-player/?goal=${encodeURIComponent(goal)}&scene=${encodeURIComponent(scene)}&duration=${encodeURIComponent(duration)}&guidance=${encodeURIComponent(guidance)}`;
+  };
+  section.addEventListener('change',update);
+  update();
+ }
+</script>
+<style>
+ .builder{border:1px solid #28556b;border-radius:18px;background:linear-gradient(135deg,#101e2d,#0e1828);padding:clamp(18px,3vw,30px);margin:0 0 34px;color:#f8fafc}
+ .builder-heading h2{font-size:clamp(23px,3vw,32px);margin:10px 0}
+ .builder-heading p:last-child{color:#cbd5e1;line-height:1.6;max-width:750px}
+ .builder-fields{display:grid;gap:22px;margin-top:24px}
+ .builder fieldset{border:0;padding:0;margin:0;min-width:0}
+ .builder legend,.setting-row label{font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:12px}
+ .choices{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+ .choices label{display:flex;align-items:center;gap:9px;cursor:pointer;border:1px solid #405066;border-radius:10px;padding:11px 15px;background:#111e2e;color:#e2e8f0}
+ .choices label:has(input:checked){border-color:#6ee7b7;background:#12342f}
+ .choices input{accent-color:#6ee7b7}
+ .setting-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+ .setting-row label{display:flex;flex-direction:column;gap:10px}
+ .setting-row select{width:100%;border:1px solid #405066;border-radius:10px;padding:12px;background:#0b1524;color:#f8fafc;font:inherit}
+ .builder-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid #334155;margin-top:24px;padding-top:20px}
+ .builder-footer p{color:#cbd5e1;margin:0}
+ .builder-cta{display:inline-block;background:#6ee7b7;color:#06251d;border-radius:10px;padding:12px 18px;font-weight:750;text-decoration:none}
+ .builder-cta:hover{background:#a7f3d0}
+ .builder :focus-visible{outline:3px solid #7dd3fc;outline-offset:3px}
+ .library-heading{font-size:22px;margin:0 0 20px;color:#f8fafc}
+ @media(max-width:650px){.setting-row{grid-template-columns:1fr}.builder-footer{align-items:stretch}.builder-cta{text-align:center}}
 </style>
