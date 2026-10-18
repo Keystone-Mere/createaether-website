@@ -33,7 +33,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             <div class="selected-background"><img id="selected-background-image" src="" alt="" /><span id="selected-background-label"></span></div>
             <button id="background-change" type="button">Change background</button>
                         <dialog id="podcast-background-dialog" aria-labelledby="background-dialog-title"><div class="gallery-heading"><h2 id="background-dialog-title">Choose your background</h2><button id="background-close" type="button" autofocus>Done</button></div>{broadcastBackgroundGroups.map(group => <div class="podcast-background-group"><h3>{group.name}</h3><div class="podcast-backgrounds">{group.assets.map(asset => <label><input type="radio" name="background" value={asset.id} checked={asset.id === 'wirral-liverpool'} /><span><img src={asset.src} alt="" loading="lazy" /><span>{asset.name}</span></span></label>)}</div></div>)}<p class="podcast-field-help">Switch scenes while keeping your branding and camera layout. Copy a fresh link to update OBS.</p></dialog></details>
-            <details id="podcast-layout-section" class="podcast-control-section" open><summary>Layout</summary>            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span>Two people</span></label><label><input type="radio" name="layout" value="background" /><span>No frames</span></label></div></fieldset>
+            <details id="podcast-layout-section" class="podcast-control-section" open><summary>Layout</summary>            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/><rect class="layout-thumb-frame" x="34" y="22" width="92" height="52" rx="4"/></svg>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/><rect class="layout-thumb-frame" x="12" y="29" width="65" height="37" rx="4"/><rect class="layout-thumb-frame" x="83" y="29" width="65" height="37" rx="4"/></svg>Two people</span></label><label><input type="radio" name="layout" value="background" /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/></svg>No frames</span></label></div></fieldset>
             <div class="podcast-names"><div><label for="host-name">Host name</label><input id="host-name" name="host" maxlength="40" value="Host" /></div><div id="guest-name-field"><label for="guest-name">Guest name</label><input id="guest-name" name="guest" maxlength="40" value="Guest" /></div></div></details>
             <details class="podcast-control-section" open><summary>Branding</summary>
             <label for="show-name">Show name</label><input id="show-name" name="show" maxlength="80" value="The Evening Conversation" />
@@ -316,4 +316,22 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){controller.destr
  .podcast-preview .podcast-screen-tabs span{font-size:10px;padding:8px 3px}
 }
 @media(max-height:500px) and (max-width:1150px){.podcast-preview{position:static;max-height:none}.podcast-preview :global(.broadcast-stage){max-width:440px}}
+</style>
+
+<style>
+/* Layout diagrams are decorative; the native radio labels name each choice. */
+.podcast-layouts label > span { padding:6px 6px 10px; transition:border-color .15s,background-color .15s; }
+.podcast-layouts .layout-thumbnail { display:block; width:100%; height:auto; margin:0 0 8px; }
+.layout-thumb-sky { fill:#101f30; stroke:#30465d; }
+.layout-thumb-horizon { fill:#223c46; }
+.layout-thumb-frame { fill:#0b1422; fill-opacity:.8; stroke:#94a3b8; stroke-width:2; }
+.podcast-layouts label:hover > span { border-color:#8ee5c1; }
+.podcast-layouts input:checked + span .layout-thumb-frame { stroke:#8ee5c1; }
+.podcast-layouts input:checked + span .layout-thumb-sky { stroke:#71cba5; }
+@media (prefers-reduced-motion:reduce) { .podcast-layouts label > span { transition:none; } }
+@media (forced-colors:active) {
+ .layout-thumb-sky,.layout-thumb-horizon { fill:Canvas; stroke:CanvasText; }
+ .layout-thumb-frame { fill:Canvas; stroke:CanvasText; }
+ .podcast-layouts input:checked + span { outline:2px solid Highlight; }
+}
 </style>
