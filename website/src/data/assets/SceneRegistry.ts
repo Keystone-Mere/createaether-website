@@ -58,14 +58,41 @@ const asset = (id:string, name:string, src:string, sceneId:SceneId | undefined, 
   particles:EffectBoundary | null = null, status:SceneAsset['geometry']['status']='none',
   credit:AssetCredit=unverified, provenance:SceneAsset['provenance']='unverified', aspectRatio='16 / 9'): SceneAsset =>
   ({ id,name,src,sceneId,role,visualScene,aspectRatio,credit,provenance,geometry:{status,particles} });
+// Curved coastal entrance, inset slightly from plaster and threshold (source-image fractions).
+const coastalEntrance: EffectBoundary = { kind:'polygons', polygons:[Array.from({length:65}, (_,i) => {
+  const angle = 2 * Math.PI * i / 64;
+  return [.511 + .185 * Math.cos(angle), Math.min(.731, .510 + .331 * Math.sin(angle))] as const;
+})] };
+// Each cabin pane is inset from timber frames, including the two triangular upper lights.
+const cabinWindows: EffectBoundary = { kind:'polygons', polygons:[
+  [[.398,.179],[.596,.179],[.609,.198],[.609,.657],[.385,.657],[.385,.198]],
+  [[.244,.403],[.341,.258],[.341,.633],[.244,.633]],
+  [[.653,.258],[.750,.403],[.750,.633],[.653,.633]],
+  [[.430,.128],[.490,.042],[.490,.128]],
+  [[.504,.042],[.565,.128],[.504,.128]],
+] };
+// Pavilion roof, columns, threshold and foreground stone lantern stay dry.
+const bambooOpenings: EffectBoundary = { kind:'polygons', polygons:[
+  [[.184,.242],[.823,.242],[.823,.748],[.263,.748],[.263,.655],[.235,.620],[.208,.655],[.208,.748],[.184,.748]],
+  [[0,.121],[.138,.230],[.138,.751],[0,.805]],
+  [[.868,.230],[1,.121],[1,.805],[.868,.751]],
+] };
+// Lakeside pavilion: inset below hanging rafters, outside both posts, above the deck.
+const lakesideOpenings: EffectBoundary = { kind:'polygons', polygons:[
+  [[.175,.168],[.821,.168],[.821,.764],[.175,.764]],
+  [[0,.175],[.140,.175],[.140,.764],[0,.841]],
+  [[.856,.175],[1,.175],[1,.841],[.856,.764]],
+] };
 export const sceneAssets: readonly SceneAsset[] = [
+  asset('bamboo-rain-pavilion','Bamboo rain pavilion','/images/experience-covers/bamboo-rain-pavilion.jpg','forest','alternative','custom',bambooOpenings,'measured'),
+  asset('indoor-snow-cabin','Snow cabin','/images/experience-covers/indoor-snow-cabin.jpg','retreat','alternative','custom',cabinWindows,'measured'),
   asset('desert','Desert','/images/experience-covers/desert-valley-dusk.webp','desert','original','custom',null,'none'),
   asset('lighthouse-retreat','Lighthouse retreat','/images/experience-covers/lighthouse-retreat.webp','ocean','alternative','custom',{kind:'rectangle',x:0.37,y:0.43,width:0.26,height:0.17},'measured'),
   asset('misty-marshes','Misty marshes','/images/experience-covers/misty-marshes.webp','forest','alternative','custom',null,'none'),
   asset('mountain-sanctuary','Mountain sanctuary','/images/experience-covers/mountain-sanctuary.webp','temple','alternative','custom',null,'none'),
-  asset('ocean-pod','Ocean pod','/images/experience-covers/ocean-pod.webp','ocean','alternative','custom',{kind:'rectangle',x:0.42,y:0.5,width:0.27,height:0.13},'measured'),
+  asset('ocean-pod','Coastal rain & incense','/images/experience-covers/ocean-pod-incense.png','ocean','alternative','custom',coastalEntrance,'measured',{status:'documented',creator:'AI-generated for Aether',note:'Edited with OpenAI image generation, October 2026. Imagined coastal room with incense and one pillar candle.'},'illustration'),
   asset('outback-veranda','Outback veranda','/images/experience-covers/outback-veranda.webp','desert','alternative','custom',null,'none'),
-  asset('outside-lake-day','Lakeside daylight','/images/experience-covers/outside-lake-day.webp','retreat','alternative','custom',null,'none'),
+  asset('outside-lake-day','Lakeside daylight','/images/experience-covers/outside-lake-day.webp','retreat','alternative','custom',lakesideOpenings,'measured'),
   asset('waterfall-tropical-day','Tropical waterfall','/images/experience-covers/waterfall-tropical-day.webp','forest','alternative','custom',null,'none'),
   asset('japanese-garden-day','Japanese garden','/images/experience-covers/japanese-garden-day.webp','forest','alternative','custom',null,'none'),
   asset('kerala-houseboat','Kerala houseboat','/images/experience-covers/kerala-houseboat.webp','retreat','alternative','custom',null,'none'),

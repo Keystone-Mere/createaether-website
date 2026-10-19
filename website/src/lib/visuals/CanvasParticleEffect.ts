@@ -1,3 +1,4 @@
+import { sceneImageRect } from '../rendering/SceneImageGeometry';
 import { displayedAssetId } from '../player/ScenePresentation';
 import { particleBoundary } from '../../data/scenes/EffectBoundaries';
 import { clipEffectBoundary } from '../rendering/EffectBoundary';
@@ -152,7 +153,18 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
 
     const sceneId = this.stage instanceof HTMLElement ? this.stage.dataset.scene : undefined;
     const boundary = particleBoundary(sceneId, this.settings.preset, this.resolveMotion(), this.backgroundId, displayedAssetId(this.stage));
-    if (boundary) clipEffectBoundary(context, boundary, width, height);
+    if (boundary) {
+      const image = this.stage?.querySelector<HTMLImageElement>('.preview-scene-image');
+      if (image?.naturalWidth && image.naturalHeight) {
+        const pixels = sceneImageRect(frame.width, frame.height, image.naturalWidth, image.naturalHeight, getComputedStyle(image).objectFit);
+        const rect = { x:pixels.x * width / frame.width, y:pixels.y * height / frame.height,
+          width:pixels.width * width / frame.width, height:pixels.height * height / frame.height };
+        // Keep the clipping region tied to the artwork when cover crops the image.
+        context.translate(rect.x, rect.y);
+        clipEffectBoundary(context, boundary, rect.width, rect.height);
+        context.translate(-rect.x, -rect.y);
+      } else { context.restore(); return; }
+    }
 
     if (this.settings.preset === "ocean-spray" && this.resolveMotion() === "flow") {
       this.renderOceanWaves(context, deltaSeconds, width, height);

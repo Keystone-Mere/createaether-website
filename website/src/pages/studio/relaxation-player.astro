@@ -6,20 +6,20 @@ import StudioLayout from '../../layouts/StudioLayout.astro';
 <a href="/studio/guided-relaxation/">← Change your session</a>
 <p class="eyebrow">AETHER / PERSONALISED RELAXATION</p><h1 id="session-title">Your moment of calm</h1><p id="session-detail">Settle in and begin when you're ready.</p>
 <div id="relax-player" class="player">
- <div class="scene"><img id="scene-image" src="/images/experience-covers/underwater-sanctuary.png" alt="Underwater sanctuary"/><canvas id="living-fish" class="living-fish" aria-hidden="true"></canvas><div id="cue" class="cue"><strong id="cue-heading">Take a moment</strong><p id="cue-body">When you're ready, begin your session.</p></div></div>
- <div class="controls"><button id="toggle" type="button">Begin session</button><button id="restart" type="button">Restart</button><button id="full" type="button">Full screen</button><button id="view" type="button" aria-pressed="false">Immersive view</button><button id="fit" type="button" aria-pressed="true">Fill screen</button><label id="fish-options" class="fish-options">Creatures <select id="fish-species"><option value="school">Schooling fish</option><option value="ray">Ray</option><option value="shark">Shark</option></select></label><label id="fish-count-wrap" class="fish-options">Number <input id="fish-count" type="range" min="1" max="16" value="8"/><output id="fish-count-label">8</output></label><label id="fish-speed-wrap" class="fish-options">Speed <input id="fish-speed" type="range" min="25" max="150" step="5" value="75"/><output id="fish-speed-label">75%</output></label><label id="fish-still-wrap" class="fish-options"><input id="fish-still" type="checkbox"/> Still scene</label><span id="clock" role="timer">10:00</span><label><input id="guidance-toggle" type="checkbox" checked/> Show guidance</label><label>Sound <input id="volume" type="range" min="0" max="100" value="20" aria-label="Sound volume"/></label></div>
+ <div class="scene"><img id="scene-image" src="/images/relaxation/deep-ocean-sanctuary.webp" alt="Underwater sanctuary"/><canvas id="living-fish" class="living-fish" aria-hidden="true"></canvas><div id="cue" class="cue"><strong id="cue-heading">Take a moment</strong><p id="cue-body">When you're ready, begin your session.</p></div></div>
+ <div class="controls"><button id="toggle" type="button">Begin session</button><button id="restart" type="button">Restart</button><button id="full" type="button">Full screen</button><button id="fit" type="button" aria-pressed="true">Fill screen</button><label id="fish-options" class="fish-options">Creatures <select id="fish-species"><option value="school">Schooling fish</option><option value="ray">Ray</option><option value="shark">Shark</option></select></label><label id="fish-count-wrap" class="fish-options">Number <input id="fish-count" type="range" min="1" max="16" value="8"/><output id="fish-count-label">8</output></label><label id="fish-speed-wrap" class="fish-options">Speed <input id="fish-speed" type="range" min="25" max="150" step="5" value="75"/><output id="fish-speed-label">75%</output></label><label id="fish-still-wrap" class="fish-options"><input id="fish-still" type="checkbox"/> Still scene</label><span id="clock" role="timer">10:00</span><label><input id="guidance-toggle" type="checkbox" checked/> Show guidance</label><label>Sound <input id="volume" type="range" min="0" max="100" value="20" aria-label="Sound volume"/></label></div>
 </div><p id="status" role="status">Ready to begin. Sound is optional.</p><audio id="ambient" loop preload="none"></audio>
 </section>
 </StudioLayout>
 <script>
  import { UnderwaterFish } from '../../lib/visuals/UnderwaterFish.js';
- const scenes:Record<string,{name:string,image:string,audio:string}>={underwater:{name:'Underwater Sanctuary',image:'/images/experience-covers/underwater-sanctuary.png',audio:''},forest:{name:'Forest Stillness',image:'/images/experience-covers/forest-dawn.webp',audio:'/audio/forest_wind.mp3'},temple:{name:'Candlelit Temple',image:'/images/experience-covers/temple.jpg',audio:'/audio/fireplace.mp3'},garden:{name:'Night Garden',image:'/images/experience-covers/night-garden.jpg',audio:'/audio/forest_wind.mp3'}};
+ const scenes:Record<string,{name:string,image:string,audio:string}>={underwater:{name:'Underwater Sanctuary',image:'/images/relaxation/deep-ocean-sanctuary.webp',audio:''},forest:{name:'Forest Stillness',image:'/images/experience-covers/forest-dawn.webp',audio:'/audio/forest_wind.mp3'},temple:{name:'Candlelit Temple',image:'/images/experience-covers/temple.jpg',audio:'/audio/fireplace.mp3'},garden:{name:'Night Garden',image:'/images/experience-covers/night-garden.jpg',audio:'/audio/forest_wind.mp3'}};
  const params=new URLSearchParams(location.search);const scene=scenes[params.get('scene')||'']||scenes.underwater;
  const goal=['relax','focus','rest'].includes(params.get('goal')||'')?params.get('goal')!:'relax';
  const requested=params.get('duration')||'10 minutes';const duration=requested==='Untimed'?null:({'5 minutes':300,'10 minutes':600,'20 minutes':1200} as Record<string,number>)[requested]??600;
  const guided=params.get('guidance')!=='Silent relaxation';
  const $=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
- const player=$<HTMLElement>('relax-player'),image=$<HTMLImageElement>('scene-image'),audio=$<HTMLAudioElement>('ambient'),toggle=$<HTMLButtonElement>('toggle'),restart=$<HTMLButtonElement>('restart'),full=$<HTMLButtonElement>('full'),clock=$<HTMLElement>('clock'),status=$<HTMLElement>('status'),cue=$<HTMLElement>('cue'),cueHeading=$<HTMLElement>('cue-heading'),cueBody=$<HTMLElement>('cue-body'),guidanceToggle=$<HTMLInputElement>('guidance-toggle'),volume=$<HTMLInputElement>('volume'),view=$<HTMLButtonElement>('view'),fit=$<HTMLButtonElement>('fit');
+ const player=$<HTMLElement>('relax-player'),image=$<HTMLImageElement>('scene-image'),audio=$<HTMLAudioElement>('ambient'),toggle=$<HTMLButtonElement>('toggle'),restart=$<HTMLButtonElement>('restart'),full=$<HTMLButtonElement>('full'),clock=$<HTMLElement>('clock'),status=$<HTMLElement>('status'),cue=$<HTMLElement>('cue'),cueHeading=$<HTMLElement>('cue-heading'),cueBody=$<HTMLElement>('cue-body'),guidanceToggle=$<HTMLInputElement>('guidance-toggle'),volume=$<HTMLInputElement>('volume'),fit=$<HTMLButtonElement>('fit');
  image.src=scene.image;image.alt=scene.name;audio.src=scene.audio;$<HTMLElement>('session-title').textContent=scene.name;$<HTMLElement>('session-detail').textContent=`${goal[0].toUpperCase()+goal.slice(1)} · ${requested} · ${guided?'On-screen guidance':'Silent relaxation'}`;
  guidanceToggle.checked=guided;cue.hidden=!guided;volume.disabled=!scene.audio;audio.volume=.2;
  const fishCanvas=$<HTMLCanvasElement>('living-fish');
@@ -32,32 +32,21 @@ import StudioLayout from '../../layouts/StudioLayout.astro';
  let fish:UnderwaterFish|null=null;
  function syncFish(){if(!underwater||!fish)return;if(running&&!fishStill.checked&&!document.hidden)fish.start();else fish.pause();}
  function rebuildFish(){if(!underwater)return;fish?.destroy();fishCount.max=String(fishLimits[fishSpecies.value]??16);fishCount.value=String(Math.min(Number(fishCount.value),Number(fishCount.max)));fishCountLabel.value=fishCount.value;fishSpeedLabel.value=fishSpeed.value+'%';fish=new UnderwaterFish(fishCanvas,Number(fishCount.value),fishSpecies.value,Number(fishSpeed.value)/100);syncFish();}
-  // Align the fish canvas to the aquarium glass in the source image, not to the viewport.
-  // Fractions describe the glass in underwater-sanctuary.png (left, top, right, bottom).
-  const aquariumGlass={left:0.185,top:0.20,right:0.885,bottom:0.745};
+  // Keep creatures inside the displayed reef image, including contain-mode letterboxing.
+
+
   const sceneBox=player.querySelector<HTMLElement>('.scene')!;
   function positionFish(){
     if(!underwater)return;
     const sw=sceneBox.clientWidth,sh=sceneBox.clientHeight;
-    // The dedicated immersive artwork has no glass boundary.
-    if(player.classList.contains('immersive-view')){
-      Object.assign(fishCanvas.style,{left:'0px',top:'0px',width:`${sw}px`,height:`${sh}px`});
-      return;
-    }
+
     const iw=image.naturalWidth,ih=image.naturalHeight;
     if(!sw||!sh||!iw||!ih)return;
     const fitMode=player.classList.contains('fit-scene')?'contain':'cover';
     const scale=fitMode==='contain'?Math.min(sw/iw,sh/ih):Math.max(sw/iw,sh/ih);
     const displayedW=iw*scale,displayedH=ih*scale;
-    // The existing immersive CSS scales the whole image about 50% 49%.
-    const zoom=player.classList.contains('immersive-view')?1.72:1;
-    const ox=sw*0.5,oy=sh*0.49;
-    const x0=(sw-displayedW)/2+displayedW*aquariumGlass.left;
-    const x1=(sw-displayedW)/2+displayedW*aquariumGlass.right;
-    const y0=(sh-displayedH)/2+displayedH*aquariumGlass.top;
-    const y1=(sh-displayedH)/2+displayedH*aquariumGlass.bottom;
-    const left=ox+(x0-ox)*zoom,right=ox+(x1-ox)*zoom;
-    const top=oy+(y0-oy)*zoom,bottom=oy+(y1-oy)*zoom;
+    const left=(sw-displayedW)/2,right=left+displayedW;
+    const top=(sh-displayedH)/2,bottom=top+displayedH;
     // Intersect with the visible scene: no creatures in letterbox bars or room walls.
     const l=Math.max(0,left),t=Math.max(0,top);
     const r=Math.min(sw,right),b=Math.min(sh,bottom);
@@ -82,25 +71,25 @@ import StudioLayout from '../../layouts/StudioLayout.astro';
  toggle.addEventListener('click',()=>{if(completed){finish();completed=false;}if(running){elapsed=now();running=false;stopTick();audio.pause();syncFish();toggle.textContent='Resume session';status.textContent='Session paused.';return;}started=performance.now();running=true;syncFish();toggle.textContent='Pause session';status.textContent='Session in progress.';revealControls();render();tick=window.setInterval(render,250);if(scene.audio&&Number(volume.value)>0)void audio.play().catch(()=>{status.textContent='Audio unavailable; your session continues silently.';});});
  restart.addEventListener('click',()=>finish());guidanceToggle.addEventListener('change',()=>{cue.hidden=!guidanceToggle.checked;if(guidanceToggle.checked)render();});volume.addEventListener('input',()=>{audio.volume=Number(volume.value)/100;if(audio.volume===0)audio.pause();else if(running&&audio.paused&&scene.audio)void audio.play().catch(()=>{});});
  full.addEventListener('click',async()=>{try{if(document.fullscreenElement===player)await document.exitFullscreen();else await player.requestFullscreen();}catch{status.textContent='Full screen is unavailable.';}});
- let immersive=false,fill=false,hideTimer:number|undefined;
- function syncView(){if(underwater){image.src=immersive?'/images/relaxation/deep-ocean-sanctuary.webp':scene.image;image.alt=immersive?'Deep Ocean Sanctuary underwater reef':scene.name;}player.classList.toggle('immersive-view',immersive);player.classList.toggle('fit-scene',!fill);requestAnimationFrame(positionFish);view.textContent=immersive?'Room view':'Immersive view';view.setAttribute('aria-pressed',String(immersive));fit.textContent=fill?'Fit scene':'Fill screen';fit.setAttribute('aria-pressed',String(fill));}
- view.addEventListener('click',()=>{immersive=!immersive;syncView();revealControls();});fit.addEventListener('click',()=>{fill=!fill;syncView();revealControls();});syncView();
+ let fill=false,hideTimer:number|undefined;
+ function syncView(){player.classList.toggle('fit-scene',!fill);requestAnimationFrame(positionFish);fit.textContent=fill?'Fit scene':'Fill screen';fit.setAttribute('aria-pressed',String(fill));}
+ fit.addEventListener('click',()=>{fill=!fill;syncView();revealControls();});syncView();
  function revealControls(){player.classList.remove('controls-idle');if(hideTimer!==undefined)window.clearTimeout(hideTimer);if(document.fullscreenElement===player&&running){hideTimer=window.setTimeout(()=>{if(!player.matches(':focus-within'))player.classList.add('controls-idle');},4500);}}
  ['pointermove','pointerdown','keydown','focusin'].forEach(event=>player.addEventListener(event,revealControls));
  const syncFull=()=>{requestAnimationFrame(positionFish);full.textContent=document.fullscreenElement===player?'Exit full screen':'Full screen';player.classList.remove('controls-idle');revealControls();};document.addEventListener('fullscreenchange',syncFull);
 
- const dispose=()=>{stopTick();if(hideTimer!==undefined)window.clearTimeout(hideTimer);audio.pause();fishLayoutObserver.disconnect();fish?.destroy();document.removeEventListener('fullscreenchange',syncFull);};window.addEventListener('pagehide',dispose,{once:true});document.addEventListener('astro:before-swap',dispose,{once:true});render();
+ const dispose=()=>{stopTick();if(hideTimer!==undefined)window.clearTimeout(hideTimer);audio.pause();fishLayoutObserver.disconnect();fish?.destroy();document.removeEventListener('fullscreenchange',syncFull);document.removeEventListener('visibilitychange',syncFish);image.removeEventListener('load',positionFish);};window.addEventListener('pagehide',dispose,{once:true});document.addEventListener('astro:before-swap',dispose,{once:true});render();
 </script>
 <style>
 .relax{max-width:1100px;margin:auto;padding:24px 0;color:#e2e8f0}.relax>a{color:#6ee7b7}.eyebrow{color:#7dd3fc;letter-spacing:.12em;font-size:12px;margin-top:26px}h1{font-size:clamp(30px,5vw,48px);margin:10px 0}#session-detail,#status{color:#cbd5e1;line-height:1.6}.player{border:1px solid #334155;border-radius:18px;overflow:hidden;background:#0b1724;margin-top:24px}.scene{position:relative;aspect-ratio:16/9;background:#050b12}.scene img{width:100%;height:100%;object-fit:cover;display:block}.cue{position:absolute;bottom:5%;left:5%;right:5%;max-width:540px;padding:15px 20px;border:1px solid #ffffff55;background:#07121cdd;border-radius:12px}.cue p{margin:6px 0 0;line-height:1.5}.cue[hidden]{display:none}.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:16px;background:#101e2d}.controls button{padding:11px 15px;border:1px solid #475569;border-radius:9px;background:#1e293b;color:#fff;font:inherit;cursor:pointer}.controls #toggle{background:#047857;border-color:#34d399}.controls label{display:flex;align-items:center;gap:8px;font-size:14px}.controls input{accent-color:#6ee7b7}#clock{font-variant-numeric:tabular-nums;font-weight:700}.controls :focus-visible{outline:3px solid #7dd3fc;outline-offset:3px}.player:fullscreen{height:100vh;width:100vw;border:0;border-radius:0;display:flex;flex-direction:column;justify-content:center;background:#000}.player:fullscreen .scene{flex:1;min-height:0;aspect-ratio:auto}.player:fullscreen .scene img{object-fit:contain}.player:fullscreen .controls{flex-shrink:0}@media(max-width:650px){.controls{gap:10px}.cue{padding:10px 12px}}
 </style>
 
 <style>
-/* v3 immersive display: keep the original room framing by default. */
+/* Shared reef artwork in preview and full screen. */
 .player .scene{overflow:hidden}
 .player .scene img{object-fit:cover;object-position:center center;transition:transform .65s ease,object-fit .3s ease}
 .player.fit-scene .scene img{object-fit:contain}
-.player.immersive-view .scene img{transform:none;transform-origin:center center}
+
 .player:fullscreen{justify-content:initial}
 .player:fullscreen .scene{width:100%;flex:1;min-height:0}
 .player:fullscreen .scene img{object-fit:cover}
@@ -112,12 +101,11 @@ import StudioLayout from '../../layouts/StudioLayout.astro';
 </style>
 
 <style>
-/* v4: fish use the existing canvas engine. In room mode they stay inside the aquarium window.
-   In immersive mode the overlay expands with the underwater view. */
+/* Fish follow the visible reef image rather than the surrounding letterbox. */
 .player .living-fish{position:absolute;z-index:1;pointer-events:none;left:0;top:0;width:0;height:0;display:none}
 .player.has-fish .living-fish{display:block}
-.player.immersive-view.has-fish .living-fish{clip-path:inset(0)}
-/* Fish viewport is calculated from the image's aquarium-glass coordinates in every mode. */
+
+
 .player:not(.has-fish) .fish-options{display:none}
 .controls .fish-options select{background:#172b3c;color:#fff;border:1px solid #64748b;border-radius:5px;padding:5px;max-width:140px}
 .controls .fish-options input[type=range]{width:75px}

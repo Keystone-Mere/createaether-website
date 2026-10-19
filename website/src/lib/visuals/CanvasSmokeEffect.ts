@@ -1,3 +1,4 @@
+import { sceneImageRect } from '../rendering/SceneImageGeometry';
 import type { ExperienceStateData } from '../ExperienceState';
 import type { VisualEffect } from './VisualEffect';
 
@@ -5,7 +6,7 @@ import type { VisualEffect } from './VisualEffect';
 export class CanvasSmokeEffect implements VisualEffect {
     readonly id = 'incense-smoke';
     readonly name = 'Incense smoke';
-    readonly description = 'Soft wisps rising from the displayed Temple incense burner';
+    readonly description = 'Soft wisps rising from the displayed incense burner';
     readonly version = '1.1.0';
     readonly category = 'particles' as const;
     enabled = true;
@@ -61,7 +62,7 @@ export class CanvasSmokeEffect implements VisualEffect {
         this.amount = typeof value === 'number' && Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 35;
         this.draw(); this.schedule();
     }
-    private eligible() { return this.visible && this.amount > 0 && this.stage.dataset.scene === 'temple' && ['temple', 'temple-original'].includes(this.stage.dataset.assetId ?? ''); }
+    private eligible() { return this.visible && this.amount > 0 && ['temple', 'temple-original', 'ocean-pod'].includes(this.stage.dataset.assetId ?? ''); }
     private draw() {
         const ctx = this.ctx;
         if (!ctx) return;
@@ -70,11 +71,12 @@ export class CanvasSmokeEffect implements VisualEffect {
         if (!this.eligible() || !this.textures.length) return;
         // Coordinates measured on each source image. Account for object-fit:cover cropping.
         const original = this.stage.dataset.assetId === 'temple-original';
-        const anchor = original ? { x: .24, y: .66 } : { x: .259, y: .696 };
+        const anchor = this.stage.dataset.assetId === 'ocean-pod' ? { x: .206, y: .686 }
+            : original ? { x: .24, y: .66 } : { x: .259, y: .696 };
         const image = this.stage.querySelector<HTMLImageElement>('.preview-scene-image');
         const ratio = image?.naturalWidth && image.naturalHeight ? image.naturalWidth / image.naturalHeight : 1672 / 941;
-        const imageW = Math.max(w, h * ratio), imageH = imageW / ratio;
-        const offsetX = (w - imageW) / 2, offsetY = (h - imageH) / 2;
+        const rect = sceneImageRect(w, h, ratio, 1, image ? getComputedStyle(image).objectFit : 'cover');
+        const imageW = rect.width, imageH = rect.height, offsetX = rect.x, offsetY = rect.y;
         for (let i = 0; i < 48; i++) {
             const age = ((this.time / 9 + i / 48) % 1);
             const curl = Math.sin(age * 11 + this.time * .32) * age * .013;

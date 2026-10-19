@@ -72,7 +72,7 @@ export function isExperience(
             'count', 'glow', 'minRadius', 'maxRadius',
             'minSpeed', 'maxSpeed', 'drift', 'minOpacity',
             'maxOpacity', 'minLifetime', 'maxLifetime'
-        ].every((key) => isFiniteNumber(value.particles[key])) &&
+        ].every((key) => isFiniteNumber((value.particles as Record<string, unknown>)[key])) &&
         isFiniteNumber(value.transition.duration) &&
         typeof value.transition.easing === 'string'
     );

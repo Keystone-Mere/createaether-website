@@ -61,6 +61,10 @@ const selectedAudioTrack =
             </details>
             <details class="control-section">
                 <summary>Effects</summary>
+                <div id="coastal-rain-preset" hidden style="padding:18px">
+                    <button id="apply-coastal-rain" type="button">Coastal rain + incense</button>
+                    <p>Rain stays outside the entrance. Optional incense smoke rises from the small pot inside.</p>
+                </div>
                 <h3 class="effect-subheading" id="effect-section-label">Particles</h3>
                 <div class="particles-slot"><ParticlesPanel experience={experience} /></div>
                 <section id="smoke-panel" class="studio-card" hidden style="padding:18px;border-radius:14px;background:#111b2a;color:#cbd5e1">
@@ -914,6 +918,8 @@ const selectedAudioTrack =
     import { applyBackground } from '../../../lib/player/ScenePresentation';
     import { backgroundChoices, backgroundSource, backgroundAsset } from '../../../lib/player/BackgroundChoices';
     import { audioTracks } from '../../../data/audio/tracks';
+    import { applyWeatherBackground } from '../../../lib/player/WeatherBackgrounds';
+    import { applyCoastalRain } from '../../../lib/player/CoastalRain';
     import { createPageEffectsCode } from '../../../lib/player/PageEffectsExport';
     import { experiences as defaultExperiences } from '../../../data/experiences';
     import type {
@@ -1127,6 +1133,13 @@ const selectedAudioTrack =
     smokeToggle.addEventListener('change', updateSmoke);
     smokeAmount.addEventListener('input', updateSmoke);
 
+    document.querySelector('#apply-coastal-rain')!.addEventListener('click', () => {
+        if (!editableExperience) return;
+        editableExperience = applyCoastalRain(editableExperience);
+        experienceLoader.load(cloneExperience(editableExperience));
+        synchroniseEditor(editableExperience);
+    });
+
     const canonicalExperienceIds = new Set(defaultExperiences.map(item => item.id));
 
     const isCanonicalExperience = (
@@ -1307,7 +1320,8 @@ const selectedAudioTrack =
         document.querySelector<HTMLElement>('#retreat-presets')!.hidden = coverId !== 'retreat';
         const activeRetreatPreset = !selectedExperience.atmosphere.particles ? 'quiet' : selectedExperience.particles.motion === 'snow' ? 'winter' : 'rain';
         document.querySelectorAll<HTMLButtonElement>('[data-retreat-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.retreatPreset === activeRetreatPreset)));
-        const smokeAvailable = coverId === 'temple' && ['temple', 'temple-original'].includes(backgroundAsset(selectedExperience)?.id ?? '');
+        document.querySelector<HTMLElement>('#coastal-rain-preset')!.hidden = coverId !== 'ocean';
+        const smokeAvailable = ['temple', 'temple-original', 'ocean-pod'].includes(backgroundAsset(selectedExperience)?.id ?? '');
         document.querySelector<HTMLElement>('#smoke-panel')!.hidden = !smokeAvailable;
         const smoke = selectedExperience.smoke ?? { enabled: false, amount: 35 };
         selectedExperience.smoke = { ...smoke };
@@ -1345,6 +1359,10 @@ const selectedAudioTrack =
                     delete editableExperience.background;
                     if (choice.id) editableExperience.backgroundId = choice.id;
                     else delete editableExperience.backgroundId;
+                    if (['ocean-pod', 'bamboo-rain-pavilion', 'indoor-snow-cabin'].includes(choice.id)) {
+                        editableExperience = applyWeatherBackground(editableExperience, choice.id);
+                        experienceLoader.load(editableExperience);
+                    }
                     synchroniseEditor(editableExperience);
                     document.querySelector<HTMLElement>('#background-feedback')!.textContent = `${choice.name} background selected. Save your creation to keep this choice.`;
                 });
@@ -1774,7 +1792,10 @@ const selectedAudioTrack =
             }
             const requestedBackground = new URLSearchParams(location.search).get('background');
             const requestedChoice = backgroundChoices.find(choice => choice.id === requestedBackground && choice.sceneId === initialExperience.id);
-            if (!stagedExperience && requestedChoice) editableExperience.backgroundId = requestedChoice.id;
+            if (!stagedExperience && requestedChoice) {
+                editableExperience.backgroundId = requestedChoice.id;
+                editableExperience = applyWeatherBackground(editableExperience, requestedChoice.id);
+            }
 
             experienceLoader.load(
                 editableExperience
