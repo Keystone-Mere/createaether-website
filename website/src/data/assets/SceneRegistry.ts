@@ -83,11 +83,17 @@ const lakesideOpenings: EffectBoundary = { kind:'polygons', polygons:[
   [[0,.175],[.140,.175],[.140,.764],[0,.841]],
   [[.856,.175],[1,.175],[1,.841],[.856,.764]],
 ] };
+const lighthouseOpening: EffectBoundary = {kind:'polygons',polygons:[Array.from({length:49},(_,i)=>{
+  const angle=Math.PI+Math.PI*i/48;
+  return [.514+.190*Math.cos(angle),.390+.218*Math.sin(angle)] as const;
+}).concat([[.704,.723],[.324,.723]])]};
 export const sceneAssets: readonly SceneAsset[] = [
+  asset('beach-bonfire','Beach Bonfire','/images/experience-covers/beach-bonfire-seating.png','ocean','alternative','custom',null,'outdoor'),
+  asset('lantern-garden','Lantern Garden','/images/experience-covers/night-garden.jpg','forest','alternative','custom',null,'outdoor'),
   asset('bamboo-rain-pavilion','Bamboo rain pavilion','/images/experience-covers/bamboo-rain-pavilion.jpg','forest','alternative','custom',bambooOpenings,'measured'),
   asset('indoor-snow-cabin','Snow cabin','/images/experience-covers/indoor-snow-cabin.jpg','retreat','alternative','custom',cabinWindows,'measured'),
   asset('desert','Desert','/images/experience-covers/desert-valley-dusk.webp','desert','original','custom',null,'none'),
-  asset('lighthouse-retreat','Lighthouse retreat','/images/experience-covers/lighthouse-retreat.webp','ocean','alternative','custom',{kind:'rectangle',x:0.37,y:0.43,width:0.26,height:0.17},'measured'),
+  asset('lighthouse-retreat','Lighthouse Retreat','/images/experience-covers/lighthouse-retreat.jpg','ocean','alternative','custom',lighthouseOpening,'measured'),
   asset('misty-marshes','Misty marshes','/images/experience-covers/misty-marshes.webp','forest','alternative','custom',null,'none'),
   asset('mountain-sanctuary','Mountain sanctuary','/images/experience-covers/mountain-sanctuary.webp','temple','alternative','custom',null,'none'),
   asset('ocean-pod','Coastal rain & incense','/images/experience-covers/ocean-pod-incense.png','ocean','alternative','custom',coastalEntrance,'measured',{status:'documented',creator:'AI-generated for Aether',note:'Edited with OpenAI image generation, October 2026. Imagined coastal room with incense and one pillar candle.'},'illustration'),

@@ -1,6 +1,5 @@
 ---
-import { experiences } from '../data/experiences';
-import CardScene from './studio/CardScene.astro';
+import {places,placeImage,placePlayUrl} from '../data/PlaceCatalog';
 ---
 
 <section
@@ -17,15 +16,15 @@ import CardScene from './studio/CardScene.astro';
     </div>
 
     <p class="experience-showcase__intro">
-      Play a scene without a timer, or open it in the scene editor to make your own version. The same collection supports your show and your space.
+      Play a scene without a timer, or open it in the scene editor to make your own version. Each named place has its own starting atmosphere, ready to play or edit.
     </p>
   </div>
 
   <div class="experience-showcase__grid">
     {
-      experiences.filter(experience => ['desert','forest','ocean'].includes(experience.id)).map((experience, index) => (
-        <a class="experience-card" href={`/studio/listen/?scene=${experience.id}`}>
-          <CardScene sceneId={experience.id} name={experience.name} />
+      places.filter(experience => ['lighthouse-retreat','bamboo-rain-pavilion','snow-cabin'].includes(experience.id)).map((experience, index) => (
+        <a class="experience-card" href={placePlayUrl(experience)}>
+          <img class="experience-card__cover" src={placeImage(experience)} alt="" width="1024" height="576" loading="lazy" />
           <div class="experience-card__body">
           <div class="experience-card__top">
             <span class="experience-card__number">

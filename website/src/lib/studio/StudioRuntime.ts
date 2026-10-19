@@ -1,3 +1,4 @@
+import { CoastalMistEffect } from '../visuals/CoastalMistEffect';
 import { registerRuntimeCleanup } from '../runtime/RuntimeLifecycle';
 import { ExperienceState } from '../ExperienceState';
 import { ExperienceRuntime } from '../ExperienceRuntime';
@@ -102,6 +103,7 @@ export const createStudioRuntime = (
             : null;
 
     if (canvasRenderer) {
+        if(previewStage instanceof HTMLElement) visualSystem.register(new CoastalMistEffect(canvasRenderer,previewStage));
         visualSystem.register(
             new CanvasParticleEffect(
                 canvasRenderer,

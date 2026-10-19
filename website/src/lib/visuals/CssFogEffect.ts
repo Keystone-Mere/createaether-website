@@ -150,8 +150,12 @@ export class CssFogEffect
     public update(
         state: ExperienceStateData
     ): void {
+        if(state.fog.preset === 'coastal-sea-mist'){
+            this.densityTransition.cancel();
+            this.applyDensity(0);
+        }
         const fogEnabled =
-            state.atmosphere.fog;
+            state.atmosphere.fog && state.fog.preset !== 'coastal-sea-mist';
 
         this.targetFogEnabled =
             fogEnabled;
@@ -304,7 +308,7 @@ export class CssFogEffect
             this.fogStatus instanceof HTMLElement
         ) {
             this.fogStatus.textContent =
-                fogEnabled
+                state.atmosphere.fog
                     ? `Fog active · ${state.fog.preset}`
                     : 'Fog disabled';
         }

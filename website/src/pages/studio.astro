@@ -2,6 +2,8 @@
 import StudioLayout from '../layouts/StudioLayout.astro';
 import ExperienceCard from '../components/studio/ExperienceCard.astro';
 import MyExperiencesPanel from '../components/studio/MyExperiencesPanel.astro';
+import PlaceCard from '../components/studio/PlaceCard.astro';
+import { places, placeCollections } from '../data/PlaceCatalog';
 import { experiences } from '../data/experiences';
 import { backgroundSource } from '../lib/player/BackgroundChoices';
 ---
@@ -16,7 +18,7 @@ import { backgroundSource } from '../lib/player/BackgroundChoices';
         <p class="studio-dashboard__eyebrow">Aether Studio</p>
         <h1>Scene library</h1>
         <p class="studio-dashboard__intro">
-          Play a scene without a timer, open the scene editor to customise it, or return to your saved creations. For a timed session with optional guidance, <a href="/studio/guided-relaxation/">choose a relaxation session</a>.
+          Choose a place to settle. Play it without a timer, edit its atmosphere, or return to your saved creations. For a timed session with optional guidance, <a href="/studio/guided-relaxation/">choose a relaxation session</a>.
         </p>
       </div>
 
@@ -28,30 +30,19 @@ import { backgroundSource } from '../lib/player/BackgroundChoices';
     <div id="saved-library-panel" data-library-panel="saved"><MyExperiencesPanel /></div>
 
     <section id="experience-library" class="studio-dashboard__experiences" data-library-panel="explore">
-      <div class="studio-dashboard__section-heading">
-        <div>
-          <p class="studio-dashboard__workspace-label">Shared scene collection</p>
-          <h2>Choose a scene</h2>
-        </div>
-
-
+      <div class="studio-dashboard__section-heading"><div><p class="studio-dashboard__workspace-label">Places to settle</p><h2 id="collection-heading">Choose your place</h2></div></div>
+      <div class="collection-picker" role="group" aria-label="Browse by place">
+        <button type="button" data-place-collection="all" aria-pressed="true">All places <span>{places.length}</span></button>
+        {placeCollections.map(collection=><button type="button" data-place-collection={collection.id} aria-pressed="false">{collection.name} <span>{places.filter(place=>place.collection===collection.id).length}</span></button>)}
       </div>
-
-      <div class="studio-dashboard__experience-grid">
-        {
-          experiences.map((experience) => (
-            <ExperienceCard
-              sceneId={experience.id}
-              cover={backgroundSource(experience)}
-              title={experience.name}
-              description={experience.description}
-              href={experience.href}
-              playHref={`/studio/listen/?scene=${experience.id}`}
-            />
-          ))
-        }
-      </div>
-
+      <p id="collection-description">Start with a finished setting, complete with its own sound and visual atmosphere.</p>
+      <div class="place-filters"><label>Setting <select id="place-setting"><option value="all">Any setting</option>{['Sheltered','Indoors','Open air','Underwater'].map(value=><option>{value}</option>)}</select></label><label>Atmosphere <select id="place-atmosphere"><option value="all">Any atmosphere</option>{['Mist','Rain','Snow','Firelight','Still','Gentle motion'].map(value=><option>{value}</option>)}</select></label><button type="button" id="clear-place-filters">Clear filters</button></div>
+      <p id="place-count" role="status" aria-live="polite">{places.length} places</p>
+      <div class="place-grid">{places.map(place=><PlaceCard place={place} />)}</div>
+      <p id="place-empty" hidden>No places match these choices. Clear the filters to see more.</p>
+      <details class="more-scenes"><summary>More scenes, seasonal settings &amp; events</summary><p>Your existing scene collection remains available here.</p><div class="studio-dashboard__experience-grid">
+        {experiences.map(experience=><ExperienceCard sceneId={experience.id} cover={backgroundSource(experience)} title={experience.name} description={experience.description} href={experience.href} playHref={`/studio/listen/?scene=${experience.id}`} />)}
+      </div></details>
 
     </section>
 
@@ -368,4 +359,32 @@ import { backgroundSource } from '../lib/player/BackgroundChoices';
  .library-tabs a:focus-visible {outline:2px solid #7dd3fc;outline-offset:3px;}
  #experience-library .experience-card__footer {display:flex;gap:10px;flex-wrap:wrap;}
  #experience-library .experience-card__customise {background:#243247;}
+</style>
+
+<script>
+ import {placeCollections} from '../data/PlaceCatalog';
+ const collectionButtons=Array.from(document.querySelectorAll<HTMLButtonElement>('[data-place-collection]'));
+ const cards=Array.from(document.querySelectorAll<HTMLElement>('[data-place-card]'));
+ const setting=document.querySelector<HTMLSelectElement>('#place-setting')!;
+ const atmosphere=document.querySelector<HTMLSelectElement>('#place-atmosphere')!;
+ let collection='all';
+ function readPlaceFilters(){const params=new URLSearchParams(location.search);collection=placeCollections.some(item=>item.id===params.get('collection'))?params.get('collection')!:'all';setting.value=params.get('setting')??'all';atmosphere.value=params.get('atmosphere')??'all';if(!setting.value)setting.value='all';if(!atmosphere.value)atmosphere.value='all';}
+ function filterPlaces(write=false){
+  let count=0;cards.forEach(card=>{const show=(collection==='all'||card.dataset.collection===collection)&&(setting.value==='all'||card.dataset.setting===setting.value)&&(atmosphere.value==='all'||card.dataset.atmosphere===atmosphere.value);card.hidden=!show;if(show)count++;});
+  collectionButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.placeCollection===collection)));
+  const selected=placeCollections.find(item=>item.id===collection);
+  document.querySelector<HTMLElement>('#collection-heading')!.textContent=selected?.name??'Choose your place';
+  document.querySelector<HTMLElement>('#collection-description')!.textContent=selected?.description??'Start with a finished setting, complete with its own sound and visual atmosphere.';
+  document.querySelector<HTMLElement>('#place-count')!.textContent=`${count} ${count===1?'place':'places'}`;
+  document.querySelector<HTMLElement>('#place-empty')!.hidden=count!==0;
+  if(write){const url=new URL(location.href);for(const [key,value] of [['collection',collection],['setting',setting.value],['atmosphere',atmosphere.value]]){if(value==='all')url.searchParams.delete(key);else url.searchParams.set(key,value);}history.pushState(null,'',url);}
+ }
+ collectionButtons.forEach(button=>button.addEventListener('click',()=>{collection=button.dataset.placeCollection!;filterPlaces(true);}));
+ [setting,atmosphere].forEach(select=>select.addEventListener('change',()=>filterPlaces(true)));
+ document.querySelector('#clear-place-filters')!.addEventListener('click',()=>{setting.value=atmosphere.value='all';filterPlaces(true);});
+ window.addEventListener('popstate',()=>{readPlaceFilters();filterPlaces();});readPlaceFilters();filterPlaces();
+</script>
+<style is:global>
+ [data-place-card][hidden]{display:none!important}
+ .place-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.collection-picker{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}.collection-picker button,.place-filters button{font:inherit;color:#d8e6f4;border:1px solid #475569;border-radius:10px;background:#142337;padding:11px 14px;cursor:pointer;min-height:44px}.collection-picker button[aria-pressed=true]{background:#164454;border-color:#7dd3fc;color:#fff}.collection-picker span{font-size:12px;opacity:.8;margin-left:6px}.place-filters{display:flex;align-items:end;flex-wrap:wrap;gap:16px;margin:22px 0 12px}.place-filters label{display:grid;gap:8px;font-size:14px;color:#cbd5e1}.place-filters select{min-height:44px;padding:10px;background:#152338;border:1px solid #475569;border-radius:8px;color:#fff;font:inherit}.collection-picker :focus-visible,.place-filters :focus-visible{outline:3px solid #7dd3fc;outline-offset:3px}#collection-description,#place-count,#place-empty{color:#b6c5d8;line-height:1.7}.more-scenes{margin-top:36px;border-top:1px solid #334155;padding-top:24px}.more-scenes summary{cursor:pointer;color:#7dd3fc;font-weight:600;min-height:44px}.more-scenes p{color:#b6c5d8}@media(max-width:1150px){.place-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.place-grid{grid-template-columns:1fr}.studio-dashboard__experiences{padding:16px!important}.place-filters label{flex:1;min-width:150px}}
 </style>

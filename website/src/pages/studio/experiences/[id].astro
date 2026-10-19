@@ -34,7 +34,7 @@ const selectedAudioTrack =
 <section class="editor">
 
     <header class="hero">
-        <div><h1>Scene editor</h1><p>Shape your scene with sound, colour and atmosphere. <a href="/studio/">Back to scene library →</a></p></div>
+        <div><h1>Scene editor</h1><p>Shape your scene with sound, colour and atmosphere. <a id="scene-library-back" href="/studio/">Back to scene library →</a></p></div>
         <ExperienceSwitcher experiences={experiences} activeExperience={experience.id} />
         <span id="experience-editor-title" hidden>{experience.name}</span>
         <span id="experience-editor-status" hidden>{experience.status}</span>
@@ -66,7 +66,17 @@ const selectedAudioTrack =
                     <p>Rain stays outside the entrance. Optional incense smoke rises from the small pot inside.</p>
                 </div>
                 <h3 class="effect-subheading" id="effect-section-label">Particles</h3>
-                <div class="particles-slot"><ParticlesPanel experience={experience} /></div>
+                <section id="sea-mist-controls" hidden class="studio-card" style="margin:18px;padding:18px;border:1px solid #3d586c;border-radius:12px;background:#111b2a;color:#cbd5e1">
+                    <h3 style="margin-top:0;color:#93c5fd">Sea mist outside</h3>
+                    <p style="font-size:14px;line-height:1.6">Soft mist beyond the lighthouse arch. The room and rug stay clear.</p>
+                    <label style="display:block;margin:14px 0"><input id="sea-mist-toggle" type="checkbox" /> Sea mist on</label>
+                    <label for="sea-mist-density" style="display:block;margin-top:16px">Amount <output id="sea-mist-density-value">30%</output></label>
+                    <input id="sea-mist-density" type="range" min="0" max="100" value="30" style="width:100%;accent-color:#7dd3fc" />
+                    <label for="sea-mist-speed" style="display:block;margin-top:16px">Drift speed <output id="sea-mist-speed-value">18%</output></label>
+                    <input id="sea-mist-speed" type="range" min="0" max="100" value="18" style="width:100%;accent-color:#7dd3fc" />
+                    <button id="show-extra-particles" type="button" class="button-secondary" aria-expanded="false" aria-controls="scene-particle-controls" style="margin-top:18px">Show extra particle controls</button>
+                </section>
+                <div id="scene-particle-controls"><div class="particles-slot"><ParticlesPanel experience={experience} /></div></div>
                 <section id="smoke-panel" class="studio-card" hidden style="padding:18px;border-radius:14px;background:#111b2a;color:#cbd5e1">
                     <h2 style="font-size:16px;color:#93c5fd;margin:0 0 14px">Incense smoke</h2>
                     <label><input id="smoke-enabled" type="checkbox" /> Smoke on</label>
@@ -114,9 +124,9 @@ const selectedAudioTrack =
             <span id="audio-track-title" hidden>{selectedAudioTrack.title}</span>
             <span id="audio-playback-status" role="status" class="transport-status">Ready to play</span>
             <details class="scene-settings" open>
-                <summary>Scene</summary>
+                <summary>Background &amp; appearance</summary>
             <fieldset class="background-choices" id="background-choices" hidden>
-                <legend>Choose your background</legend>
+                <legend>Background alternatives</legend>
                 <div id="background-choice-buttons"></div>
             </fieldset>
 
@@ -139,7 +149,7 @@ const selectedAudioTrack =
             <h2>Save and export</h2>
             <label for="creation-name">Name your creation</label>
             <input id="creation-name" type="text" maxlength="120" placeholder="For example, Storm podcast backdrop" style="width:100%;box-sizing:border-box;margin:8px 0 12px;padding:12px;border:1px solid #475569;border-radius:8px;background:#192537;color:#f8fafc" />
-            <small>Your saved creation appears under My saved in the scene library.</small>
+            <small>Your saved scene appears under My saved in the scene library.</small>
             <p>Save your creation or use it as a silent animated backdrop in OBS. Export again after changing its settings.</p>
             <div class="preview-actions">
                 <button type="button" id="save-experience-button">Save as Copy</button>
@@ -918,6 +928,7 @@ const selectedAudioTrack =
     import { applyBackground } from '../../../lib/player/ScenePresentation';
     import { backgroundChoices, backgroundSource, backgroundAsset } from '../../../lib/player/BackgroundChoices';
     import { audioTracks } from '../../../data/audio/tracks';
+    import {places,placeById,createPlaceExperience} from '../../../data/PlaceCatalog';
     import { applyWeatherBackground } from '../../../lib/player/WeatherBackgrounds';
     import { applyCoastalRain } from '../../../lib/player/CoastalRain';
     import { createPageEffectsCode } from '../../../lib/player/PageEffectsExport';
@@ -1140,6 +1151,31 @@ const selectedAudioTrack =
         synchroniseEditor(editableExperience);
     });
 
+    const updateSeaMist=()=>{
+        if(!editableExperience || backgroundAsset(editableExperience)?.id!=='lighthouse-retreat')return;
+        const enabled=document.querySelector<HTMLInputElement>('#sea-mist-toggle')!.checked;
+        const density=Number(document.querySelector<HTMLInputElement>('#sea-mist-density')!.value)/100;
+        const speed=Number(document.querySelector<HTMLInputElement>('#sea-mist-speed')!.value)/100;
+        editableExperience.atmosphere.fog=enabled;
+        editableExperience.fog={...editableExperience.fog,preset:'coastal-sea-mist',density,speed};
+        experienceState.data.atmosphere.fog=enabled;
+        experienceState.data.fog={...editableExperience.fog};
+        if(fogToggle instanceof HTMLInputElement)fogToggle.checked=enabled;
+        document.querySelector<HTMLOutputElement>('#sea-mist-density-value')!.value=`${Math.round(density*100)}%`;
+        document.querySelector<HTMLOutputElement>('#sea-mist-speed-value')!.value=`${Math.round(speed*100)}%`;
+        experienceRuntime.update(experienceState.data);
+    };
+    document.querySelector('#sea-mist-toggle')!.addEventListener('change',updateSeaMist);
+    document.querySelector('#sea-mist-density')!.addEventListener('input',updateSeaMist);
+    document.querySelector('#sea-mist-speed')!.addEventListener('input',updateSeaMist);
+    document.querySelector('#show-extra-particles')!.addEventListener('click',()=>{
+        const controls=document.querySelector<HTMLElement>('#scene-particle-controls')!;
+        controls.hidden=!controls.hidden;
+        const button=document.querySelector<HTMLButtonElement>('#show-extra-particles')!;
+        button.setAttribute('aria-expanded',String(!controls.hidden));
+        button.textContent=controls.hidden?'Show extra particle controls':'Hide extra particle controls';
+    });
+
     const canonicalExperienceIds = new Set(defaultExperiences.map(item => item.id));
 
     const isCanonicalExperience = (
@@ -1304,7 +1340,10 @@ const selectedAudioTrack =
             if (!Array.from(experienceSelect.options).some(option => option.value === selectedExperience.id)) {
                 experienceSelect.add(new Option(selectedExperience.name, selectedExperience.id));
             }
-            experienceSelect.value = selectedExperience.id;
+            const named=places.find(place=>!place.session&&place.engineId===selectedExperience.sceneId&&place.name===selectedExperience.name&&(place.backgroundId??'')===(selectedExperience.backgroundId??''));
+            experienceSelect.value = named ? `place:${named.id}` : selectedExperience.id;
+            const collectionPlace=named??places.find(place=>!place.session&&place.engineId===selectedExperience.sceneId&&(place.backgroundId??'')===(selectedExperience.backgroundId??''));
+            document.querySelector<HTMLAnchorElement>('#scene-library-back')!.href=collectionPlace?`/studio/?collection=${collectionPlace.collection}`:'/studio/';
         }
         // Keep the scene when a saved copy changes its particle preset.
         const source = selectedExperience.particles.preset;
@@ -1320,7 +1359,20 @@ const selectedAudioTrack =
         document.querySelector<HTMLElement>('#retreat-presets')!.hidden = coverId !== 'retreat';
         const activeRetreatPreset = !selectedExperience.atmosphere.particles ? 'quiet' : selectedExperience.particles.motion === 'snow' ? 'winter' : 'rain';
         document.querySelectorAll<HTMLButtonElement>('[data-retreat-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.retreatPreset === activeRetreatPreset)));
-        document.querySelector<HTMLElement>('#coastal-rain-preset')!.hidden = coverId !== 'ocean';
+        const lighthouse=backgroundAsset(selectedExperience)?.id==='lighthouse-retreat';
+        document.querySelector<HTMLElement>('#coastal-rain-preset')!.hidden = coverId !== 'ocean' || lighthouse || backgroundAsset(selectedExperience)?.id==='beach-bonfire';
+        document.querySelector<HTMLElement>('#effect-section-label')!.hidden=lighthouse;
+        document.querySelector<HTMLElement>('#sea-mist-controls')!.hidden=!lighthouse;
+        document.querySelector<HTMLElement>('#scene-particle-controls')!.hidden=lighthouse && !selectedExperience.atmosphere.particles;
+        const extras=document.querySelector<HTMLButtonElement>('#show-extra-particles')!;
+        extras.setAttribute('aria-expanded',String(selectedExperience.atmosphere.particles));
+        extras.textContent=selectedExperience.atmosphere.particles?'Hide extra particle controls':'Show extra particle controls';
+        document.querySelector<HTMLInputElement>('#sea-mist-toggle')!.checked=selectedExperience.atmosphere.fog;
+        for(const [key,value] of [['density',selectedExperience.fog.density],['speed',selectedExperience.fog.speed]] as const){
+            document.querySelector<HTMLInputElement>(`#sea-mist-${key}`)!.value=String(Math.round(value*100));
+            document.querySelector<HTMLOutputElement>(`#sea-mist-${key}-value`)!.value=`${Math.round(value*100)}%`;
+        }
+        document.querySelector<HTMLElement>('.fog-slot')!.hidden=lighthouse;
         const smokeAvailable = ['temple', 'temple-original', 'ocean-pod'].includes(backgroundAsset(selectedExperience)?.id ?? '');
         document.querySelector<HTMLElement>('#smoke-panel')!.hidden = !smokeAvailable;
         const smoke = selectedExperience.smoke ?? { enabled: false, amount: 35 };
@@ -1359,7 +1411,12 @@ const selectedAudioTrack =
                     delete editableExperience.background;
                     if (choice.id) editableExperience.backgroundId = choice.id;
                     else delete editableExperience.backgroundId;
-                    if (['ocean-pod', 'bamboo-rain-pavilion', 'indoor-snow-cabin'].includes(choice.id)) {
+                    const namedChoice=places.find(place=>!place.session&&place.engineId===coverId&&(place.backgroundId??'')===choice.id);
+                    if(namedChoice && isCanonicalExperience(editableExperience)){
+                        const preset=createPlaceExperience(namedChoice);
+                        editableExperience={...preset,audio:{...preset.audio,enabled:editableExperience.audio.enabled}};
+                        experienceLoader.load(editableExperience);
+                    } else if (['ocean-pod', 'bamboo-rain-pavilion', 'indoor-snow-cabin'].includes(choice.id)) {
                         editableExperience = applyWeatherBackground(editableExperience, choice.id);
                         experienceLoader.load(editableExperience);
                     }
@@ -1381,6 +1438,7 @@ const selectedAudioTrack =
             'ocean-spray': ['Wave shimmer', 'Shimmer amount', 'Drift'],
             'festival-dust': ['Floating dust', 'Dust amount', 'Drift'],
             'temple-embers': ['Embers', 'Ember count', 'Drift'],
+            'beach-embers': ['Embers', 'Ember count', 'Drift'],
         };
         const labels = effectLabels[selectedExperience.particles.preset] ?? ['Particles', 'Particle count', 'Drift'];
         for (const [id, text] of [['effect-section-label', labels[0]], ['effect-toggle-label', `${labels[0]} on`], ['effect-count-label', labels[1]], ['effect-drift-label', labels[2]]]) {
@@ -1786,6 +1844,8 @@ const selectedAudioTrack =
                         ?? initialExperience
                 );
 
+            const requestedPlace=placeById(new URLSearchParams(location.search).get('place'));
+            if(!stagedExperience && requestedPlace && !requestedPlace.session && requestedPlace.engineId===initialExperience.id) editableExperience=createPlaceExperience(requestedPlace);
             const requestedRetreat = new URLSearchParams(location.search).get('retreat');
             if (!stagedExperience && initialExperience.id === 'retreat' && ['quiet','rain','winter'].includes(requestedRetreat ?? '')) {
                 editableExperience = applyRetreatPreset(editableExperience, requestedRetreat as RetreatPreset);

@@ -166,6 +166,11 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       } else { context.restore(); return; }
     }
 
+    if (displayedAssetId(this.stage) === 'beach-bonfire' && this.resolveMotion() === 'rise') {
+      this.renderBonfireEmbers(context, deltaSeconds, frame.width, frame.height);
+      context.restore(); return;
+    }
+
     if (this.settings.preset === "ocean-spray" && this.resolveMotion() === "flow") {
       this.renderOceanWaves(context, deltaSeconds, width, height);
       context.restore();
@@ -273,6 +278,28 @@ export class CanvasParticleEffect implements VisualEffect, CanvasRenderable {
       context.stroke();
     }
     context.restore();
+  }
+
+  private emberTime = 0;
+  private renderBonfireEmbers(ctx:CanvasRenderingContext2D, dt:number, frameWidth:number, frameHeight:number) {
+    this.emberTime += dt;
+    const image=this.stage?.querySelector<HTMLImageElement>('.preview-scene-image');
+    if(!image?.naturalWidth||!image.naturalHeight)return;
+    const rect=sceneImageRect(frameWidth,frameHeight,image.naturalWidth,image.naturalHeight,getComputedStyle(image).objectFit);
+    // Each ember starts at the fire, using the same source-image mapping as masks.
+    ctx.save();ctx.translate(rect.x*960/frameWidth,rect.y*540/frameHeight);ctx.scale(rect.width/frameWidth,rect.height/frameHeight);
+    ctx.fillStyle=this.settings.colour;ctx.shadowColor=this.settings.colour;ctx.shadowBlur=this.settings.glow;
+    const speed=(this.settings.minSpeed+this.settings.maxSpeed)/2;
+    for(let i=0;i<Math.min(300,this.settings.count);i++){
+      const life=this.settings.minLifetime+(i%7)/6*(this.settings.maxLifetime-this.settings.minLifetime);
+      const age=(this.emberTime+i*.413)%Math.max(.1,life),fraction=age/Math.max(.1,life);
+      const x=960*(.545+Math.sin(i*31)*.018)+Math.sin(age*2+i)*this.settings.drift*age;
+      const y=540*(.665+(i%4)*.006)-age*speed;
+      const fade=Math.sin(Math.PI*fraction);
+      ctx.globalAlpha=this.settings.minOpacity+(this.settings.maxOpacity-this.settings.minOpacity)*fade;
+      ctx.globalAlpha*=fade;ctx.beginPath();ctx.arc(x,y,this.settings.minRadius+(i%5)/4*(this.settings.maxRadius-this.settings.minRadius),0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
   }
 
   private resolveMotion(): NonNullable<ParticleSettings["motion"]> {

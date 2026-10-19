@@ -2,17 +2,17 @@
 import StudioLayout from '../../layouts/StudioLayout.astro';
 import SceneStage from '../../components/studio/SceneStage.astro';
 ---
-<StudioLayout title="Play an experience">
+<StudioLayout title="Play a scene">
  <section class="listen">
-  <a href="/studio/#experience-library">← Experiences</a>
-  <h1 id="listen-title">Your experience</h1>
+  <a id="listen-library-back" href="/studio/#experience-library">← Scene library</a>
+  <h1 id="listen-title">Your scene</h1>
   <div id="listen-content" hidden>
-   <SceneStage sceneId="temple" name="Your experience" />
+   <SceneStage sceneId="temple" name="Your scene" />
    <div class="listen-controls">
     <button id="listen-play" type="button" aria-pressed="false">Play Audio</button>
     <label>Volume <input id="listen-volume" type="range" min="0" max="100" value="40" /></label>
     <button id="listen-fullscreen" type="button">Full-screen</button>
-    <a id="listen-customise" href="/studio/">Customise</a>
+    <a id="listen-customise" href="/studio/">Edit scene</a>
    </div>
    <audio id="listen-audio" preload="none"></audio>
   </div>
@@ -20,6 +20,7 @@ import SceneStage from '../../components/studio/SceneStage.astro';
  </section>
 </StudioLayout>
 <script>
+ import {placeById,createPlaceExperience,placeEditUrl} from '../../data/PlaceCatalog';
  import { experiences } from '../../data/experiences';
  import { ExperienceLibrary } from '../../lib/storage/ExperienceLibrary';
  import { applyBackground } from '../../lib/player/ScenePresentation';
@@ -27,14 +28,16 @@ import SceneStage from '../../components/studio/SceneStage.astro';
  const params = new URLSearchParams(location.search);
  const library = new ExperienceLibrary();
  const saved = params.get('saved');
- const experience = saved ? library.get(saved) : experiences.find(item => item.id === params.get('scene'));
+ const place=placeById(params.get('place'));
+ const experience = saved ? library.get(saved) : place && !place.session ? createPlaceExperience(place) : structuredClone(experiences.find(item => item.id === params.get('scene')));
  const status = document.querySelector<HTMLElement>('#listen-status')!;
  const audio = document.querySelector<HTMLAudioElement>('#listen-audio')!;
  const button = document.querySelector<HTMLButtonElement>('#listen-play')!;
  const volume = document.querySelector<HTMLInputElement>('#listen-volume')!;
- if (!experience) status.textContent = 'This experience is unavailable on this device. Return to Experiences to choose another.';
+ if (!experience) status.textContent = 'This scene is unavailable here. Return to the scene library to choose another.';
  else {
   document.querySelector<HTMLElement>('#listen-title')!.textContent = experience.name;
+  if(place&&!saved) document.querySelector<HTMLAnchorElement>('#listen-library-back')!.href=`/studio/?collection=${place.collection}`;
   document.title = `${experience.name} — Aether`;
   const stage = document.querySelector<HTMLElement>('.preview-stage')!;
   applyBackground(stage, experience);
@@ -60,6 +63,7 @@ import SceneStage from '../../components/studio/SceneStage.astro';
   const customise = document.querySelector<HTMLAnchorElement>('#listen-customise')!;
   const scene = experience.sceneId ?? experience.id.split('-')[0];
   customise.href = `/studio/experiences/${encodeURIComponent(scene)}/`;
+  if (place && !saved) customise.href=placeEditUrl(place);
   if (saved) customise.addEventListener('click',event => { if (!library.stageForEditing(experience)) {event.preventDefault();status.textContent = 'Unable to open this saved experience for editing.';} });
   audio.addEventListener('error',() => {status.textContent='The audio could not be loaded. You can still enjoy the scene.';});
  }

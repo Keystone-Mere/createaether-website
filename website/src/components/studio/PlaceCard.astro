@@ -1,0 +1,13 @@
+---
+import { placeImage, placeEditUrl, placePlayUrl, type Place } from '../../data/PlaceCatalog';
+interface Props { place:Place; }
+const {place}=Astro.props;
+---
+<article class:list={['place-card',{'place-card--featured':place.featured}]} data-place-card data-collection={place.collection} data-setting={place.setting} data-atmosphere={place.atmosphere}>
+ <a class="place-card__image" href={placePlayUrl(place)} aria-label={`Play ${place.name}`}><img src={placeImage(place)} alt="" width="1024" height="576" loading="lazy" />{place.featured&&<span class="place-card__badge">Featured coastal scene</span>}</a>
+ <div class="place-card__body"><p class="place-card__tags">{place.setting} · {place.atmosphere}</p><h3>{place.name}</h3><p>{place.description}</p>
+ <div class="place-card__actions"><a class="place-card__play" href={placePlayUrl(place)}>Play scene <span class="sr-only">— {place.name}</span></a><a href={placeEditUrl(place)}>{place.session?'Session options':'Edit scene'}<span class="sr-only"> — {place.name}</span></a></div></div>
+</article>
+<style>
+.place-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #314156;border-radius:16px;background:#101827;color:#f8fafc}.place-card--featured{border-color:#4b8c9c}.place-card__image{position:relative;display:block}.place-card img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}.place-card__badge{position:absolute;left:12px;top:12px;padding:6px 9px;border-radius:7px;background:#08232ee6;color:#b3f1ec;font-size:11px}.place-card__body{display:flex;flex-direction:column;flex:1;padding:20px}.place-card__tags{font-size:12px!important;color:#7dd3fc!important;margin:0 0 10px!important}.place-card h3{font-size:21px;margin:0 0 10px}.place-card p{color:#b6c5d8;line-height:1.65;font-size:14px;margin:0 0 20px}.place-card__actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}.place-card__actions a{display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;border:1px solid #475569;border-radius:9px;color:#e2e8f0;text-decoration:none;font-size:14px}.place-card__actions .place-card__play{background:#2563eb;border-color:#2563eb;color:#fff}.place-card a:focus-visible{outline:3px solid #7dd3fc;outline-offset:-3px}.place-card a:hover{filter:brightness(1.12)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>

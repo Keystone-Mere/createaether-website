@@ -1,17 +1,18 @@
 ---
+import {places,placeEditUrl} from '../../data/PlaceCatalog';
 const { experiences, activeExperience } = Astro.props;
 ---
 <div class="experience-switcher">
-    <label for="experience-selector">Choose experience</label>
-    <select id="experience-selector">{experiences.map(experience => <option value={experience.id} selected={experience.id === activeExperience}>{experience.name}</option>)}</select>
+    <label for="experience-selector">Change scene</label>
+    <select id="experience-selector"><optgroup label="Places">{places.filter(place=>!place.session).map(place=><option value={`place:${place.id}`} data-href={placeEditUrl(place)}>{place.name}</option>)}</optgroup><optgroup label="More scenes">{experiences.map(experience => <option value={experience.id} data-href={`/studio/experiences/${experience.id}/`} selected={experience.id === activeExperience}>{experience.name}</option>)}</optgroup></select>
     <div hidden>{experiences.map(experience => <button type="button" data-experience-id={experience.id}>{experience.name}</button>)}</div>
 </div>
 <script>
 const selector = document.querySelector('#experience-selector');
 selector?.addEventListener('change', () => {
     if (!(selector instanceof HTMLSelectElement)) return;
-    const button = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-experience-id]')).find(button => button.dataset.experienceId === selector.value);
-    button?.click();
+    const href=selector.selectedOptions[0]?.dataset.href;
+    if(href) location.assign(href);
 });
 </script>
 <style>

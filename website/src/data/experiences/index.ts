@@ -1,3 +1,4 @@
+import { normalizeExperience } from '../../lib/models/ExperienceFormat';
 import type { Experience } from '../../lib/models/Experience';
 
 import temple from './temple.json';
@@ -40,4 +41,4 @@ export const experiences: ExperienceLibraryItem[] = [
     ...festival,
     href: '/studio/experiences/festival/',
   },
-];
+].map(item => ({ ...normalizeExperience(item), href:item.href }));
