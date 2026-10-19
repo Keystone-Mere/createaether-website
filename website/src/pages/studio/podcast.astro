@@ -6,6 +6,15 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 <StudioLayout title="Podcast & Stream" description="Create a personalised, gently animated setting for your show.">
 <section class="podcast-workspace">
     <header class="podcast-header"><div><p class="podcast-eyebrow">A setting for your show</p><h1>Podcast &amp; Stream</h1><p>Make it yours. Add it to OBS. Reuse it every episode.</p></div><span class="podcast-silent">Silent playback</span></header>
+    <details class="show-library" id="show-library">
+        <summary>My Shows <span>Save and reopen your show designs</span></summary>
+        <p class="podcast-field-help">Your current draft saves automatically in this browser. Named shows are separate saved copies: use Update saved show to keep later edits. Download a backup to move a show or protect it before clearing browser data.</p>
+        <label for="saved-show-name">Saved show name</label>
+        <input id="saved-show-name" type="text" maxlength="80" placeholder="For example, The Wirral Way" />
+        <div class="show-library-actions"><button id="show-save-new" type="button">Save as new show</button><button id="show-update" type="button" disabled>Update saved show</button><button id="show-backup" type="button">Download draft backup</button><label class="show-import-label" for="show-import">Import show backup<input id="show-import" type="file" accept="application/json,.json" /></label></div>
+        <p id="shows-status" role="status" aria-live="polite"></p>
+        <div id="saved-shows"></div>
+    </details>
     <div class="podcast-grid">
         <section class="podcast-preview" aria-label="Show preview">
             <div class="podcast-preview-heading"><div><h2>Your show preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><div class="preview-heading-actions"><button id="podcast-preview-toggle" type="button" aria-expanded="true" aria-controls="podcast-preview-body" hidden>Hide preview</button><button id="podcast-fullscreen" type="button">Full-screen editor</button></div></div>
@@ -106,6 +115,7 @@ syncPreviewVisibility();
 window.addEventListener('pagehide',event=>{if(!event.persisted)previewViewport.removeEventListener('change',syncPreviewVisibility);});
 
 import { broadcastBackgrounds, broadcastScreens, screenLabels, defaultBroadcast, validateBroadcast, createBroadcastUrl, prepareLogo, isLogo, createBroadcastHtml } from '../../lib/broadcast/BroadcastSettings';
+import { attachShowLibrary } from '../../lib/broadcast/ShowLibrary';
 import { createObsCollection } from '../../lib/broadcast/ObsCollection';
 import { cameraPlacement } from '../../lib/broadcast/CameraPlacement';
 import { createBroadcastController } from '../../lib/broadcast/BroadcastController';
@@ -184,6 +194,9 @@ function render(persist=true) {
     }
 }
 render(false);
+attachShowLibrary(() => ({ settings: settings(), logo }), project => {
+    logoRequest++; logo = project.logo; setFields(project.settings); render();
+}, download);
 form.addEventListener('submit',e=>e.preventDefault());
 function formInput(e:Event) {
     const input=e.target as HTMLInputElement;
@@ -334,4 +347,26 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){controller.destr
  .layout-thumb-frame { fill:Canvas; stroke:CanvasText; }
  .podcast-layouts input:checked + span { outline:2px solid Highlight; }
 }
+</style>
+
+<style is:global>
+.podcast-workspace .show-library{margin:0 0 24px;padding:18px 22px;border:1px solid #223247;border-radius:16px;background:#0b1422}
+.podcast-workspace .show-library>summary{cursor:pointer;font-size:16px;font-weight:600;color:#b4f4d8}
+.podcast-workspace .show-library>summary span{font-size:12px;font-weight:400;color:#94a3b8;margin-left:12px}
+.podcast-workspace .show-library>label{display:block;margin:14px 0 8px;font-size:12px;color:#becbd8}
+.podcast-workspace #saved-show-name{box-sizing:border-box;max-width:360px;width:100%;padding:11px;background:#07101c;border:1px solid #293d55;border-radius:8px;color:#e2e8f0;font:13px system-ui}
+.podcast-workspace .show-library-actions,.podcast-workspace .saved-show-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.podcast-workspace .show-library button,.podcast-workspace .show-import-label{border:1px solid #324359;background:#111f30;color:#e2e8f0;border-radius:8px;padding:10px 13px;cursor:pointer;font:12px system-ui}
+.podcast-workspace .show-library button:hover{background:#1b3045}
+.podcast-workspace .show-library button:disabled{opacity:.45;cursor:default}
+.podcast-workspace .show-import-label{display:flex;align-items:center;gap:8px;position:relative}
+.podcast-workspace #show-import{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
+.podcast-workspace .show-import-label:focus-within,.podcast-workspace .show-library button:focus-visible{outline:2px solid #8ee5c1;outline-offset:3px}
+.podcast-workspace #shows-status{font-size:12px;color:#a2e7c9;line-height:1.6}
+.podcast-workspace #saved-shows{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.podcast-workspace .saved-show-card{padding:14px;border:1px solid #293d55;border-radius:10px;min-width:0}
+.podcast-workspace .saved-show-card img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;max-height:140px}
+.podcast-workspace .saved-show-card h3{color:#e2e8f0;font-size:14px;overflow-wrap:anywhere;margin:10px 0 6px}
+.podcast-workspace .saved-show-card p,.podcast-workspace #saved-shows>p{color:#94a3b8;font-size:12px;line-height:1.5}
+@media(max-width:600px){.podcast-workspace .show-library>summary span{display:block;margin:6px 0 0}.podcast-workspace #saved-shows{grid-template-columns:1fr}}
 </style>
