@@ -216,6 +216,18 @@ const displayedId = registered?.src === src ? registered.id : 'user-background';
 .preview-stage--lighting-static .scene-light { animation:none; }
 @keyframes scene-breathe { to { opacity:calc(var(--aether-lighting-intensity) * .3); } }
 @media(prefers-reduced-motion:reduce) { .scene-light { animation:none!important; } }
+/* Incense Hall lamps; the original background retains its existing positions. */
+.preview-stage[data-asset-id="temple"] .candle-light { width:12%; height:23%; animation-name:incense-lamp-shimmer; }
+.preview-stage[data-asset-id="temple"] .candle-light--left { left:4%; top:39%; }
+.preview-stage[data-asset-id="temple"] .candle-light--back { left:24%; top:51%; }
+.preview-stage[data-asset-id="temple"] .candle-light--right { left:76%; top:51%; }
+.preview-stage[data-asset-id="temple"] .candle-light--front { left:96%; top:39%; }
+@keyframes incense-lamp-shimmer {
+  0%,100% { opacity:calc(var(--aether-lighting-intensity) * .16); }
+  38% { opacity:calc(var(--aether-lighting-intensity) * .23); }
+  71% { opacity:calc(var(--aether-lighting-intensity) * .19); }
+}
+@media(prefers-reduced-motion:reduce) { .candle-light { animation:none!important; } }
 @keyframes candle-shimmer { 0% { opacity:calc(var(--aether-lighting-intensity) * .25); } 38% { opacity:calc(var(--aether-lighting-intensity) * .95); } 71% { opacity:calc(var(--aether-lighting-intensity) * .4); } 100% { opacity:calc(var(--aether-lighting-intensity) * .8); } }
 .fullscreen-exit{display:none}.preview-stage:fullscreen .fullscreen-exit{display:block;position:absolute;right:24px;top:24px;z-index:10;background:#192537;color:white;border:1px solid #94a3b8;padding:10px;border-radius:8px}
 

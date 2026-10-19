@@ -70,7 +70,8 @@ export const sceneAssets: readonly SceneAsset[] = [
   asset('japanese-garden-day','Japanese garden','/images/experience-covers/japanese-garden-day.webp','forest','alternative','custom',null,'none'),
   asset('kerala-houseboat','Kerala houseboat','/images/experience-covers/kerala-houseboat.webp','retreat','alternative','custom',null,'none'),
 
-  asset('temple','Temple','/images/experience-covers/temple.jpg','temple','original','temple',null,'none'),
+  asset('temple','Incense Hall','/images/experience-covers/incense-hall.webp','temple','original','temple',null,'measured',{status:'documented',creator:'AI-generated for Aether',note:'Generated with OpenAI image generation, October 2026. Imagined interior inspired by South Indian temple halls; not a documentary reconstruction.'},'illustration'),
+  asset('temple-original','Original candlelit temple','/images/experience-covers/temple.jpg','temple','alternative','temple',null,'existing'),
   asset('forest','Forest','/images/experience-covers/forest.jpg','forest','original','forest',null,'none'),
   asset('ocean','Ocean','/images/experience-covers/ocean.jpg','ocean','original','ocean',null,'none'),
   asset('christmas','Christmas','/images/experience-covers/christmas.jpg','christmas','original','christmas',legacyEffectBoundaries.christmas,'existing'),

@@ -1,7 +1,7 @@
 {
   "id": "temple",
   "name": "Temple",
-  "description": "A meditative temple environment with ambient audio, subtle lighting and ritual atmosphere.",
+  "description": "A quiet incense hall with carved stone pillars, warm oil lamps and gently rising smoke.",
   "status": "MVP",
   "audio": {
     "enabled": true,
@@ -10,7 +10,7 @@
     "track": "temple-echoes"
   },
   "atmosphere": {
-    "particles": true,
+    "particles": false,
     "lighting": true,
     "fog": false
   },
@@ -51,7 +51,7 @@
     "easing": "ease-in-out"
   },
   "smoke": {
-    "enabled": false,
+    "enabled": true,
     "amount": 35
   }
 }

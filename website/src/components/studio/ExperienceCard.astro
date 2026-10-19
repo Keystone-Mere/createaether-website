@@ -13,7 +13,7 @@ const { sceneId, cover, title, description, href, playHref } = Astro.props;
 ---
 <article class="experience-card">
   {cover && (href ? (
-    <a class="experience-card__image-link" href={href} aria-label={`Open ${title} in Studio`}>
+    <a class="experience-card__image-link" href={href} aria-label={`Edit ${title} scene`}>
       {sceneId ? <CardScene sceneId={sceneId} name={title} /> : <img class="experience-card__cover" src={cover} alt="" width="1024" height="576" loading="lazy" />}
     </a>
   ) : (sceneId ? <CardScene sceneId={sceneId} name={title} /> : <img class="experience-card__cover" src={cover} alt="" width="1024" height="576" loading="lazy" />))}
@@ -22,8 +22,8 @@ const { sceneId, cover, title, description, href, playHref } = Astro.props;
     <p>{description}</p>
   </div>
   <div class="experience-card__footer">
-    {playHref && <a class="experience-card__button" href={playHref}>Play</a>}
-    {href ? <a class:list={["experience-card__button", {"experience-card__customise": !!playHref}]} href={href}>{playHref ? "Customise" : "Open in Studio"}</a> : <button disabled>Open in Studio</button>}
+    {playHref && <a class="experience-card__button" href={playHref}>Play scene</a>}
+    {href ? <a class:list={["experience-card__button", {"experience-card__customise": !!playHref}]} href={href}>{playHref ? "Edit scene" : "Edit scene"}</a> : <button disabled>Open in Studio</button>}
   </div>
 </article>
 <style>

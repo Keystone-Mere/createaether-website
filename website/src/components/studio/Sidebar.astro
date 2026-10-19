@@ -1,7 +1,7 @@
 ---
 const navigation = [
-  { label: 'Experiences', href: '/studio', active: Astro.url.pathname === '/studio' || Astro.url.pathname === '/studio/' || Astro.url.pathname.startsWith('/studio/experiences') || Astro.url.pathname.startsWith('/studio/listen') },
-  { label: 'Guided relaxation', href: '/studio/guided-relaxation/', active: ['/studio/guided-relaxation', '/studio/temple-relaxation', '/studio/evening-wind-down', '/studio/relaxation-player', '/studio/morning-in-the-forest', '/studio/underwater-sanctuary'].some(path => Astro.url.pathname.startsWith(path)) },
+  { label: 'Scene library', href: '/studio', active: Astro.url.pathname === '/studio' || Astro.url.pathname === '/studio/' || Astro.url.pathname.startsWith('/studio/experiences') || Astro.url.pathname.startsWith('/studio/listen') },
+  { label: 'Relaxation sessions', href: '/studio/guided-relaxation/', active: ['/studio/guided-relaxation', '/studio/temple-relaxation', '/studio/evening-wind-down', '/studio/relaxation-player', '/studio/morning-in-the-forest', '/studio/underwater-sanctuary'].some(path => Astro.url.pathname.startsWith(path)) },
   { label: 'Podcast & Stream', href: '/studio/podcast/', active: Astro.url.pathname.startsWith('/studio/podcast') },
 ];
 
@@ -16,12 +16,12 @@ const secondaryNavigation = [
 
 <aside class="studio-sidebar">
   <div class="studio-sidebar__brand">
-    <a href="/" aria-label="Create Aether home">
-      <span class="studio-sidebar__mark">A</span>
+    <a href="/" aria-label="Aether home">
+      <img class="studio-sidebar__mark" src="/brand/aether-mark.svg" alt="" width="43" height="43" />
 
       <span class="studio-sidebar__identity">
-        <strong>Create Aether</strong>
-        <small>Scenes · Relaxation · Broadcast</small>
+        <strong>Aether</strong>
+        <small>For your show · For your space</small>
       </span>
     </a>
   </div>
@@ -31,7 +31,7 @@ const secondaryNavigation = [
 
     <span>
       <strong>Aether Studio</strong>
-      <small>Create your environment</small>
+      <small>Create, save and reuse</small>
     </span>
   </div>
 
@@ -109,7 +109,7 @@ const secondaryNavigation = [
   }
 
   .studio-sidebar__mark {
-    display: grid;
+    object-fit: contain;
     width: 2.65rem;
     height: 2.65rem;
     place-items: center;

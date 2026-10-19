@@ -7,7 +7,7 @@ import '../styles/animations.css';
 import '../styles/components.css';
 import PostHog from '../components/posthog.astro';
 
-const features = [{"number": "01", "id": "scenes", "eyebrow": "Scene library", "title": "Find a setting that feels right.", "text": "Start with a ready-made environment or upload a background in the scene editor.", "items": ["Background choices", "Your own image uploads", "Live scene preview", "Full-screen viewing"]}, {"number": "02", "id": "podcast", "eyebrow": "Podcast & Stream", "title": "Give your show a consistent look.", "text": "Create a reusable show setting and bring it into OBS for recording or streaming.", "items": ["One host, two people or no frames", "Show titles, names, colour and logo", "Starting Soon, Live, Be Right Back and Ending", "Four-scene OBS collection export"]}, {"number": "03", "id": "relaxation", "eyebrow": "Relaxation", "title": "Make time for a quiet moment.", "text": "Choose a setting, duration and optional on-screen guidance in the relaxation session builder.", "items": ["5, 10 or 20 minutes, or untimed", "Relax, focus or rest", "Optional guidance and sound where available", "Immersive underwater view and creature controls"]}, {"number": "04", "id": "atmosphere", "eyebrow": "Atmosphere controls", "title": "Shape the mood of your scene.", "text": "Adjust the effects available for your chosen experience and see the result as you edit.", "items": ["Layered audio and volume controls", "Lighting and colour", "Fog, weather and particles", "Scene-specific presets and settings"]}, {"number": "05", "id": "saved", "eyebrow": "Your experiences", "title": "Keep a version of your own.", "text": "Save an edited experience as a copy, then find it again in My Experiences in the same browser.", "items": ["Name your creation", "Rename or delete saved copies", "Import an exported experience", "Local browser storage on this device"]}, {"number": "06", "id": "obs", "eyebrow": "OBS workflow", "title": "Take your setting into your show.", "text": "Export silent browser-rendered visuals, then add your cameras and microphone in OBS.", "items": ["Copy an OBS playback link", "Download an HTML backdrop file", "Include a logo with the supported file export", "Export again after editing"]}];
+const features = [{"number": "01", "id": "scenes", "eyebrow": "Scene library", "title": "Find a setting that feels right.", "text": "Start with a ready-made environment or upload a background in the scene editor.", "items": ["Background choices", "Your own image uploads", "Live scene preview", "Full-screen viewing"]}, {"number": "02", "id": "podcast", "eyebrow": "Podcast & Stream", "title": "Give your show a consistent look.", "text": "Create a reusable show setting and bring it into OBS for recording or streaming.", "items": ["One host, two people or no frames", "Show titles, names, colour and logo", "Starting Soon, Live, Be Right Back and Ending", "Four-scene OBS collection export"]}, {"number": "03", "id": "relaxation", "eyebrow": "Relaxation", "title": "Make time for a quiet moment.", "text": "Choose a setting, duration and optional on-screen guidance in the relaxation session builder.", "items": ["5, 10 or 20 minutes, or untimed", "Relax, focus or rest", "Optional guidance and sound where available", "Immersive underwater view and creature controls"]}, {"number": "04", "id": "atmosphere", "eyebrow": "Atmosphere controls", "title": "Shape the mood of your scene.", "text": "Adjust the effects available for your chosen experience and see the result as you edit.", "items": ["Layered audio and volume controls", "Lighting and colour", "Fog, weather and particles", "Scene-specific presets and settings"]}, {"number": "05", "id": "saved", "eyebrow": "Your experiences", "title": "Keep a version of your own.", "text": "Save an edited experience as a copy, then find it again in My saved in the scene library in the same browser.", "items": ["Name your creation", "Rename or delete saved copies", "Import an exported experience", "Local browser storage on this device"]}, {"number": "06", "id": "obs", "eyebrow": "OBS workflow", "title": "Take your setting into your show.", "text": "Export silent browser-rendered visuals, then add your cameras and microphone in OBS.", "items": ["Copy an OBS playback link", "Download an HTML backdrop file", "Include a logo with the supported file export", "Export again after editing"]}];
 import SiteFooter from '../components/SiteFooter.astro';
 ---
 
@@ -38,7 +38,7 @@ import SiteFooter from '../components/SiteFooter.astro';
         <div class="features-hero-content">
           <p class="eyebrow">Aether Features</p>
 
-          <h1>Scenes to unwind in. Settings to create with.</h1>
+          <h1>One engine. Atmosphere for your show and your space.</h1>
 
           <p class="features-intro">
             Build a relaxation session, personalise a podcast setting, or shape an environment with sound, lighting and animated effects.
@@ -50,7 +50,7 @@ import SiteFooter from '../components/SiteFooter.astro';
             </a>
 
             <a class="button secondary" href="/studio/">
-              Launch Studio →
+              Browse scene library →
             </a>
           </div>
         </div>
@@ -101,7 +101,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 
         <div class="actions">
           <a class="button primary" href="/studio/">
-            Explore Studio →
+            Browse scene library →
           </a>
 
           <a

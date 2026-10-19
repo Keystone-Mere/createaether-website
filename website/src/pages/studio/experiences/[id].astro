@@ -29,12 +29,12 @@ const selectedAudioTrack =
     ) ?? defaultAudioTrack;
 ---
 
-<StudioLayout title={`${experience.name} Experience`} privacyMode={experience.id === 'temple'}>
+<StudioLayout title={`${experience.name} — Scene editor`} privacyMode={experience.id === 'temple'}>
 
 <section class="editor">
 
     <header class="hero">
-        <div><h1>Aether Studio</h1><p>Shape your experience with sound, colour and atmosphere</p></div>
+        <div><h1>Scene editor</h1><p>Shape your scene with sound, colour and atmosphere. <a href="/studio/">Back to scene library →</a></p></div>
         <ExperienceSwitcher experiences={experiences} activeExperience={experience.id} />
         <span id="experience-editor-title" hidden>{experience.name}</span>
         <span id="experience-editor-status" hidden>{experience.status}</span>
@@ -59,14 +59,14 @@ const selectedAudioTrack =
                 <summary>Audio</summary>
                 <div class="audio-slot"><AudioPanel experience={experience} /></div>
             </details>
-            <details class="control-section" open>
+            <details class="control-section">
                 <summary>Effects</summary>
                 <h3 class="effect-subheading" id="effect-section-label">Particles</h3>
                 <div class="particles-slot"><ParticlesPanel experience={experience} /></div>
                 <section id="smoke-panel" class="studio-card" hidden style="padding:18px;border-radius:14px;background:#111b2a;color:#cbd5e1">
                     <h2 style="font-size:16px;color:#93c5fd;margin:0 0 14px">Incense smoke</h2>
                     <label><input id="smoke-enabled" type="checkbox" /> Smoke on</label>
-                    <label for="smoke-amount" style="display:block;margin-top:16px">Amount <output id="smoke-amount-value">35%</output></label>
+                    <label for="smoke-amount" style="display:block;margin-top:16px">Intensity <output id="smoke-amount-value">35%</output></label>
                     <input id="smoke-amount" type="range" min="0" max="100" step="1" value="35" style="width:100%;accent-color:#60a5fa" />
                 </section>
             </details>
@@ -132,15 +132,32 @@ const selectedAudioTrack =
             </div>
         </div>
         <div class="panel save-panel">
-            <h2>Save and Use Elsewhere</h2>
+            <h2>Save and export</h2>
             <label for="creation-name">Name your creation</label>
             <input id="creation-name" type="text" maxlength="120" placeholder="For example, Storm podcast backdrop" style="width:100%;box-sizing:border-box;margin:8px 0 12px;padding:12px;border:1px solid #475569;border-radius:8px;background:#192537;color:#f8fafc" />
-            <small>Your saved creation appears in My Experiences at the top of the dashboard.</small>
+            <small>Your saved creation appears under My saved in the scene library.</small>
             <p>Save your creation or use it as a silent animated backdrop in OBS. Export again after changing its settings.</p>
             <div class="preview-actions">
                 <button type="button" id="save-experience-button">Save as Copy</button>
+                <button type="button" id="website-embed" class="button-secondary" aria-controls="website-embed-setup" aria-expanded="false">Export page effects</button>
                 <button type="button" id="use-in-obs" class="button-secondary" aria-controls="obs-setup">Use in OBS</button>
                 <button type="button" id="import-experience-button" class="button-secondary">Import experience</button>
+            </div>
+            <div id="website-embed-setup" hidden class="embed-setup">
+              <h3>Snow over your existing webpage</h3>
+              <p>Add falling snow across the page. Your website stays visible and clickable underneath.</p>
+              <label>Snow amount <input id="page-snow-count" type="number" min="0" max="300" value="80" /></label>
+              <label>Falling speed <select id="page-snow-speed"><option value="35">Gentle</option><option value="60" selected>Steady</option><option value="110">Brisk</option></select></label>
+              <label>Snow colour <input id="page-snow-colour" type="color" value="#ffffff" /></label>
+              <label><input id="page-snow-audio" type="checkbox" /> Include the selected main audio track</label>
+              <p id="embed-local-warning" hidden>Local test only. Export from createaether.com after deployment for other visitors.</p>
+              <button type="button" id="generate-website-embed" class="button-secondary">Generate effect code</button>
+              <label for="website-embed-code" id="website-embed-code-label" hidden>Paste into your website before the closing body tag, or an HTML block that permits scripts</label>
+              <textarea id="website-embed-code" readonly hidden rows="5" style="width:100%;box-sizing:border-box"></textarea>
+              <button type="button" id="copy-website-embed" class="button-secondary" hidden>Copy effect code</button>
+              <a href="/aether-effects.js" download="aether-effects.js">Download effect script to host yourself</a>
+              <p id="website-embed-status" role="status" aria-live="polite"></p>
+              <small>Audio starts on a visitor click. Visitors can turn snow off. Reduced-motion preferences are respected. No scene background is included.</small>
             </div>
             <div id="obs-setup" hidden>
                 <h3>Set up your OBS backdrop</h3>
@@ -151,7 +168,7 @@ const selectedAudioTrack =
                 <small>Sound is off. Export again after changes. An internet connection is required for exports from the live website.</small>
             </div>
             <p id="save-experience-feedback" class="save-feedback" role="status" aria-live="polite"></p>
-            <a id="saved-experiences-link" class="saved-experiences-link" href="/studio/#my-experiences-title" hidden>View My Experiences →</a>
+            <a id="saved-experiences-link" class="saved-experiences-link" href="/studio/#my-experiences-title" hidden>View saved scenes →</a>
             <input type="file" id="import-experience-input" accept=".aether.json,.json,application/json" hidden />
             <span id="import-experience-status" role="status"></span>
         </div>
@@ -895,8 +912,9 @@ const selectedAudioTrack =
     import { createPlaybackUrl } from '../../../lib/player/PlaybackLink';
     import { applyRetreatPreset, type RetreatPreset } from '../../../lib/player/RetreatPresets';
     import { applyBackground } from '../../../lib/player/ScenePresentation';
-    import { backgroundChoices, backgroundSource } from '../../../lib/player/BackgroundChoices';
+    import { backgroundChoices, backgroundSource, backgroundAsset } from '../../../lib/player/BackgroundChoices';
     import { audioTracks } from '../../../data/audio/tracks';
+    import { createPageEffectsCode } from '../../../lib/player/PageEffectsExport';
     import { experiences as defaultExperiences } from '../../../data/experiences';
     import type {
         Experience,
@@ -1289,7 +1307,7 @@ const selectedAudioTrack =
         document.querySelector<HTMLElement>('#retreat-presets')!.hidden = coverId !== 'retreat';
         const activeRetreatPreset = !selectedExperience.atmosphere.particles ? 'quiet' : selectedExperience.particles.motion === 'snow' ? 'winter' : 'rain';
         document.querySelectorAll<HTMLButtonElement>('[data-retreat-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.retreatPreset === activeRetreatPreset)));
-        const smokeAvailable = coverId === 'temple' && !selectedExperience.background && !selectedExperience.backgroundId;
+        const smokeAvailable = coverId === 'temple' && ['temple', 'temple-original'].includes(backgroundAsset(selectedExperience)?.id ?? '');
         document.querySelector<HTMLElement>('#smoke-panel')!.hidden = !smokeAvailable;
         const smoke = selectedExperience.smoke ?? { enabled: false, amount: 35 };
         selectedExperience.smoke = { ...smoke };
@@ -2072,6 +2090,35 @@ const selectedAudioTrack =
             if (request === backgroundRequest) feedback.textContent = error instanceof Error ? error.message : 'Could not open this image.';
         } finally { input.value = ''; }
     });
+    document.querySelector('#website-embed')?.addEventListener('click', () => {
+        const setup=document.querySelector<HTMLElement>('#website-embed-setup')!;
+        setup.hidden=!setup.hidden;
+        document.querySelector('#website-embed')!.setAttribute('aria-expanded',String(!setup.hidden));
+        document.querySelector<HTMLElement>('#embed-local-warning')!.hidden=!['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+    });
+    document.querySelector('#generate-website-embed')?.addEventListener('click', () => {
+        if(!editableExperience)return;
+        const status=document.querySelector<HTMLElement>('#website-embed-status')!;
+        const code=document.querySelector<HTMLTextAreaElement>('#website-embed-code')!;
+        try {
+            code.value=createPageEffectsCode({
+                count:Number(document.querySelector<HTMLInputElement>('#page-snow-count')!.value),
+                speed:Number(document.querySelector<HTMLSelectElement>('#page-snow-speed')!.value),
+                colour:document.querySelector<HTMLInputElement>('#page-snow-colour')!.value,
+                audioTrack:document.querySelector<HTMLInputElement>('#page-snow-audio')!.checked?editableExperience.audio.track:undefined,
+                volume:experienceState.data.audio.volume
+            },location.origin);
+            code.hidden=false;document.querySelector<HTMLElement>('#copy-website-embed')!.hidden=false;document.querySelector<HTMLElement>('#website-embed-code-label')!.hidden=false;
+            status.textContent='Effect code ready. Paste into your existing webpage. It adds snow and small visitor controls; it does not replace your background.';
+        }catch(error){code.hidden=true;document.querySelector<HTMLElement>('#copy-website-embed')!.hidden=true;status.textContent=error instanceof Error?error.message:'Could not generate effect code.';}
+    });
+    document.querySelector('#copy-website-embed')?.addEventListener('click',async()=>{
+        const code=document.querySelector<HTMLTextAreaElement>('#website-embed-code')!;
+        const status=document.querySelector<HTMLElement>('#website-embed-status')!;
+        try{await navigator.clipboard.writeText(code.value);status.textContent='Effect code copied.';}
+        catch{code.focus();code.select();status.textContent='Select and copy the effect code above.';}
+    });
+
     document.querySelector('#use-in-obs')?.addEventListener('click', async () => {
         if (!editableExperience) return;
         const setup = document.querySelector<HTMLElement>('#obs-setup')!;
