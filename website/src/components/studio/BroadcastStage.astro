@@ -28,16 +28,16 @@ import SceneStage from './SceneStage.astro';
 .broadcast-titles { min-width:0; text-shadow:0 2px 12px #000; }
 .broadcast-titles h2 { font:600 calc(2.7cqw * var(--brand-scale, 1))/1.2 system-ui; letter-spacing:-.035em; margin:0; overflow-wrap:anywhere; }
 .broadcast-titles p { font:400 calc(1.1cqw * var(--brand-scale, 1))/1.4 system-ui; margin:.7cqw 0 0; color:#dbe2e8; overflow-wrap:anywhere; }
-.broadcast-cameras { position:absolute; z-index:5; left:5%; right:5%; top:30%; display:grid; grid-template-columns:1fr 1fr; gap:3%; }
-.broadcast-camera { box-sizing:border-box; position:relative; aspect-ratio:16/9; border:2px solid var(--show-accent); border-radius:1cqw; box-shadow:0 10px 40px #0005; }
+.broadcast-cameras { position:absolute; z-index:5; inset:0; pointer-events:none; }
+.broadcast-camera { box-sizing:border-box; position:absolute; aspect-ratio:16/9; pointer-events:auto; border:2px solid var(--show-accent); border-radius:1cqw; box-shadow:0 10px 40px #0005; }
 .camera-guide { display:none; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(150deg,#14232ee8,#0b1727ef); align-items:center; justify-content:center; color:#bac5d1; font:500 1.7cqw/1.2 system-ui; }
 .broadcast-stage[data-guides="true"] .camera-guide { display:flex; }
 .camera-guide span::before { content:''; display:block; margin:0 auto 1cqw; width:3cqw; height:2cqw; border:1px solid #8b9bb2; border-radius:.4cqw; }
 .camera-name { position:absolute; top:calc(100% + 1cqw); left:0; padding:.6cqw 1cqw; border-left:3px solid var(--show-accent); background:#09121ce8; color:white; border-radius:0 .5cqw .5cqw 0; font:500 1.3cqw/1.2 system-ui; max-width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .camera-name:empty { display:none; }
-.broadcast-stage[data-layout="solo"] .broadcast-cameras { left:21%; right:21%; top:23%; grid-template-columns:1fr; }
+
 .broadcast-stage[data-layout="solo"] .broadcast-camera--guest,.broadcast-stage[data-layout="background"] .broadcast-cameras { display:none; }
-.broadcast-stage[data-framing="presenter-safe"] .broadcast-cameras { top:32%; }
+
 .broadcast-scene-credit { display:none; }
 .broadcast-stage[data-motion="still"] .preview-canvas { display:none; }
 .broadcast-stage[data-motion="still"] * { animation:none!important; }

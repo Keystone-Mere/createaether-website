@@ -1,3 +1,4 @@
+import { cameraFrames } from './CameraPlacement';
 import { sceneAsset } from '../../data/assets/SceneRegistry';
 import type { Experience } from '../models/Experience';
 import { broadcastFraming, type BroadcastSettings } from './BroadcastSettings';
@@ -30,6 +31,12 @@ export function createBroadcastController(root: HTMLElement) {
     }
     function update(settings: BroadcastSettings, logo = '', guides = false) {
         currentSettings = settings;
+        const frames = cameraFrames(settings);
+        root.querySelectorAll<HTMLElement>('.broadcast-camera').forEach((node, index) => {
+            const frame = frames[index];
+            if (!frame) return;
+            Object.assign(node.style, { left: `${frame.x / 1920 * 100}%`, top: `${frame.y / 1080 * 100}%`, width: `${frame.width / 1920 * 100}%`, height: `${frame.width * 9 / 16 / 1080 * 100}%` });
+        });
         root.dataset.screen = settings.screen;
         root.dataset.brandPosition = settings.brandPosition;
         root.style.setProperty('--brand-scale', String(settings.brandSize / 100));
