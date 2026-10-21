@@ -50,7 +50,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                 <div class="camera-number-fields"><div><label for="camera-x">Position X</label><input id="camera-x" data-camera-control type="number" min="0" max="1600" step="1" /></div><div><label for="camera-y">Position Y</label><input id="camera-y" data-camera-control type="number" min="0" max="820" step="1" /></div><div><label for="camera-width">Frame width</label><input id="camera-width" data-camera-control type="number" min="320" max="1600" step="16" /></div></div>
                 <p id="camera-edit-status" class="podcast-field-help" role="status"></p>
                 <button id="camera-reset" type="button">Reset this layout</button>
-                <p class="podcast-field-help">Frames keep a 16:9 shape. Positions save with your draft and My Shows. After changing them, export again and update your camera transforms in OBS using the values under First time? Set up OBS.</p>
+                <p class="podcast-field-help">Frames keep a 16:9 shape. Positions save with your draft and My Shows. After changing them, export again and update your camera transforms in OBS using the values under Set up or update OBS.</p>
             </div>
             <div class="podcast-names"><div><label for="host-name">Host name</label><input id="host-name" name="host" maxlength="40" value="Host" /></div><div id="guest-name-field"><label for="guest-name">Guest name</label><input id="guest-name" name="guest" maxlength="40" value="Guest" /></div></div></details>
             <details class="podcast-control-section" open><summary>Branding</summary>
@@ -82,7 +82,17 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             </div>
     </div>
     <section class="podcast-export podcast-setup-guide" aria-label="OBS setup">                <details id="podcast-obs-setup">
-                    <summary>First time? Set up OBS</summary>
+                    <summary>Set up or update OBS</summary>
+                    <div class="obs-update-help">
+                        <h3>Already using Aether in OBS?</h3>
+                        <ol>
+                            <li>Select <strong>Live</strong> in Aether, then click <strong>Copy OBS link</strong>.</li>
+                            <li>In OBS, open your <strong>Main Show</strong> scene. In <strong>Sources</strong>, double-click <strong>Aether — Main Show</strong> (or the name you gave your Aether Browser source).</li>
+                            <li>In that source's properties, replace the <strong>URL</strong> and click <strong>OK</strong>. If <strong>Local file</strong> is enabled, turn it off to use a link. To keep using a downloaded HTML file instead, download a fresh file and select it here.</li>
+                            <li>If you moved or resized the frames in Aether, update each camera using the placement table in step 4 below. Replacing the link updates the backdrop; camera transforms are set separately in OBS.</li>
+                        </ol>
+                        <p>Your existing Browser source is the one to update. Your camera and microphone remain separate sources. For Starting Soon, Be Right Back and Ending, select the matching screen in Aether and update the corresponding scene's Browser source.</p>
+                    </div>
                     <h3>1. Choose how to add your backdrop</h3>
                     <p><strong>Browser link:</strong> copy the link and paste it into an OBS Browser source. Uploaded logos are included in the downloaded file only.</p>
                     <button id="podcast-copy" type="button">Copy OBS link</button>
@@ -95,13 +105,19 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                     <h3>3. Create your matching screen set</h3>
                     <p>Create four scenes in OBS: <strong>Starting Soon, Live, Be Right Back and Ending</strong>. Select each matching screen in Aether, then copy its link or download its file into a separate Browser source in the corresponding OBS scene. All four use the same branding and background. Export each again after changing the shared design.</p>
                     <h3>4. Add your cameras to Live</h3>
-                    <p>Add each camera source <strong>above Aether</strong> in the Sources list. Unlock the camera, right-click it → <strong>Transform → Edit Transform</strong> (Ctrl+E on Windows).</p>
-                    <p>Set <strong>Positional Alignment: Top Left</strong>, <strong>Rotation: 0</strong>, <strong>Bounds: Fit (Scale to inner bounds in older versions)</strong>, and <strong>Alignment in Bounding Box: Center</strong>. Enter the Position and Bounding Box Size values below. Lock the camera when finished.</p>
+                    <p>In the Live / Main Show scene, add each camera source <strong>above Aether</strong> in the Sources list. For an existing camera, select <strong>Host Camera</strong> (or your camera's name), click its padlock to unlock it, then press <strong>Ctrl+E</strong> on Windows to open <strong>Edit Transform</strong>.</p>
+                    <ol>
+                        <li>At the top, enter <strong>Position X</strong> and <strong>Position Y</strong> from the table below. Set <strong>Rotation to 0°</strong> and choose the <strong>top-left square</strong> in the top Alignment grid.</li>
+                        <li>In the separate <strong>Bounds</strong> section, change the dropdown from <strong>Automatic</strong> to <strong>Fit</strong> (called <strong>Scale to inner bounds</strong> in some versions).</li>
+                        <li>Enter the table's <strong>Bounds width</strong> and <strong>Bounds height</strong> into the Width and Height fields <strong>inside that Bounds section</strong>. Use the <strong>centre square</strong> in the Bounds Alignment grid.</li>
+                        <li>Click <strong>Close</strong>, check the fit, then lock the camera again. Repeat for the guest camera if you use Two people.</li>
+                    </ol>
+                    <p class="obs-bounds-note"><strong>Use the Bounds fields below the dropdown.</strong> The upper <strong>Size → Width / Height</strong> fields are different; use the Bounds fields for this setup. The table shows the camera area inside each frame, so its dimensions are slightly smaller than the frame width in Aether's editor.</p>
                     <div id="podcast-camera-sizes" aria-live="polite"></div>
                     <p>These values preserve the camera image proportions. A 16:9 camera feed fills the space; other proportions leave space rather than stretch the image. Existing crop settings affect the result.</p>
                     <details><summary>If your camera looks wrong</summary><ul><li>Check that the camera is above Aether in Sources.</li><li>Check the canvas is 1920 × 1080 and Aether is fitted to it.</li><li>Check Position, Top Left alignment and Bounding Box Size, rather than changing the source Size.</li><li>If you intend to start fresh, reset the camera transform before entering these values; this removes previous positioning and crop settings.</li></ul></details>
                     <h3>5. Check the finished scene</h3>
-                    <p>Make a short test recording. Check the logo, titles, camera positions and microphone sound. Aether's backdrop is silent; your microphone is a separate OBS source.</p>
+                    <p>Record about <strong>15 seconds</strong> while speaking, then play it back. Check camera alignment, readable branding, clear voice audio and smooth playback without a black screen. This is a local recording; you do not need to go live. Aether's backdrop is silent; your microphone is a separate OBS source.</p>
                     <p id="podcast-export-state" role="status">Create a fresh export after changing settings.</p>
                     <p>Copy a new link or download a new file after changing settings. Keep the downloaded file on your computer; it still needs access to Aether online.</p>
                 </details></section>
@@ -284,6 +300,8 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){cameraEditor?.de
 
 <style>
 .podcast-export h3 {font-size:14px;color:#e2e8f0;margin:20px 0 10px;}
+.obs-update-help{padding:0 16px 8px;border:1px solid #28514c;border-radius:10px;background:#0c242155;margin-top:16px}
+.podcast-export .obs-bounds-note{padding:12px;border-left:3px solid #7de0b4;background:#10251f;color:#c7e4da}
 .podcast-export .podcast-link-details {border:0;margin:12px 0 18px;padding:0;}
 </style>
 
