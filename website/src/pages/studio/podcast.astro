@@ -118,6 +118,32 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                     <details><summary>If your camera looks wrong</summary><ul><li>Check that the camera is above Aether in Sources.</li><li>Check the canvas is 1920 × 1080 and Aether is fitted to it.</li><li>Check Position, Top Left alignment and Bounding Box Size, rather than changing the source Size.</li><li>If you intend to start fresh, reset the camera transform before entering these values; this removes previous positioning and crop settings.</li></ul></details>
                     <h3>5. Check the finished scene</h3>
                     <p>Record about <strong>15 seconds</strong> while speaking, then play it back. Check camera alignment, readable branding, clear voice audio and smooth playback without a black screen. This is a local recording; you do not need to go live. Aether's backdrop is silent; your microphone is a separate OBS source.</p>
+                    <details id="podcast-background-removal-guide">
+                        <summary>Optional: remove your room background</summary>
+                        <p>Keep yourself on camera while letting the Aether setting show through behind you. This uses <strong>Live Background Removal Lite</strong>, an independent third-party OBS filter. Install and enable it in OBS; Aether does not install it or control its settings.</p>
+                        <p><strong>Tested setup:</strong> Windows 11, OBS 32.2.2 (64-bit), HP HD Camera, default filter settings and improved front/side lighting. Recording and head-turn checks passed on that setup. Results on other cameras and computers may differ.</p>
+                        <h3>Install the optional filter (Windows)</h3>
+                        <p>The plugin currently lists <strong>OBS 31.1.1 or later</strong> as a requirement and does not support portable OBS installations. Check its current instructions before installing.</p>
+                        <ol>
+                            <li>Open the <a href="https://kaito-tokyo.github.io/live-backgroundremoval-lite/en/" target="_blank" rel="noopener noreferrer">official plugin download page ↗</a> and download the Windows ZIP.</li>
+                            <li>Close OBS completely. Extract the ZIP and copy the <strong>live-backgroundremoval-lite</strong> plugin folder into <code>C:\ProgramData\obs-studio\plugins</code>. The plugin folder should contain <strong>bin</strong> and <strong>data</strong>; avoid an extra nested download folder.</li>
+                            <li>Reopen OBS. Right-click <strong>Host Camera</strong> (or your camera source) → <strong>Filters</strong>.</li>
+                            <li>Under the lower <strong>Effect Filters</strong> list, click <strong>+</strong> and choose <strong>Live Background Removal Lite</strong>. Start with its default settings.</li>
+                        </ol>
+                        <p>Keep your camera source <strong>above Aether</strong> in Sources. Apply the filter to the camera, rather than the Aether Browser source. Repeat for a guest camera only if needed. Your room should disappear within the camera area, revealing Aether underneath.</p>
+                        <h3>Light your face before adjusting the filter</h3>
+                        <p>Face a window or use even front lighting. A side light can help fill shadows. Avoid a bright window behind you. In our test, better lighting substantially improved the cutout when turning sideways. Fine hair, face profiles and moving hands can still produce rough or flickering edges.</p>
+                        <h3>If the camera picture is black</h3>
+                        <ol>
+                            <li>In camera Filters, click the eye beside <strong>Live Background Removal Lite</strong> to disable it temporarily. Check whether the unfiltered picture returns.</li>
+                            <li>If it stays black, open the camera source's <strong>Properties</strong>. Select your physical camera under <strong>Device</strong> (HP HD Camera in our test), then try <strong>Deactivate</strong>, wait five seconds and <strong>Activate</strong>. Check the camera privacy shutter.</li>
+                            <li>If there is still no picture, close OBS and test the camera in the Windows <strong>Camera</strong> app. If that works, close the Camera app before reopening OBS. If it also fails, resolve the camera issue before continuing the filter test.</li>
+                        </ol>
+                        <p>Once the ordinary camera picture works, re-enable the filter. To return to a normal camera view at any time, turn its eye off in Effect Filters.</p>
+                        <h3>Check a recording before using it live</h3>
+                        <p>Record <strong>30 seconds</strong> over your Aether setting. Speak, turn your head both ways and move your hands naturally. Play it back to check the face and hair edges, flickering, smooth movement and voice synchronisation. If quality is unreliable, improve lighting or keep the normal camera view.</p>
+                        <p><a href="https://github.com/kaito-tokyo/live-backgroundremoval-lite" target="_blank" rel="noopener noreferrer">Plugin requirements, installation and support ↗</a> · Setup guidance checked 22 October 2026.</p>
+                    </details>
                     <p id="podcast-export-state" role="status">Create a fresh export after changing settings.</p>
                     <p>Copy a new link or download a new file after changing settings. Keep the downloaded file on your computer; it still needs access to Aether online.</p>
                 </details></section>
