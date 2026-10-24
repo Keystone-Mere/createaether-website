@@ -5,6 +5,7 @@ import type {
 
 export type ExperienceStateData = Pick<
     Experience,
+    'clearSpace' |
     'smoke' |
     'audio' |
     'atmosphere' |
@@ -183,6 +184,7 @@ export class ExperienceState {
     public load(
         state: ExperienceStateData
     ): void {
+        this.data.clearSpace = state.clearSpace ? { ...state.clearSpace } : undefined;
         this.data.smoke = state.smoke ? { ...state.smoke } : undefined;
         this.data.audio = {
             ...state.audio

@@ -37,6 +37,7 @@ export class ExperienceLoader {
         experience: Experience
     ): ExperienceStateData {
         return {
+            clearSpace: experience.clearSpace ? { ...experience.clearSpace } : undefined,
             smoke: experience.smoke ? { ...experience.smoke } : undefined,
             audio: {
                 ...experience.audio

@@ -1,3 +1,4 @@
+import { isClearSpace, type ClearSpace } from '../clear-space/ClearSpace';
 import { validateCameraLayouts, type CameraLayouts } from './CameraGeometry';
 import { sceneAsset } from '../../data/assets/SceneRegistry';
 export const studioBackgroundIds = ['warm-studio', 'liverpool-waterfront', 'botanical-observatory'] as const;
@@ -22,6 +23,7 @@ export const screenLabels: Record<BroadcastScreen, string> = { starting: 'Starti
 export const defaultScreenMessages = { starting: 'Starting soon', live: '', break: 'Be right back', ending: 'Thanks for watching' };
 export type Motion = 'still' | 'subtle' | 'atmospheric';
 export interface BroadcastSettings {
+    clearSpace?: ClearSpace;
     cameraLayouts?: CameraLayouts;
     show: string; episode: string; host: string; guest: string;
     background: BroadcastBackground;
@@ -38,6 +40,7 @@ export const defaultBroadcast: BroadcastSettings = {
 export function validateBroadcast(value: unknown): BroadcastSettings {
     if (!value || typeof value !== 'object') throw new Error('Invalid show settings');
     const v = value as Record<string, unknown>;
+    if (v.clearSpace !== undefined && !isClearSpace(v.clearSpace)) throw new Error('Invalid clear space');
     const text = (key: string, limit: number) => {
         if (typeof v[key] !== 'string') throw new Error('Invalid show text');
         return (v[key] as string).replace(/[\u0000-\u001f\u007f]/g, '').slice(0, limit);
@@ -66,7 +69,7 @@ export function validateBroadcast(value: unknown): BroadcastSettings {
     }
     if (v.countdown !== undefined && typeof v.countdown !== 'boolean') throw new Error('Invalid countdown');
     const social = v.social === undefined ? '' : text('social', 80);
-    return { cameraLayouts: validateCameraLayouts(v.cameraLayouts), screen: screen as BroadcastScreen, messages, social, brandPosition: brandPosition as BroadcastSettings['brandPosition'], brandSize: number('brandSize', 100, 70, 140), countdown: v.countdown === true, countdownSeconds: number('countdownSeconds', 300, 10, 3600), background: background as BroadcastBackground, show: text('show', 80), episode: text('episode', 120), host: text('host', 40), guest: text('guest', 40), accent: v.accent, layout: v.layout as Layout, motion: v.motion as Motion };
+    return { clearSpace: v.clearSpace ? { ...(v.clearSpace as ClearSpace) } : undefined, cameraLayouts: validateCameraLayouts(v.cameraLayouts), screen: screen as BroadcastScreen, messages, social, brandPosition: brandPosition as BroadcastSettings['brandPosition'], brandSize: number('brandSize', 100, 70, 140), countdown: v.countdown === true, countdownSeconds: number('countdownSeconds', 300, 10, 3600), background: background as BroadcastBackground, show: text('show', 80), episode: text('episode', 120), host: text('host', 40), guest: text('guest', 40), accent: v.accent, layout: v.layout as Layout, motion: v.motion as Motion };
 }
 export function createBroadcastUrl(settings: BroadcastSettings, origin: string): string {
     const json = JSON.stringify({ v: 1, show: validateBroadcast(settings) });

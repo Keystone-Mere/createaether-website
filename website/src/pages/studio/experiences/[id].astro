@@ -1,4 +1,5 @@
 ---
+import ClearSpacePanel from '../../../components/studio/ClearSpacePanel.astro';
 import SceneStage from '../../../components/studio/SceneStage.astro';
 import StudioLayout from '../../../layouts/StudioLayout.astro';
 import AudioPanel from '../../../components/studio/AudioPanel.astro';
@@ -84,6 +85,7 @@ const selectedAudioTrack =
                     <input id="smoke-amount" type="range" min="0" max="100" step="1" value="35" style="width:100%;accent-color:#60a5fa" />
                 </section>
             </details>
+            <ClearSpacePanel />
             <details class="control-section">
                 <summary>Atmosphere</summary>
                 <h3 class="effect-subheading">Lighting</h3>
@@ -922,6 +924,9 @@ const selectedAudioTrack =
 ></audio>
 
 <script>
+import { attachClearSpaceControls } from '../../../lib/clear-space/ClearSpaceControls';
+import { suggestedClearSpace } from '../../../lib/clear-space/ClearSpace';
+
     import { prepareBackground, createBackdropHtml } from '../../../lib/player/Background';
     import { createPlaybackUrl } from '../../../lib/player/PlaybackLink';
     import { applyRetreatPreset, type RetreatPreset } from '../../../lib/player/RetreatPresets';
@@ -1130,6 +1135,12 @@ const selectedAudioTrack =
             synchroniseEditor(editableExperience);
         });
     });
+    const clearSpaceControls = attachClearSpaceControls(
+        document.querySelector<HTMLElement>('[data-clear-space-panel]')!, previewStage as HTMLElement,
+        () => editableExperience?.clearSpace,
+        value => { if (!editableExperience) return; editableExperience.clearSpace = { ...value }; experienceState.data.clearSpace = { ...value }; experienceRuntime.update(experienceState.data); },
+        () => suggestedClearSpace((previewStage as HTMLElement).dataset.assetId)
+    );
     const smokeToggle = document.querySelector<HTMLInputElement>('#smoke-enabled')!;
     const smokeAmount = document.querySelector<HTMLInputElement>('#smoke-amount')!;
     const smokeValue = document.querySelector<HTMLOutputElement>('#smoke-amount-value')!;
@@ -1385,6 +1396,7 @@ const selectedAudioTrack =
             applyBackground(previewStage, selectedExperience);
             previewStage.setAttribute('aria-label', `${selectedExperience.name} atmosphere preview`);
         }
+        clearSpaceControls.sync();
         const choices = backgroundChoices.filter(choice => choice.sceneId === coverId);
         const choiceGroup = document.querySelector<HTMLFieldSetElement>('#background-choices')!;
         const choiceButtons = document.querySelector<HTMLElement>('#background-choice-buttons')!;

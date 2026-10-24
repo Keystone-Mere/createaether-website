@@ -1,0 +1,109 @@
+---
+import SceneStage from '../components/studio/SceneStage.astro';
+---
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="robots" content="noindex" /><meta name="referrer" content="no-referrer" /><title>Aether scene</title></head>
+<body>
+<main id="embed-player" hidden>
+ <SceneStage sceneId="temple" name="Aether scene" exitButton={false} />
+ <div class="embed-controls" aria-label="Scene controls">
+  <button id="embed-audio" type="button" aria-pressed="false">Play Audio</button>
+  <label>Volume <input id="embed-volume" type="range" min="0" max="100" aria-label="Audio volume" /></label>
+  <button id="embed-motion" type="button" aria-pressed="true">Pause effects</button>
+  <button id="embed-fullscreen" type="button">Full screen</button>
+ </div>
+ <p id="embed-status" role="status" aria-live="polite"></p>
+ <audio id="embed-main-audio" preload="none" loop></audio><audio id="embed-layer-audio" preload="none" loop></audio>
+</main>
+<section id="embed-error" hidden role="alert"><h1>This scene could not be opened</h1><p>Create a new website embed in Aether Studio.</p></section>
+<script>
+import {readEmbedHash} from '../lib/player/EmbedLink';
+import {audioTracks} from '../data/audio/tracks';
+import {applyBackground} from '../lib/player/ScenePresentation';
+import {isBackground} from '../lib/player/Background';
+import {createStudioRuntime} from '../lib/studio/StudioRuntime';
+import {registerRuntimeCleanup} from '../lib/runtime/RuntimeLifecycle';
+import type {Experience} from '../lib/models/Experience';
+const root=document.querySelector<HTMLElement>('#embed-player')!;
+const stage=root.querySelector<HTMLElement>('.preview-stage')!;
+const audio=document.querySelector<HTMLAudioElement>('#embed-main-audio')!;
+const layer=document.querySelector<HTMLAudioElement>('#embed-layer-audio')!;
+const play=document.querySelector<HTMLButtonElement>('#embed-audio')!;
+const volume=document.querySelector<HTMLInputElement>('#embed-volume')!;
+const motion=document.querySelector<HTMLButtonElement>('#embed-motion')!;
+const fullscreen=document.querySelector<HTMLButtonElement>('#embed-fullscreen')!;
+const status=document.querySelector<HTMLElement>('#embed-status')!;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+let experience:Experience|null=null;
+let runtime:ReturnType<typeof createStudioRuntime>|null=null;
+let effectsOn=!reduced.matches;
+function updateTransport(){play.textContent=audio.paused?'Play Audio':'Pause Audio';play.setAttribute('aria-pressed',String(!audio.paused));}
+function pauseAudio(){audio.pause();layer.pause();updateTransport();}
+function updateVolume(){if(!experience)return;audio.volume=Number(volume.value)/100;layer.volume=audio.volume*(experience.audio.layerVolume??0)/100;}
+function updateEffects(){
+ if(!runtime||!experience)return;
+ const silent=structuredClone(experience);silent.audio.enabled=false;
+ if(!effectsOn){silent.atmosphere.particles=false;silent.atmosphere.fog=false;silent.lighting.pulse=false;silent.smoke={enabled:false,amount:0};}
+ stage.classList.toggle('effects-paused',!effectsOn);
+ runtime.experienceLoader.load(silent);
+ motion.textContent=effectsOn?'Pause effects':'Resume effects';motion.setAttribute('aria-pressed',String(effectsOn));
+}
+function load(){
+ pauseAudio();runtime?.destroy();runtime=null;root.hidden=true;document.querySelector<HTMLElement>('#embed-error')!.hidden=true;
+ try{
+  experience=readEmbedHash(location.hash);
+  const track=audioTracks.find(track=>track.id===experience!.audio.track)!;
+  audio.removeAttribute('src');layer.removeAttribute('src');
+  // Audio stays unloaded until the visitor clicks Play Audio.
+  play.dataset.src=track.src;play.dataset.layerSrc=track.layerSrc??'';
+  play.hidden=volume.parentElement!.hidden=!experience.audio.enabled;
+  volume.value=String(experience.audio.volume);updateVolume();
+  document.title=`${experience.name} — Aether`;stage.setAttribute('aria-label',`${experience.name} scene`);
+  applyBackground(stage,experience);root.hidden=false;status.textContent='';
+  effectsOn=!reduced.matches;
+  runtime=createStudioRuntime({audioElement:null,audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,previewStage:stage,previewCanvas:stage.querySelector('canvas'),particlesStatus:null,lightingStatus:null,fogStatus:null});
+  updateEffects();
+ }catch{experience=null;runtime?.destroy();runtime=null;root.hidden=true;document.querySelector<HTMLElement>('#embed-error')!.hidden=false;}
+}
+play.addEventListener('click',async()=>{
+ if(!experience||!experience.audio.enabled)return;
+ if(!audio.paused){pauseAudio();return;}
+ try{
+  if(!audio.getAttribute('src'))audio.src=play.dataset.src!;
+  const pending=[audio.play()];
+  if(play.dataset.layerSrc&&layer.volume>0){if(!layer.getAttribute('src'))layer.src=play.dataset.layerSrc;pending.push(layer.play());}
+  await Promise.all(pending);status.textContent='';updateTransport();
+ }catch{pauseAudio();status.textContent='Audio could not start. Please try again.';}
+});
+volume.addEventListener('input',updateVolume);
+audio.addEventListener('play',updateTransport);audio.addEventListener('pause',()=>{layer.pause();updateTransport();});
+for(const item of [audio,layer])item.addEventListener('error',()=>{pauseAudio();status.textContent='Audio could not load. You can still enjoy the scene.';});
+motion.addEventListener('click',()=>{effectsOn=!effectsOn;updateEffects();});
+fullscreen.addEventListener('click',async()=>{try{if(document.fullscreenElement===root)await document.exitFullscreen();else await root.requestFullscreen();}catch{status.textContent='Full screen is unavailable in this embed.';}});
+document.addEventListener('fullscreenchange',()=>{fullscreen.textContent=document.fullscreenElement===root?'Exit full screen':'Full screen';});
+const visibility=()=>{if(document.hidden){pauseAudio();runtime?.experienceRuntime.stop();}else{runtime?.experienceRuntime.start();updateEffects();}};
+document.addEventListener('visibilitychange',visibility);
+const onReduced=()=>{effectsOn=!reduced.matches;updateEffects();};reduced.addEventListener('change',onReduced);
+window.addEventListener('message',event=>{
+ if(window.parent===window||event.source!==window.parent||event.data?.type!=='aether-embed-background'||!isBackground(event.data.image)||!experience)return;
+ experience.background=event.data.image;delete experience.backgroundId;applyBackground(stage,experience);updateEffects();
+});
+window.addEventListener('hashchange',load);
+registerRuntimeCleanup(()=>{pauseAudio();runtime?.destroy();document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',onReduced);window.removeEventListener('hashchange',load);});
+load();if(window.parent!==window)window.parent.postMessage('aether-embed-ready','*');
+</script>
+</body></html>
+<style is:global>
+html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;overflow:hidden;font:14px/1.4 system-ui}
+#embed-player{width:100%;height:100%;position:relative;background:#000}
+#embed-player .preview-stage{position:absolute;inset:0;min-height:0;height:100%;width:100%;border:0;border-radius:0}
+#embed-player .preview-scene{inset:auto;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,177.7778vh);height:min(100vh,56.25vw)}
+.embed-controls{position:absolute;bottom:12px;left:12px;right:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;z-index:5}
+.embed-controls button,.embed-controls label{padding:9px 12px;border:1px solid #64748b;border-radius:8px;background:#0f172aeb;color:white;font:inherit}
+.embed-controls button{cursor:pointer;min-height:40px}.embed-controls label{display:flex;gap:8px;align-items:center}.embed-controls input{width:80px}
+:focus-visible{outline:3px solid #7dd3fc;outline-offset:2px}
+#embed-status{position:absolute;bottom:70px;left:12px;right:12px;z-index:5;background:#0f172ae8;margin:0;border-radius:6px}
+#embed-status:empty{display:none}#embed-error{padding:24px}
+.effects-paused *{animation-play-state:paused!important}
+[hidden]{display:none!important}
+</style>

@@ -60,12 +60,13 @@ export function createBroadcastController(root: HTMLElement) {
         root.querySelector<HTMLElement>('.broadcast-scene-credit')!.textContent = asset.name;
         const effectiveMotion = reducedMotion.matches || settings.background !== 'wirral-liverpool' ? 'still' : settings.motion;
         root.dataset.motion = effectiveMotion;
+        if (runtime) { runtime.experienceState.data.clearSpace = settings.clearSpace; runtime.experienceRuntime.update(runtime.experienceState.data); }
         if (motion === effectiveMotion) return;
         motion = effectiveMotion;
         runtime?.destroy(); runtime = null;
         if (motion === 'still') return;
         const experience: Experience = {
-            ...storm, sceneId: 'storm', name: settings.show,
+            ...storm, clearSpace:settings.clearSpace, sceneId: 'storm', name: settings.show,
             audio: { enabled:false, volume:0, layerVolume:0, track:'' },
             atmosphere: { particles:true, lighting:false, fog:false },
             // The lounge window sits fully inside the existing rain geometry; CSS masks the glass.

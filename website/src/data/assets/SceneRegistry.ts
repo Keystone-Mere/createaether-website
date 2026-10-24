@@ -1,4 +1,4 @@
-import type { EffectBoundary } from '../scenes/EffectBoundaryTypes';
+﻿import type { EffectBoundary } from '../scenes/EffectBoundaryTypes';
 export interface AssetCredit {
   status: 'documented' | 'review-needed';
   creator?: string; sourceUrl?: string; licence?: string; licenceUrl?: string; note?: string;
@@ -88,20 +88,28 @@ const lighthouseOpening: EffectBoundary = {kind:'polygons',polygons:[Array.from(
   return [.514+.190*Math.cos(angle),.390+.218*Math.sin(angle)] as const;
 }).concat([[.704,.723],[.324,.723]])]};
 export const sceneAssets: readonly SceneAsset[] = [
+  asset('polynesian-lagoon',"Polynesian Lagoon",'/images/scene-library/polynesian-lagoon.webp','ocean','alternative','custom',null,'none'),
+// Temporarily unavailable:   asset('moroccan-courtyard',"Moroccan Courtyard",'/images/scene-library/moroccan-courtyard.webp','temple','alternative','custom',null,'none'),
+  asset('garden-room',"Garden Room",'/images/scene-library/garden-room.webp','forest','alternative','custom',null,'none'),
+  asset('autumn-lakeside-pavilion',"Autumn Lakeside Pavilion",'/images/scene-library/autumn-lakeside-pavilion.webp','retreat','alternative','custom',null,'none'),
+  asset('savannah-lodge',"Savannah Lodge",'/images/scene-library/savannah-lodge.webp','desert','alternative','custom',null,'none'),
+  asset('canal-retreat',"Canal Retreat",'/images/scene-library/canal-retreat.webp','retreat','alternative','custom',null,'none'),
+// Temporarily unavailable:   asset('andean-retreat',"Andean Retreat",'/images/scene-library/andean-retreat.webp','temple','alternative','custom',null,'none'),
+  asset('library-retreat',"Library Retreat",'/images/scene-library/library-retreat.webp','retreat','alternative','custom',null,'none'),
   asset('beach-bonfire','Beach Bonfire','/images/experience-covers/beach-bonfire-seating.png','ocean','alternative','custom',null,'outdoor'),
   asset('lantern-garden','Lantern Garden','/images/experience-covers/night-garden.jpg','forest','alternative','custom',null,'outdoor'),
   asset('bamboo-rain-pavilion','Bamboo rain pavilion','/images/experience-covers/bamboo-rain-pavilion.jpg','forest','alternative','custom',bambooOpenings,'measured'),
   asset('indoor-snow-cabin','Snow cabin','/images/experience-covers/indoor-snow-cabin.jpg','retreat','alternative','custom',cabinWindows,'measured'),
   asset('desert','Desert','/images/experience-covers/desert-valley-dusk.webp','desert','original','custom',null,'none'),
   asset('lighthouse-retreat','Lighthouse Retreat','/images/experience-covers/lighthouse-retreat.jpg','ocean','alternative','custom',lighthouseOpening,'measured'),
-  asset('misty-marshes','Misty marshes','/images/experience-covers/misty-marshes.webp','forest','alternative','custom',null,'none'),
+  asset('misty-marshes','Misty marshes','/images/scene-library/misty-marsh-retreat.webp','forest','alternative','custom',null,'none'),
   asset('mountain-sanctuary','Mountain sanctuary','/images/experience-covers/mountain-sanctuary.webp','temple','alternative','custom',null,'none'),
   asset('ocean-pod','Coastal rain & incense','/images/experience-covers/ocean-pod-incense.png','ocean','alternative','custom',coastalEntrance,'measured',{status:'documented',creator:'AI-generated for Aether',note:'Edited with OpenAI image generation, October 2026. Imagined coastal room with incense and one pillar candle.'},'illustration'),
-  asset('outback-veranda','Outback veranda','/images/experience-covers/outback-veranda.webp','desert','alternative','custom',null,'none'),
+  asset('outback-veranda','Outback veranda','/images/scene-library/outback-retreat.webp','desert','alternative','custom',null,'none'),
   asset('outside-lake-day','Lakeside daylight','/images/experience-covers/outside-lake-day.webp','retreat','alternative','custom',lakesideOpenings,'measured'),
-  asset('waterfall-tropical-day','Tropical waterfall','/images/experience-covers/waterfall-tropical-day.webp','forest','alternative','custom',null,'none'),
+  asset('waterfall-tropical-day','Tropical waterfall','/images/scene-library/tropical-waterfall.webp','forest','alternative','custom',null,'none'),
   asset('japanese-garden-day','Japanese garden','/images/experience-covers/japanese-garden-day.webp','forest','alternative','custom',null,'none'),
-  asset('kerala-houseboat','Kerala houseboat','/images/experience-covers/kerala-houseboat.webp','retreat','alternative','custom',null,'none'),
+  asset('kerala-houseboat','Kerala houseboat','/images/scene-library/kerala-backwaters.webp','retreat','alternative','custom',null,'none'),
 
   asset('temple','Incense Hall','/images/experience-covers/incense-hall.webp','temple','original','temple',null,'measured',{status:'documented',creator:'AI-generated for Aether',note:'Generated with OpenAI image generation, October 2026. Imagined interior inspired by South Indian temple halls; not a documentary reconstruction.'},'illustration'),
   asset('temple-original','Original candlelit temple','/images/experience-covers/temple.jpg','temple','alternative','temple',null,'existing'),

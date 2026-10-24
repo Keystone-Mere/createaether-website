@@ -1,0 +1,26 @@
+<details class="control-section podcast-control-section" data-clear-space-panel>
+    <summary>Clear space</summary>
+    <div class="clear-space-fields">
+        <p>Keep particles, fog and smoke away from your presenter or practice area. The background stays visible.</p>
+        <label><input type="checkbox" data-clear="enabled" /> Enable clear space</label>
+        <fieldset data-clear-options disabled>
+            <legend class="sr-only">Clear space position and size</legend>
+            {['x','y','width','height'].map(key => <label>{({x:'Horizontal position',y:'Vertical position',width:'Width',height:'Height'})[key]} <output data-clear-value={key}></output><input aria-label={({x:'Horizontal position',y:'Vertical position',width:'Width',height:'Height'})[key]} type="range" min={key === 'width' || key === 'height' ? 5 : 0} max="100" step="1" data-clear={key} /></label>)}
+            <label><input type="checkbox" data-clear-outline /> Show outline in editor</label>
+        </fieldset>
+        <button type="button" data-clear-reset>Reset suggested position</button>
+        <p>The outline marks the fully clear area. Effects fade in outside it. This is a fixed area, without person tracking.</p>
+    </div>
+</details>
+<style is:global>
+[data-clear-space-panel] .clear-space-fields{padding:16px;color:#bdcbd8;font-size:13px}
+[data-clear-space-panel] p{font-size:12px;line-height:1.6;color:#94a3b8}
+[data-clear-space-panel] label{display:block;margin:12px 0}
+[data-clear-space-panel] input[type=range]{display:block;width:100%;accent-color:#7de0b4}
+[data-clear-space-panel] input[type=checkbox]{width:auto!important;padding:0!important;margin-right:8px}
+[data-clear-space-panel] fieldset{border:0;padding:0;margin:0}
+[data-clear-space-panel] fieldset:disabled{opacity:.5}
+[data-clear-space-panel] output{float:right}
+.clear-space-guide{position:absolute;pointer-events:none;border:2px dashed #7de0b4;border-radius:50%;box-sizing:border-box;z-index:20}
+.clear-space-guide span{position:absolute;top:40%;width:100%;text-align:center;color:#c9ffe8;font:12px system-ui;text-shadow:0 1px 4px #000}
+</style>

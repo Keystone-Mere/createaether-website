@@ -1,4 +1,4 @@
-import type { Experience } from '../lib/models/Experience';
+﻿import type { Experience } from '../lib/models/Experience';
 import { experiences } from './experiences';
 import { backgroundSource } from '../lib/player/BackgroundChoices';
 import { applyWeatherBackground } from '../lib/player/WeatherBackgrounds';
@@ -29,6 +29,18 @@ export const places: readonly Place[] = [
   { id:'lakeside-cabin',name:'Lakeside Cabin',description:'A warm, sheltered room with an inviting rug and a wide view across the lake.',collection:'rooms-sanctuaries',engineId:'retreat',setting:'Indoors',atmosphere:'Still' },
   { id:'lakeside-pavilion',name:'Lakeside Pavilion',description:'A clear wooden platform beside still water, with gentle rain outside the shelter.',collection:'rooms-sanctuaries',engineId:'retreat',backgroundId:'outside-lake-day',setting:'Sheltered',atmosphere:'Rain' },
   { id:'incense-hall',name:'Incense Hall',description:'A spacious stone hall, warm lamps and optional incense smoke.',collection:'rooms-sanctuaries',engineId:'temple',setting:'Indoors',atmosphere:'Still' },
+  {"id": "polynesian-lagoon", "name": "Polynesian Lagoon", "description": "A thatched deck and woven mat above a turquoise lagoon at sunset.", "collection": "coast-ocean", "engineId": "ocean", "backgroundId": "polynesian-lagoon", "setting": "Sheltered", "atmosphere": "Still"},
+  {"id": "tropical-waterfall", "name": "Tropical Waterfall", "description": "A shaded timber deck overlooking a waterfall and lush tropical greenery.", "collection": "forest-woodland", "engineId": "forest", "backgroundId": "waterfall-tropical-day", "setting": "Sheltered", "atmosphere": "Still"},
+  {"id": "misty-marsh-retreat", "name": "Misty Marshes", "description": "A quiet wooden platform beside reeds and still water in the morning mist.", "collection": "mountains-landscapes", "engineId": "forest", "backgroundId": "misty-marshes", "setting": "Open air", "atmosphere": "Still"},
+// Temporarily unavailable:   {"id": "moroccan-courtyard", "name": "Moroccan Courtyard", "description": "A peaceful tiled courtyard with warm lanterns, palms and a central cushion.", "collection": "gardens-courtyards", "engineId": "temple", "backgroundId": "moroccan-courtyard", "setting": "Sheltered", "atmosphere": "Still"},
+  {"id": "garden-room", "name": "Garden Room", "description": "A soft cushion and warm wooden floor beside a wide garden window.", "collection": "rooms-sanctuaries", "engineId": "forest", "backgroundId": "garden-room", "setting": "Indoors", "atmosphere": "Still"},
+  {"id": "autumn-lakeside-pavilion", "name": "Autumn Lakeside Pavilion", "description": "A sheltered mat overlooking a still lake framed by autumn leaves.", "collection": "mountains-landscapes", "engineId": "retreat", "backgroundId": "autumn-lakeside-pavilion", "setting": "Sheltered", "atmosphere": "Still"},
+  {"id": "kerala-backwaters", "name": "Kerala Houseboat", "description": "A covered wooden deck looking along the palm-lined backwaters at golden hour.", "collection": "mountains-landscapes", "engineId": "retreat", "backgroundId": "kerala-houseboat", "setting": "Sheltered", "atmosphere": "Still"},
+  {"id": "savannah-lodge", "name": "Savannah Lodge", "description": "A shaded lodge veranda with a woven mat and a wide savannah view.", "collection": "mountains-landscapes", "engineId": "desert", "backgroundId": "savannah-lodge", "setting": "Sheltered", "atmosphere": "Still"},
+  {"id": "canal-retreat", "name": "Canal Retreat", "description": "A quiet covered deck beside a canal, willow trees and a stone bridge.", "collection": "gardens-courtyards", "engineId": "retreat", "backgroundId": "canal-retreat", "setting": "Sheltered", "atmosphere": "Still"},
+// Temporarily unavailable:   {"id": "andean-retreat", "name": "Andean Retreat", "description": "A stone mountain shelter with a cushion and a view across cloud-filled valleys.", "collection": "mountains-landscapes", "engineId": "temple", "backgroundId": "andean-retreat", "setting": "Sheltered", "atmosphere": "Still"},
+  {"id": "library-retreat", "name": "Library Retreat", "description": "A warm reading room with bookshelves, a hearth and a peaceful garden view.", "collection": "rooms-sanctuaries", "engineId": "retreat", "backgroundId": "library-retreat", "setting": "Indoors", "atmosphere": "Still"},
+  {"id": "outback-retreat", "name": "Outback Veranda", "description": "A covered veranda and woven mat facing the red earth at sunset.", "collection": "mountains-landscapes", "engineId": "desert", "backgroundId": "outback-veranda", "setting": "Sheltered", "atmosphere": "Still"},
   { id:'underwater-sanctuary',name:'Underwater Sanctuary',description:'An immersive reef view with optional gently swimming creatures.',collection:'underwater',engineId:'ocean',setting:'Underwater',atmosphere:'Gentle motion',session:true },
 ];
 export function placeById(id:string | null | undefined) { return places.find(place=>place.id===id); }

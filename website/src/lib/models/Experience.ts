@@ -1,3 +1,5 @@
+import type { ClearSpace } from '../clear-space/ClearSpace';
+
 export interface AudioSettings {
   enabled: boolean;
   volume: number;
@@ -63,6 +65,7 @@ export interface Experience {
   /** Omitted on legacy v1 files; added when loaded or saved. */
   formatVersion?: 1;
   /** Scene stays independent of particle and audio preset choices. */
+  clearSpace?: ClearSpace;
   smoke?: { enabled: boolean; amount: number };
   sceneId?: string;
   /** Embedded, compressed JPG for user-created backgrounds. */

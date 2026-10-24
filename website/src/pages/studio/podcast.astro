@@ -1,4 +1,5 @@
 ---
+import ClearSpacePanel from '../../components/studio/ClearSpacePanel.astro';
 import StudioLayout from '../../layouts/StudioLayout.astro';
 import { broadcastBackgroundGroups, broadcastScreens, screenLabels } from '../../lib/broadcast/BroadcastSettings';
 import BroadcastStage from '../../components/studio/BroadcastStage.astro';
@@ -63,6 +64,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             <label for="show-accent">Accent colour</label><div class="podcast-colour"><input id="show-accent" type="color" name="accent" value="#d6ad72" /><span id="show-accent-value">#d6ad72</span></div>
             <label for="show-logo">Show logo <span class="podcast-optional">optional</span></label><input id="show-logo" type="file" accept="image/png,image/jpeg,image/webp" /><p class="podcast-field-help">PNG, JPG or WebP, up to 5 MB. Use the downloaded OBS file to include your logo.</p><button id="remove-logo" type="button" hidden>Remove logo</button>
             </details>
+            <ClearSpacePanel />
             <details class="podcast-control-section"><summary>Motion</summary><fieldset><legend class="sr-only">Background motion</legend><div class="podcast-motion"><label><input type="radio" name="motion" value="still" /><span>Still</span></label><label><input type="radio" name="motion" value="subtle" checked /><span>Subtle</span></label><label><input type="radio" name="motion" value="atmospheric" /><span>Atmospheric</span></label></div><p class="podcast-field-help"><span id="podcast-motion-help">Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.</span></p><p id="podcast-reduced" hidden>Your device requests reduced motion, so this preview stays still.</p></fieldset></details>
 
             <button id="podcast-reset" type="button">Reset to demo</button>
@@ -150,6 +152,11 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 </section>
 </StudioLayout>
 <script>
+import { attachClearSpaceControls } from '../../lib/clear-space/ClearSpaceControls';
+import { suggestedClearSpace, type ClearSpace } from '../../lib/clear-space/ClearSpace';
+let clearSpace: ClearSpace | undefined;
+let clearSpaceControls: ReturnType<typeof attachClearSpaceControls> | undefined;
+
 const previewToggle=document.querySelector<HTMLButtonElement>('#podcast-preview-toggle')!;
 const previewBody=document.querySelector<HTMLElement>('#podcast-preview-body')!;
 const previewViewport=window.matchMedia('(max-width: 1150px)');
@@ -188,6 +195,7 @@ let messages = { ...defaultBroadcast.messages };
 let countdownSeconds=defaultBroadcast.countdownSeconds;
 function field(name:string) { return form.elements.namedItem(name) as HTMLInputElement | RadioNodeList; }
 function setFields(settings:typeof defaultBroadcast) {
+    clearSpace = settings.clearSpace ? { ...settings.clearSpace } : undefined;
     cameraLayouts = structuredClone(settings.cameraLayouts ?? {});
     for(const name of ['show','episode','host','guest','background','accent','layout','motion','screen','social','brandPosition','brandSize'] as const) field(name).value=String(settings[name]);
     messages = { ...settings.messages };
@@ -203,9 +211,9 @@ try {
 function settings() {
     const seconds=document.querySelector<HTMLInputElement>('#countdown-seconds')!;
     if(seconds.value!=='' && seconds.validity.valid) countdownSeconds=seconds.valueAsNumber;
-    return validateBroadcast({cameraLayouts,...Object.fromEntries(new FormData(form)), motion:field('motion').value, messages, countdown:document.querySelector<HTMLInputElement>('#show-countdown')!.checked, countdownSeconds}); }
+    return validateBroadcast({clearSpace,cameraLayouts,...Object.fromEntries(new FormData(form)), motion:field('motion').value, messages, countdown:document.querySelector<HTMLInputElement>('#show-countdown')!.checked, countdownSeconds}); }
 function render(persist=true) {
-    const s=settings(); controller.update(s,logo,guides.checked); cameraEditor?.sync();
+    const s=settings(); controller.update(s,logo,guides.checked); clearSpaceControls?.sync(); cameraEditor?.sync();
     document.querySelector<HTMLInputElement>('#screen-message')!.value=messages[s.screen];
     document.querySelector<HTMLElement>('#podcast-message-field')!.hidden=s.screen==='live';
     document.querySelector<HTMLElement>('#podcast-countdown-field')!.hidden=s.screen!=='starting';
@@ -249,6 +257,11 @@ function render(persist=true) {
         catch { saveStatus.textContent='Browser storage is unavailable or full. Download your OBS file to keep this setting.'; }
     }
 }
+clearSpaceControls = attachClearSpaceControls(
+    document.querySelector<HTMLElement>('[data-clear-space-panel]')!, root.querySelector<HTMLElement>('.preview-stage')!,
+    () => clearSpace, value => { clearSpace = value; render(); },
+    () => suggestedClearSpace(String(field('background').value))
+);
 cameraEditor = attachCameraEditor(root, settings, layouts => { cameraLayouts = layouts; render(); });
 render(false);
 attachShowLibrary(() => ({ settings: settings(), logo }), project => {

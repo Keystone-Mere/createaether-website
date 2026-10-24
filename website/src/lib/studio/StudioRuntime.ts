@@ -1,3 +1,4 @@
+import { ClearSpaceEffect } from '../clear-space/ClearSpaceEffect';
 import { CoastalMistEffect } from '../visuals/CoastalMistEffect';
 import { registerRuntimeCleanup } from '../runtime/RuntimeLifecycle';
 import { ExperienceState } from '../ExperienceState';
@@ -112,6 +113,8 @@ export const createStudioRuntime = (
             )
         );
     }
+
+    if (previewStage instanceof HTMLElement) visualSystem.register(new ClearSpaceEffect(previewStage));
 
     experienceRuntime.register(
         previewController
