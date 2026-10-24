@@ -1,17 +1,20 @@
 ---
 import PostHog from '../components/posthog.astro';
 import Sidebar from '../components/studio/Sidebar.astro';
+import '../styles/studio-master.css';
 
 interface Props {
   title?: string;
   description?: string;
   privacyMode?: boolean;
+  workspace?: 'scene' | 'podcast';
 }
 
 const {
   title = 'Aether Studio',
   description = 'Create scenes, build relaxation sessions and design silent podcast settings for OBS.',
   privacyMode = false,
+  workspace,
 } = Astro.props;
 ---
 
@@ -28,7 +31,7 @@ const {
     <PostHog privacyMode={privacyMode} />
   </head>
 
-  <body>
+  <body id={workspace ? 'aether-workspace' : undefined} data-studio-design={workspace ? 'master' : undefined} data-workspace={workspace}>
     <a class="studio-skip" href="#studio-main">Skip to workspace</a>
     <div class="studio-shell">
       <Sidebar />

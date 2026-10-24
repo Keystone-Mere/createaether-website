@@ -30,13 +30,13 @@ const selectedAudioTrack =
     ) ?? defaultAudioTrack;
 ---
 
-<StudioLayout title={`${experience.name} — Scene editor`} privacyMode={experience.id === 'temple'}>
+<StudioLayout title={`${experience.name} — Scene editor`} privacyMode={experience.id === 'temple'} workspace="scene">
 
 <section class="editor">
 
     <header class="hero">
-        <div><h1>Scene editor</h1><p>Shape your scene with sound, colour and atmosphere. <a id="scene-library-back" href="/studio/">Back to scene library →</a></p></div>
-        <ExperienceSwitcher experiences={experiences} activeExperience={experience.id} />
+        <div><h1>Scene editor</h1><p>Shape your scene with sound, colour and atmosphere.</p></div>
+        <a id="scene-library-back" class="workspace-button" href="/studio/">Back to scene library</a>
         <span id="experience-editor-title" hidden>{experience.name}</span>
         <span id="experience-editor-status" hidden>{experience.status}</span>
     </header>
@@ -47,6 +47,7 @@ const selectedAudioTrack =
     </aside>
     <div class="grid">
         <div class="editor-controls editor-column">
+            <section class="workspace-card scene-selection"><h2>Scene</h2><ExperienceSwitcher experiences={experiences} activeExperience={experience.id} /></section>
             <section id="retreat-presets" hidden class="control-section" style="padding:18px">
                 <h2 style="margin:0 0 12px;font-size:16px;color:#93c5fd">Choose your retreat</h2>
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -60,7 +61,7 @@ const selectedAudioTrack =
                 <summary>Audio</summary>
                 <div class="audio-slot"><AudioPanel experience={experience} /></div>
             </details>
-            <details class="control-section">
+            <details class="control-section" open>
                 <summary>Effects</summary>
                 <div id="coastal-rain-preset" hidden style="padding:18px">
                     <button id="apply-coastal-rain" type="button">Coastal rain + incense</button>
@@ -99,7 +100,7 @@ const selectedAudioTrack =
             <div class="preview-header">
                 <div>
                     <p class="panel-label">Runtime preview</p>
-                    <h2>Live Preview</h2>
+                    <h2>Live preview</h2>
                 </div>
 
                 <span
@@ -125,6 +126,8 @@ const selectedAudioTrack =
             </div>
             <span id="audio-track-title" hidden>{selectedAudioTrack.title}</span>
             <span id="audio-playback-status" role="status" class="transport-status">Ready to play</span>
+        </div>
+        <section class="panel background-panel" aria-label="Background and appearance">
             <details class="scene-settings" open>
                 <summary>Background &amp; appearance</summary>
             <fieldset class="background-choices" id="background-choices" hidden>
@@ -142,15 +145,15 @@ const selectedAudioTrack =
                     <div class="environment-slot"><VisualLayerPanel layer="environment" experience={experience} /></div>
                 </details>
             </details>
-            <div class="preview-features" hidden>
+        </section>
+        <div class="preview-features" hidden>
                 <span id="audio-status">Audio enabled</span><span id="particles-status">Particles active</span>
                 <span id="lighting-status">Lighting active</span><span id="fog-status">Fog active</span>
             </div>
-        </div>
         <div class="panel save-panel">
             <h2>Save and export</h2>
             <label for="creation-name">Name your creation</label>
-            <input id="creation-name" type="text" maxlength="120" placeholder="For example, Storm podcast backdrop" style="width:100%;box-sizing:border-box;margin:8px 0 12px;padding:12px;border:1px solid #475569;border-radius:8px;background:#192537;color:#f8fafc" />
+            <input id="creation-name" type="text" maxlength="120" placeholder="For example, Storm podcast backdrop" />
             <small>Your saved scene appears under My saved in the scene library.</small>
             <p>Save your creation or use it as a silent animated backdrop in OBS. Export again after changing its settings.</p>
             <div class="preview-actions">
@@ -771,7 +774,7 @@ const selectedAudioTrack =
 .preview-status {font-size:11px; padding:4px 6px;}
 .preview-actions {display:flex; flex-wrap:wrap; gap:8px; margin-top:20px;}
 .panel button {margin:0; min-height:44px; padding:10px 14px; font-size:13px; border-radius:8px;}
-.button-secondary {background:#192537 !important; border:1px solid #475569 !important;}
+.button-secondary {background:var(--studio-input,#192537) !important; border:1px solid var(--studio-border,#475569) !important;}
 .fullscreen-exit {display:none;}
 .preview-stage:fullscreen {width:100vw;height:100vh;min-height:0;max-height:none;aspect-ratio:auto;border:0;border-radius:0;}
 .preview-stage:fullscreen .fullscreen-exit {display:block;position:absolute;right:24px;top:24px;z-index:10;background:#192537;border:1px solid #94a3b8;color:white;}

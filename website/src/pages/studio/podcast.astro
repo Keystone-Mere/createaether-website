@@ -4,47 +4,18 @@ import StudioLayout from '../../layouts/StudioLayout.astro';
 import { broadcastBackgroundGroups, broadcastScreens, screenLabels } from '../../lib/broadcast/BroadcastSettings';
 import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 ---
-<StudioLayout title="Podcast & Stream" description="Create a personalised, gently animated setting for your show.">
+<StudioLayout workspace="podcast" title="Podcast & Stream" description="Create a personalised, gently animated setting for your show.">
 <section class="podcast-workspace">
-    <header class="podcast-header"><div><p class="podcast-eyebrow">A setting for your show</p><h1>Podcast &amp; Stream</h1><p>Make it yours. Add it to OBS. Reuse it every episode.</p></div><span class="podcast-silent">Silent playback</span></header>
-    <details class="show-library" id="show-library">
-        <summary>My Shows <span>Save and reopen your show designs</span></summary>
-        <p class="podcast-field-help">Your current draft saves automatically in this browser. Named shows are separate saved copies: use Update saved show to keep later edits. Download a backup to move a show or protect it before clearing browser data.</p>
-        <label for="saved-show-name">Saved show name</label>
-        <input id="saved-show-name" type="text" maxlength="80" placeholder="For example, The Wirral Way" />
-        <div class="show-library-actions"><button id="show-save-new" type="button">Save as new show</button><button id="show-update" type="button" disabled>Update saved show</button><button id="show-backup" type="button">Download draft backup</button><label class="show-import-label" for="show-import">Import show backup<input id="show-import" type="file" accept="application/json,.json" /></label></div>
-        <p id="shows-status" role="status" aria-live="polite"></p>
-        <div id="saved-shows"></div>
-    </details>
+    <header class="podcast-header"><div><h1>Podcast &amp; Stream</h1><p>Make it yours. Add it to OBS. Reuse it every episode.</p></div><button type="button" id="open-saved-shows" class="workspace-button" aria-controls="show-library">My saved shows</button></header>
     <div class="podcast-grid">
-        <section class="podcast-preview" aria-label="Show preview">
-            <div class="podcast-preview-heading"><div><h2>Your show preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><div class="preview-heading-actions"><button id="podcast-preview-toggle" type="button" aria-expanded="true" aria-controls="podcast-preview-body" hidden>Hide preview</button><button id="podcast-fullscreen" type="button">Full-screen editor</button></div></div>
-            <div id="podcast-preview-body">
-            <fieldset class="podcast-screen-tabs"><legend>Broadcast screen</legend>{broadcastScreens.map(screen => <label><input form="podcast-form" type="radio" name="screen" value={screen} checked={screen === 'live'} /><span>{screenLabels[screen]}</span></label>)}</fieldset>
-            <BroadcastStage />
-            <div class="camera-edit-toolbar"><button id="camera-edit-toggle" type="button" aria-pressed="false">Position cameras</button><span class="podcast-field-help">Move and resize frames for your show.</span></div>
-            <div class="podcast-preview-footer"><label><input id="podcast-guides" type="checkbox" checked /> Show camera guides in editor</label><span>1920 × 1080 · 16:9</span></div>
-            <p id="podcast-save-status" class="podcast-save-status" role="status">Saved in this browser.</p>
-            <p id="podcast-obs-status" class="podcast-field-help" role="status">Copy a link when you are ready to use this setting in OBS.</p>
-            <p class="podcast-hint">Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.</p>
-
-            </div>
-        </section>
         <form class="podcast-controls" id="podcast-form">
-            <h2>Personalise your show</h2>
-            <details class="podcast-control-section" open><summary>Screen message</summary>
-                <p id="podcast-screen-help" class="podcast-field-help">Your Live screen shows your camera layout.</p>
-                <div id="podcast-message-field" hidden><label for="screen-message">Screen heading</label><input id="screen-message" maxlength="100" /></div>
-                <div id="podcast-countdown-field" hidden><label class="countdown-toggle"><input id="show-countdown" type="checkbox" /> Show countdown</label>
-                <label for="countdown-seconds">Countdown length (seconds)</label><input id="countdown-seconds" type="number" min="10" max="3600" step="1" value="300" />
-                <button id="countdown-restart" type="button">Restart preview countdown</button>
-                <p class="podcast-field-help">Starts when this screen loads in OBS. Stops at 00:00; switch to Live in OBS when ready. Enable “Refresh browser when scene becomes active” in OBS to restart it on each visit.</p></div>
-            </details>
+            <section class="workspace-card podcast-show-card"><h2>Your show</h2>
+            <label for="show-name">Show name</label><input id="show-name" name="show" maxlength="80" value="The Evening Conversation" />
             <details class="podcast-control-section" open><summary>Background</summary>
             <div class="selected-background"><img id="selected-background-image" src="" alt="" /><span id="selected-background-label"></span></div>
             <button id="background-change" type="button">Change background</button>
                         <dialog id="podcast-background-dialog" aria-labelledby="background-dialog-title"><div class="gallery-heading"><h2 id="background-dialog-title">Choose your background</h2><button id="background-close" type="button" autofocus>Done</button></div>{broadcastBackgroundGroups.map(group => <div class="podcast-background-group"><h3>{group.name}</h3><div class="podcast-backgrounds">{group.assets.map(asset => <label><input type="radio" name="background" value={asset.id} checked={asset.id === 'wirral-liverpool'} /><span><img src={asset.src} alt="" loading="lazy" /><span>{asset.name}</span></span></label>)}</div></div>)}<p class="podcast-field-help">Switch scenes while keeping your branding and camera layout. Copy a fresh link to update OBS.</p></dialog></details>
-            <details id="podcast-layout-section" class="podcast-control-section" open><summary>Layout</summary>            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/><rect class="layout-thumb-frame" x="34" y="22" width="92" height="52" rx="4"/></svg>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/><rect class="layout-thumb-frame" x="12" y="29" width="65" height="37" rx="4"/><rect class="layout-thumb-frame" x="83" y="29" width="65" height="37" rx="4"/></svg>Two people</span></label><label><input type="radio" name="layout" value="background" /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/></svg>No frames</span></label></div></fieldset>
+            <details id="podcast-layout-section" class="podcast-control-section" open><summary>Camera layout</summary>            <fieldset><legend>Camera layout</legend><div class="podcast-layouts"><label><input type="radio" name="layout" value="solo" /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/><rect class="layout-thumb-frame" x="34" y="22" width="92" height="52" rx="4"/></svg>One host</span></label><label><input type="radio" name="layout" value="duo" checked /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/><rect class="layout-thumb-frame" x="12" y="29" width="65" height="37" rx="4"/><rect class="layout-thumb-frame" x="83" y="29" width="65" height="37" rx="4"/></svg>Two hosts</span></label><label><input type="radio" name="layout" value="background" /><span><svg class="layout-thumbnail" viewBox="0 0 160 90" aria-hidden="true" focusable="false"><rect class="layout-thumb-sky" x="1" y="1" width="158" height="88" rx="7"/><path class="layout-thumb-horizon" d="M2 62 Q35 42 68 57 T158 50 V82 Q158 89 151 89 H9 Q1 89 1 82Z"/></svg>No hosts</span></label></div></fieldset>
             <div id="camera-adjustments" hidden>
                 <p class="podcast-field-help">Drag a frame in the preview. Drag its bottom-right corner to resize. For a larger view, use Full-screen editor. Arrow keys move a focused frame; Shift + Left/Right resize.</p>
                 <label for="camera-selection">Adjust camera</label><select id="camera-selection" data-camera-control><option value="0">Host</option><option value="1">Guest</option></select>
@@ -54,8 +25,8 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                 <p class="podcast-field-help">Frames keep a 16:9 shape. Positions save with your draft and My Shows. After changing them, export again and update your camera transforms in OBS using the values under Set up or update OBS.</p>
             </div>
             <div class="podcast-names"><div><label for="host-name">Host name</label><input id="host-name" name="host" maxlength="40" value="Host" /></div><div id="guest-name-field"><label for="guest-name">Guest name</label><input id="guest-name" name="guest" maxlength="40" value="Guest" /></div></div></details>
+            </section>
             <details class="podcast-control-section" open><summary>Branding</summary>
-            <label for="show-name">Show name</label><input id="show-name" name="show" maxlength="80" value="The Evening Conversation" />
             <label for="show-episode">Episode title or tagline</label><textarea id="show-episode" name="episode" maxlength="120" rows="2">Good conversations. A little space to unwind.</textarea>
 
             <label for="show-social">Social handle or website <span class="podcast-optional">optional</span></label><input id="show-social" name="social" maxlength="80" placeholder="@yourshow" />
@@ -67,10 +38,32 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             <ClearSpacePanel />
             <details class="podcast-control-section"><summary>Motion</summary><fieldset><legend class="sr-only">Background motion</legend><div class="podcast-motion"><label><input type="radio" name="motion" value="still" /><span>Still</span></label><label><input type="radio" name="motion" value="subtle" checked /><span>Subtle</span></label><label><input type="radio" name="motion" value="atmospheric" /><span>Atmospheric</span></label></div><p class="podcast-field-help"><span id="podcast-motion-help">Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.</span></p><p id="podcast-reduced" hidden>Your device requests reduced motion, so this preview stays still.</p></fieldset></details>
 
+            <details class="podcast-control-section"><summary>Screen message</summary>
+                <p id="podcast-screen-help" class="podcast-field-help">Your Live screen shows your camera layout.</p>
+                <div id="podcast-message-field" hidden><label for="screen-message">Screen heading</label><input id="screen-message" maxlength="100" /></div>
+                <div id="podcast-countdown-field" hidden><label class="countdown-toggle"><input id="show-countdown" type="checkbox" /> Show countdown</label>
+                <label for="countdown-seconds">Countdown length (seconds)</label><input id="countdown-seconds" type="number" min="10" max="3600" step="1" value="300" />
+                <button id="countdown-restart" type="button">Restart preview countdown</button>
+                <p class="podcast-field-help">Starts when this screen loads in OBS. Stops at 00:00; switch to Live in OBS when ready. Enable “Refresh browser when scene becomes active” in OBS to restart it on each visit.</p></div>
+            </details>
             <button id="podcast-reset" type="button">Reset to demo</button>
         </form>
+        <div class="podcast-output">
+        <section class="podcast-preview" aria-label="Show preview">
+            <div class="podcast-preview-heading"><div><h2>Live preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><div class="preview-heading-actions"><button id="podcast-preview-toggle" type="button" aria-expanded="true" aria-controls="podcast-preview-body" hidden>Hide preview</button><button id="podcast-fullscreen" type="button">Full-screen editor</button></div></div>
+            <div id="podcast-preview-body">
+            <fieldset class="podcast-screen-tabs"><legend>Broadcast screen</legend>{broadcastScreens.map(screen => <label><input form="podcast-form" type="radio" name="screen" value={screen} checked={screen === 'live'} /><span>{screenLabels[screen]}</span></label>)}</fieldset>
+            <BroadcastStage />
+            <div class="camera-edit-toolbar"><button id="camera-edit-toggle" type="button" aria-pressed="false">Position cameras</button><span class="podcast-field-help">Move and resize frames for your show.</span></div>
+            <div class="podcast-preview-footer"><label><input id="podcast-guides" type="checkbox" checked /> Show camera guides in editor</label><span>1920 × 1080 · 16:9</span></div>
+            <p id="podcast-save-status" class="podcast-save-status" role="status">Saved in this browser.</p>
+            <p id="podcast-obs-status" class="podcast-field-help" role="status">Copy a link when you are ready to use this setting in OBS.</p>
+            <p class="podcast-hint">Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.</p>
+
+            </div>
+        </section>
             <div class="podcast-export podcast-export-panel">
-                <h2>Use your setting</h2>
+                <h2>Save and use in OBS</h2>
                 <p id="podcast-export-description">Export your Live screen. Branding and background are shared across all four screens.</p>
                 <button id="podcast-collection" type="button" class="podcast-primary">Download all four OBS scenes</button>
                 <p>Import the JSON through OBS → Scene Collection → Import, then select the new Aether collection. Add your camera and microphone to Main Show. Uses your current design for all four screens.</p>
@@ -82,7 +75,15 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                 <p id="podcast-feedback" role="status" aria-live="polite"></p>
 
             </div>
-    </div>
+    <details class="show-library" id="show-library">
+        <summary>My Shows <span>Save and reopen your show designs</span></summary>
+        <p class="podcast-field-help">Your current draft saves automatically in this browser. Named shows are separate saved copies: use Update saved show to keep later edits. Download a backup to move a show or protect it before clearing browser data.</p>
+        <label for="saved-show-name">Saved show name</label>
+        <input id="saved-show-name" type="text" maxlength="80" placeholder="For example, The Wirral Way" />
+        <div class="show-library-actions"><button id="show-save-new" type="button">Save as new show</button><button id="show-update" type="button" disabled>Update saved show</button><button id="show-backup" type="button">Download draft backup</button><label class="show-import-label" for="show-import">Import show backup<input id="show-import" type="file" accept="application/json,.json" /></label></div>
+        <p id="shows-status" role="status" aria-live="polite"></p>
+        <div id="saved-shows"></div>
+    </details>
     <section class="podcast-export podcast-setup-guide" aria-label="OBS setup">                <details id="podcast-obs-setup">
                     <summary>Set up or update OBS</summary>
                     <div class="obs-update-help">
@@ -149,6 +150,8 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
                     <p id="podcast-export-state" role="status">Create a fresh export after changing settings.</p>
                     <p>Copy a new link or download a new file after changing settings. Keep the downloaded file on your computer; it still needs access to Aether online.</p>
                 </details></section>
+    </div>
+    </div>
 </section>
 </StudioLayout>
 <script>
@@ -179,6 +182,13 @@ import { attachShowLibrary } from '../../lib/broadcast/ShowLibrary';
 import { createObsCollection } from '../../lib/broadcast/ObsCollection';
 import { cameraPlacement } from '../../lib/broadcast/CameraPlacement';
 import { createBroadcastController } from '../../lib/broadcast/BroadcastController';
+document.querySelector<HTMLButtonElement>('#open-saved-shows')?.addEventListener('click', () => {
+    const library = document.querySelector<HTMLDetailsElement>('#show-library');
+    if (!library) return;
+    library.open = true;
+    library.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+    document.querySelector<HTMLInputElement>('#saved-show-name')?.focus({ preventScroll: true });
+});
 const form=document.querySelector<HTMLFormElement>('#podcast-form')!;
 const root=document.querySelector<HTMLElement>('.broadcast-stage')!;
 const controller=createBroadcastController(root);

@@ -1,0 +1,197 @@
+@font-face {
+  font-family: 'Aether Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
+}
+/* Shared desktop foundation from the Aether Figma masters.
+   Opt-in keeps public pages, players and OBS output independent. */
+html body#aether-workspace[data-studio-design="master"][data-workspace] {
+  --studio-canvas: #080f1b;
+  --studio-sidebar: #0b1421;
+  --studio-surface: #101c2c;
+  --studio-input: #172638;
+  --studio-border: #2a3a50;
+  --studio-text: #f0f5fb;
+  --studio-muted: #a6b7cc;
+  --studio-success: #84dfc0;
+  --studio-accent: #8fc5ff;
+  --studio-accent-soft: #18334e;
+  --studio-ink: #081722;
+  --studio-radius: 16px;
+  background: var(--studio-canvas);
+  color: var(--studio-text);
+  font-family: "Aether Inter", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.57;
+}
+html body#aether-workspace[data-studio-design="master"][data-workspace][data-workspace="podcast"] {
+  --studio-accent: #84dfc0;
+  --studio-accent-soft: #173a35;
+}
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-main { margin-left: 232px; padding: 32px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar {
+  width: 232px; padding: 24px; background: var(--studio-sidebar);
+  border: 0; backdrop-filter: none; overflow-y: auto;
+}
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__brand a { gap: 12px; align-items: flex-start; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__mark {
+  width: 28px; height: 32px; border: 0; background: transparent; box-shadow: none; border-radius: 0;
+}
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__identity strong { font-size: 18px; color: var(--studio-text); line-height: 26px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__identity small { color: var(--studio-muted); font-size: 11px; letter-spacing: 0; line-height: 18px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__runtime { margin-top: 24px; background: var(--studio-surface); border: 0; border-radius: 12px; padding: 12px; gap: 8px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__runtime-indicator { background: var(--studio-success); box-shadow: none; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__runtime strong { font-size: 14px; font-weight: 500; color: var(--studio-success); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__runtime small { font-size: 11px; color: var(--studio-muted); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__navigation { margin-top: 24px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__label { color: var(--studio-muted); font-size: 11px; font-weight: 400; letter-spacing: 0; padding: 0; margin-bottom: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__navigation ul { gap: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__link { min-height: 44px; font-size: 13px; padding: 12px; border: 0; border-radius: 8px; color: var(--studio-muted); gap: 8px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__link:hover { transform: none; color: var(--studio-text); background: var(--studio-input); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__link--active { background: var(--studio-accent-soft); color: var(--studio-accent); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__link-icon { width: 9px; height: 9px; border-radius: 50%; opacity: 1; flex-shrink: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__link--active .studio-sidebar__link-icon { background: var(--studio-accent); box-shadow: none; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__profile { border: 0; padding: 32px 0 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__profile-details { gap: 8px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__profile-details strong { color: var(--studio-text); font-size: 11px; font-weight: 400; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__profile-details small { color: var(--studio-muted); font-size: 11px; }
+
+/* The two tools share geometry and control styles. */
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) { width: 100%; max-width: 1600px; padding: 0; margin: 0 auto; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.hero, .podcast-header) { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin: 0 0 24px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.hero, .podcast-header) h1 { margin: 0 0 4px; font-size: 28px; line-height: 36px; font-weight: 700; letter-spacing: -.02em; color: var(--studio-text); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.hero, .podcast-header) p { margin: 0; font-size: 14px; line-height: 22px; color: var(--studio-muted); text-transform: none; letter-spacing: 0; max-width: none; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .grid, .podcast-grid) { display: grid; grid-template-columns: minmax(300px, 420fr) minmax(0, 700fr); align-items: start; gap: 24px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor-controls, .editor-output, .podcast-controls, .podcast-output) { display: flex; flex-direction: column; gap: 16px; min-width: 0; position: static; max-height: none; overflow: visible; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor-controls, .podcast-controls) { grid-column: 1; grid-row: 1; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor-output, .podcast-output) { grid-column: 2; grid-row: 1; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .panel, .editor .control-section, .workspace-card, .podcast-controls > .podcast-control-section, .podcast-preview, .podcast-export, .show-library) {
+  background: var(--studio-surface); border: 1px solid var(--studio-border); border-radius: var(--studio-radius); padding: 24px; box-shadow: none; min-width: 0;
+}
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-controls { background: transparent; border: 0; padding: 0; border-radius: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .panel h2, .workspace-card h2, .podcast-preview h2, .podcast-export h2) { font-size: 18px; line-height: 26px; color: var(--studio-text); font-weight: 600; margin: 0 0 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .control-section, .podcast-controls > .podcast-control-section) { padding: 0; overflow: hidden; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .control-section, .podcast-control-section) > summary { cursor: pointer; color: var(--studio-text); font-size: 18px; font-weight: 600; line-height: 26px; padding: 24px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .control-section, .podcast-control-section)[open] > summary { padding-bottom: 8px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-controls > .podcast-control-section[open] { padding: 0 24px 24px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-controls > .podcast-control-section[open] > summary { margin-inline: -24px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .control-section .panel { background: transparent; border: 0; padding: 16px 24px 24px; border-radius: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .control-section .panel > h2 { display: none; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .effect-subheading { color: var(--studio-muted); font-size: 14px; font-weight: 500; margin: 16px 24px 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .effect-subheading + .audio-slot { margin: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .panel, .workspace-card, .podcast-controls, .show-library) label { font-size: 14px; font-weight: 500; color: var(--studio-text); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) :is(input, select, textarea) { font-family: inherit; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) :is(input:not([type="radio"]):not([type="checkbox"]):not([type="range"]):not([type="color"]), select, textarea) {
+  background: var(--studio-input); color: var(--studio-text); border: 1px solid var(--studio-border); border-radius: 8px; padding: 10px 12px; min-height: 42px; width: 100%; font-size: 14px; line-height: 20px; box-sizing: border-box;
+}
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) input::placeholder { color: var(--studio-muted); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) input[type="checkbox"] { width: 18px; height: 18px; padding: 0; accent-color: var(--studio-accent); vertical-align: middle; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) input[type="range"] { accent-color: var(--studio-accent); padding: 0; min-height: 24px; width: 100%; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) input[type="color"] { width: 44px; height: 34px; padding: 3px; background: var(--studio-input); border: 1px solid var(--studio-border); border-radius: 8px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) output { color: var(--studio-accent); font-weight: 500; font-size: 14px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) :is(button, .workspace-button, .show-import-label) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 9px 14px; border: 1px solid var(--studio-border); border-radius: 8px; background: var(--studio-input); color: var(--studio-text); font-size: 14px; line-height: 20px; font-weight: 500; text-decoration: none; cursor: pointer; margin: 0; font-family: inherit;
+}
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) :is(button, .workspace-button):hover:not(:disabled) { background: var(--studio-accent-soft); border-color: var(--studio-accent); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) :is(button:disabled, input:disabled) { opacity: .5; cursor: default; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) :is(button, a, input, select, textarea, summary):focus-visible { outline: 2px solid var(--studio-accent); outline-offset: 3px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(#audio-playback-toggle, #save-experience-button, .podcast-primary, #show-save-new) { background: var(--studio-accent); border-color: var(--studio-accent); color: var(--studio-ink); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(#audio-playback-toggle, #save-experience-button, .podcast-primary, #show-save-new):hover:not(:disabled) { background: color-mix(in srgb, var(--studio-accent) 85%, white); color: var(--studio-ink); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) :is(p, small) { overflow-wrap: anywhere; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.save-panel p, .podcast-export p, .podcast-hint, .podcast-field-help, .show-library p, .clear-space-fields p) { color: var(--studio-muted); font-size: 12px; line-height: 18px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor, .podcast-workspace) [hidden] { display: none !important; }
+
+/* Scene editor: the live stage stays visible while adjusting long controls. */
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-panel { position: sticky; top: 16px; z-index: 5; padding: 24px; overflow: auto; max-height: calc(100dvh - 32px); scrollbar-gutter: stable; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-header { margin: 0 0 16px; align-items: center; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-header h2 { margin: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .panel-label { display: none; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-status { background: transparent; border: 0; font-size: 14px; font-weight: 500; color: var(--studio-success); padding: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-status__dot { box-shadow: none; background: var(--studio-success); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-stage:not(:fullscreen) { aspect-ratio: 16/9; height: auto; min-height: 0; border: 0; border-radius: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-stage__label { display: grid; gap: 8px; position: static; padding: 0; margin-top: 16px; color: var(--studio-text); background: none; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-stage__label small { color: var(--studio-muted); font-size: 14px; line-height: 22px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .preview-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .transport-status { color: var(--studio-muted); font-size: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .scene-settings { border: 0; margin: 0; padding: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .scene-settings > summary { font-size: 18px; font-weight: 600; color: var(--studio-text); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .scene-tint-settings > summary { color: var(--studio-text); font-size: 14px; padding-block: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .experience-switcher { width: 100%; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .scene-selection h2 { margin-bottom: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .background-choices button { display: block; padding: 0; border: 1px solid var(--studio-border); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .background-choices button[aria-pressed="true"] { border-color: var(--studio-accent); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .background-choices img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .background-choices span { font-size: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .background-choices legend { color: var(--studio-muted); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .save-panel > small { color: var(--studio-muted); font-size: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .save-panel #creation-name { margin: 0 0 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .control-section .clear-space-fields { padding: 16px 24px 24px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .editor .particle-heading { color: var(--studio-text); font-size: 14px; }
+
+/* Podcast studio keeps its native form and export hooks. */
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-preview { grid-column: auto; grid-row: auto; position: sticky; top: 16px; max-height: calc(100dvh - 32px); overflow-y: auto; scrollbar-gutter: stable; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-preview-heading { margin-bottom: 16px; align-items: flex-start; gap: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-preview-heading h2 { margin: 0 0 4px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-preview-heading p { color: var(--studio-muted); font-size: 12px; margin: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-preview .broadcast-stage { width: 100%; max-width: none; margin-inline: auto; border-radius: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-screen-tabs { gap: 8px; margin: 0 0 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-screen-tabs legend { font-size: 12px; color: var(--studio-muted); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.podcast-screen-tabs, .podcast-layouts, .podcast-motion) span { background: var(--studio-input); color: var(--studio-text); border-color: var(--studio-border); font-size: 13px; border-radius: 8px; min-height: 40px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.podcast-screen-tabs, .podcast-layouts, .podcast-motion) input:checked + span { color: var(--studio-ink); background: var(--studio-accent); border-color: var(--studio-accent); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-layouts .layout-thumbnail { display: none; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-layouts label > span { padding: 10px 4px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-export-panel { grid-column: auto; grid-row: auto; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-export-actions { gap: 12px; margin-top: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-controls label:not(.podcast-layouts label):not(.podcast-motion label):not(.podcast-backgrounds label) { font-size: 14px; color: var(--studio-text); margin: 16px 0 8px; font-weight: 500; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-show-card h2 { margin-bottom: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-show-card > label:first-of-type { margin-top: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-controls fieldset { margin-top: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-controls legend { font-size: 14px; color: var(--studio-text); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-preview-footer { gap: 12px; flex-wrap: wrap; color: var(--studio-muted); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.podcast-save-status, #shows-status, #podcast-feedback) { color: var(--studio-success); font-size: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .show-library { margin: 0; scroll-margin-top: 16px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .show-library > summary { font-size: 18px; line-height: 26px; color: var(--studio-text); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .show-library > summary span { color: var(--studio-muted); display: block; margin: 8px 0 0; font-size: 12px; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] #saved-shows { grid-template-columns: repeat(auto-fill,minmax(min(100%,220px),1fr)); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-setup-guide { margin-top: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-setup-guide > details { border: 0; margin: 0; padding: 0; }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-setup-guide > details > summary { font-size: 14px; color: var(--studio-text); }
+html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-controls #podcast-reset { align-self: flex-start; }
+
+/* Responsive fallback preserves existing editing access until dedicated
+   tablet/mobile masters are approved. No fixed-width desktop overflow. */
+@media (min-width: 901px) and (max-width: 1199px) {
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar { width: 208px; padding: 20px 16px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-main { margin-left: 208px; padding: 24px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .grid, .podcast-grid) { grid-template-columns: minmax(260px,.9fr) minmax(0,1.1fr); gap: 16px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .panel, .workspace-card, .podcast-preview, .podcast-export, .show-library) { padding: 16px; }
+}
+@media (max-width: 900px) {
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar { position: relative; width: auto; min-height: auto; padding: 16px; overflow: visible; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__brand a { align-items: center; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__identity small { display: block; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__runtime { display: none; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__navigation { margin-top: 16px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__navigation ul { display: flex; flex-wrap: wrap; gap: 8px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__label, html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__label--secondary + ul { display: none; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__profile { display: none; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-main { margin-left: 0; padding: 20px 16px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .grid, .podcast-grid) { display: flex; flex-direction: column; gap: 16px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor-controls, .editor-output, .podcast-controls, .podcast-output) { width: 100%; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor-output, .podcast-output) { order: 0; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor-controls, .podcast-controls) { order: 1; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .preview-panel, .podcast-preview) { position: static; max-height: none; }
+}
+@media (max-width: 600px) {
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.hero, .podcast-header) { flex-direction: column; gap: 16px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.hero, .podcast-header) h1 { font-size: 24px; line-height: 32px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .panel, .workspace-card, .podcast-preview, .podcast-export, .show-library) { padding: 16px; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-screen-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .preview-heading-actions { max-width: none; }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast-preview-heading { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__link { transition: none; }
+}
