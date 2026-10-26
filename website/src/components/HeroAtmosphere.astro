@@ -1,39 +1,73 @@
 ---
 import {placeById,placeImage,placeEditUrl} from '../data/PlaceCatalog';
+import SceneStage from './studio/SceneStage.astro';
+import BroadcastStage from './studio/BroadcastStage.astro';
 const scenes = [
-  { id:'lighthouse-retreat',name:'Lighthouse Retreat',mood:'A sheltered place beside the sea.' },
+  { id:'show',name:'Podcast & stream',mood:'A branded setting for your show.' },
   { id:'bamboo-rain-pavilion',name:'Bamboo Pavilion',mood:'A dry mat. Rain among the trees.' },
+  { id:'lighthouse-retreat',name:'Lighthouse Retreat',mood:'A sheltered place beside the sea.' },
   { id:'snow-cabin',name:'Snow Cabin',mood:'Warm indoors. Snow beyond the glass.' },
 ];
 ---
 <div class="atmosphere" data-hero-atmosphere>
-  <div class="scene" data-scene="lighthouse-retreat">
-    {scenes.map((scene, index) => <img src={placeImage(placeById(scene.id)!)} alt={`${scene.name} atmosphere`} width="1024" height="576" hidden={index !== 0} data-scene-image={scene.id} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} />)}
-    <span class="preview-label">For your space · Scene preview</span>
-    <div class="scene-caption" aria-live="polite"><h2 data-scene-name>Lighthouse Retreat</h2><p data-scene-mood>A sheltered place beside the sea.</p></div>
+  <div class="scene" data-scene="show">
+    <div class="show-stage" data-show-stage aria-label="Example show layout with camera guides"><BroadcastStage /></div>
+    <div class="bamboo-stage" data-bamboo-stage hidden aria-hidden="true"><SceneStage sceneId="forest" name="Bamboo Pavilion" assetId="bamboo-rain-pavilion" stageId="hero-bamboo-stage" exitButton={false} /></div>
+    {scenes.filter(scene => scene.id !== 'bamboo-rain-pavilion' && scene.id !== 'show').map((scene, index) => <img src={placeImage(placeById(scene.id)!)} alt={`${scene.name} atmosphere`} width="1024" height="576" hidden data-scene-image={scene.id} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} />)}
+    <span class="preview-label" data-preview-label>Podcast & stream · Example</span>
+    <div class="scene-caption" aria-live="polite"><h2 data-scene-name>Podcast & stream</h2><p data-scene-mood>A branded setting for your show.</p></div>
   </div>
   <div class="scene-controls" role="group" aria-label="Choose an atmosphere preview">
-    {scenes.map((scene,index) => <button type="button" aria-pressed={index === 0 ? 'true' : 'false'} data-scene-choice={scene.id} data-mood={scene.mood} data-href={placeEditUrl(placeById(scene.id)!)}>{scene.name}</button>)}
-    <a href="/studio/experiences/ocean/?place=lighthouse-retreat" data-scene-link>Edit this scene →</a>
+    {scenes.map((scene,index) => <button type="button" aria-pressed={index === 0 ? 'true' : 'false'} data-scene-choice={scene.id} data-mood={scene.mood} data-href={scene.id === 'show' ? '/studio/podcast/' : `${placeEditUrl(placeById(scene.id)!)}${scene.id === 'bamboo-rain-pavilion' ? '&homepage=bamboo-rain-pavilion' : ''}`}>{scene.name}</button>)}
+    <a href="/studio/podcast/" data-scene-link>Open podcast studio →</a>
   </div>
 </div>
 <script>
+  import { createStudioRuntime } from '../lib/studio/StudioRuntime';
+  import bamboo from '../data/homepage/homepage-bamboo-rain01.aether.json';
+  import type { Experience } from '../lib/models/Experience';
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const stage = document.querySelector<HTMLElement>('#hero-bamboo-stage');
+    const canvas = stage?.querySelector<HTMLCanvasElement>('.preview-canvas');
+    if (stage && canvas) {
+      const runtime = createStudioRuntime({ previewStage: stage, previewCanvas: canvas, audioElement: null, audioEnabledToggle: null, volumeControl: null, layerVolumeControl: null, volumeValue: null, particlesToggle: null, lightingToggle: null, fogToggle: null, particlesStatus: null, lightingStatus: null, fogStatus: null });
+      runtime.experienceLoader.load(bamboo as Experience);
+    }
+  }
   document.querySelectorAll<HTMLElement>('[data-hero-atmosphere]').forEach(root => {
+    const broadcast = root.querySelector<HTMLElement>('.broadcast-stage');
+    if (broadcast) { broadcast.dataset.screen = 'live'; broadcast.dataset.guides = 'true'; broadcast.dataset.motion = 'still'; }
     root.querySelectorAll<HTMLButtonElement>('[data-scene-choice]').forEach(button => {
       button.addEventListener('click', () => {
         const id = button.dataset.sceneChoice!;
+        root.querySelector<HTMLElement>('[data-bamboo-stage]')!.hidden = id !== 'bamboo-rain-pavilion';
+        root.querySelector<HTMLElement>('[data-show-stage]')!.hidden = id !== 'show';
         root.querySelectorAll<HTMLImageElement>('[data-scene-image]').forEach(img => { img.hidden = img.dataset.sceneImage !== id; });
         root.querySelectorAll<HTMLButtonElement>('[data-scene-choice]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
         root.querySelector<HTMLElement>('[data-scene]')!.dataset.scene = id;
         root.querySelector<HTMLElement>('[data-scene-name]')!.textContent = button.textContent;
+        root.querySelector<HTMLElement>('[data-preview-label]')!.textContent = id === 'show' ? 'Podcast & stream · Example' : id === 'bamboo-rain-pavilion' ? 'Live scene · Rain' : 'Scene preview';
         root.querySelector<HTMLElement>('[data-scene-mood]')!.textContent = button.dataset.mood!;
-        root.querySelector<HTMLAnchorElement>('[data-scene-link]')!.href = button.dataset.href!;
+        const link = root.querySelector<HTMLAnchorElement>('[data-scene-link]')!;
+        link.href = button.dataset.href!;
+        link.textContent = id === 'show' ? 'Open podcast studio →' : 'Edit this scene →';
       });
     });
   });
 </script>
 <style>
   .atmosphere { width:100%; border:1px solid #ffffff24; border-radius:20px; overflow:hidden; background:#10151f; box-shadow:0 24px 80px #0004; }
+  .show-stage { position:absolute; inset:0; display:grid; place-items:center; background:#09121c; }
+  .show-stage[hidden] { display:none; }
+  .show-stage :global(.broadcast-stage) { width:100%; border-radius:0; }
+  .show-stage :global(.broadcast-camera) { width:38%; left:8%; top:35%; }
+  .show-stage :global(.broadcast-camera--guest) { left:54%; }
+  .scene[data-scene="show"] .scene-caption { display:none; }
+  .scene[data-scene="show"]::after { display:none; }
+  .scene[data-scene="show"] .preview-label { top:8px; left:8px; z-index:6; }
+  .bamboo-stage { position:absolute; inset:0; }
+  .bamboo-stage[hidden] { display:none; }
+  .bamboo-stage :global(.preview-stage) { width:100%; height:100%; border:0; border-radius:0; }
   .scene { position:relative; height:350px; overflow:hidden; --accent:#ffbb65; }
   .scene[data-scene="forest"] { --accent:#c7ed9a; }
   .scene[data-scene="ocean"] { --accent:#a3eaff; }

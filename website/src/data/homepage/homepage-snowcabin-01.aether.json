@@ -1,0 +1,61 @@
+{
+  "id": "retreat-custom-1793046877624",
+  "name": "Snow cabin 01",
+  "description": "A warm cabin and soft rug, with snow falling beyond the five window panes.",
+  "status": "Custom",
+  "audio": {
+    "enabled": true,
+    "volume": 25,
+    "layerVolume": 0,
+    "track": "retreat-wind"
+  },
+  "atmosphere": {
+    "particles": true,
+    "lighting": true,
+    "fog": false
+  },
+  "environment": {
+    "colour": "#251b14"
+  },
+  "particles": {
+    "preset": "retreat-snow",
+    "motion": "snow",
+    "count": 300,
+    "colour": "#ffffff",
+    "glow": 20,
+    "minRadius": 0.15,
+    "maxRadius": 2.6,
+    "minSpeed": 22,
+    "maxSpeed": 49,
+    "drift": 3,
+    "minOpacity": 0.4,
+    "maxOpacity": 0.95,
+    "minLifetime": 12,
+    "maxLifetime": 30
+  },
+  "lighting": {
+    "preset": "storm-dark",
+    "colour": "#eee2ce",
+    "intensity": 0.18,
+    "pulse": false,
+    "speed": 0
+  },
+  "fog": {
+    "preset": "storm-mist",
+    "colour": "#8fa5b6",
+    "density": 0,
+    "speed": 0.1
+  },
+  "transition": {
+    "duration": 2600,
+    "easing": "ease-in-out"
+  },
+  "sceneId": "retreat",
+  "href": "/studio/retreat/",
+  "formatVersion": 1,
+  "smoke": {
+    "enabled": false,
+    "amount": 35
+  },
+  "backgroundId": "indoor-snow-cabin"
+}

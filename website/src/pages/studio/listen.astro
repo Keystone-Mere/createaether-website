@@ -20,6 +20,7 @@ import SceneStage from '../../components/studio/SceneStage.astro';
  </section>
 </StudioLayout>
 <script>
+ import { homepagePreset } from '../../data/homepage/presets';
  import {placeById,createPlaceExperience,placeEditUrl} from '../../data/PlaceCatalog';
  import { experiences } from '../../data/experiences';
  import { ExperienceLibrary } from '../../lib/storage/ExperienceLibrary';
@@ -29,7 +30,8 @@ import SceneStage from '../../components/studio/SceneStage.astro';
  const library = new ExperienceLibrary();
  const saved = params.get('saved');
  const place=placeById(params.get('place'));
- const experience = saved ? library.get(saved) : place && !place.session ? createPlaceExperience(place) : structuredClone(experiences.find(item => item.id === params.get('scene')));
+ const preview = place && params.get('homepage') === place.id ? homepagePreset(place.id) : undefined;
+ const experience = saved ? library.get(saved) : preview ?? (place && !place.session ? createPlaceExperience(place) : structuredClone(experiences.find(item => item.id === params.get('scene'))));
  const status = document.querySelector<HTMLElement>('#listen-status')!;
  const audio = document.querySelector<HTMLAudioElement>('#listen-audio')!;
  const button = document.querySelector<HTMLButtonElement>('#listen-play')!;
@@ -63,7 +65,7 @@ import SceneStage from '../../components/studio/SceneStage.astro';
   const customise = document.querySelector<HTMLAnchorElement>('#listen-customise')!;
   const scene = experience.sceneId ?? experience.id.split('-')[0];
   customise.href = `/studio/experiences/${encodeURIComponent(scene)}/`;
-  if (place && !saved) customise.href=placeEditUrl(place);
+  if (place && !saved) customise.href=placeEditUrl(place) + (preview ? `&homepage=${encodeURIComponent(place.id)}` : '');
   if (saved) customise.addEventListener('click',event => { if (!library.stageForEditing(experience)) {event.preventDefault();status.textContent = 'Unable to open this saved experience for editing.';} });
   audio.addEventListener('error',() => {status.textContent='The audio could not be loaded. You can still enjoy the scene.';});
  }

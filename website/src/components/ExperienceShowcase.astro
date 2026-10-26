@@ -1,5 +1,6 @@
 ---
 import {places,placeImage,placePlayUrl} from '../data/PlaceCatalog';
+import SceneStage from './studio/SceneStage.astro';
 ---
 
 <section
@@ -22,15 +23,15 @@ import {places,placeImage,placePlayUrl} from '../data/PlaceCatalog';
 
   <div class="experience-showcase__grid">
     {
-      places.filter(experience => ['lighthouse-retreat','bamboo-rain-pavilion','snow-cabin'].includes(experience.id)).map((experience, index) => (
-        <a class="experience-card" href={placePlayUrl(experience)}>
-          <img class="experience-card__cover" src={placeImage(experience)} alt="" width="1024" height="576" loading="lazy" />
+      ['incense-hall','snow-cabin','beach-bonfire'].map(id => places.find(place => place.id === id)!).map((experience, index) => (
+        <a class="experience-card" href={`${placePlayUrl(experience)}&homepage=${experience.id}`}>
+          <div class="experience-card__cover" data-homepage-preview={experience.id} aria-hidden="true"><SceneStage sceneId={experience.engineId} name={experience.name} imageSrc={placeImage(experience)} assetId={experience.backgroundId ?? experience.engineId} stageId={`homepage-${experience.id}`} exitButton={false} /></div>
           <div class="experience-card__body">
           <div class="experience-card__top">
             <span class="experience-card__number">
               {String(index + 1).padStart(2, '0')}
             </span>
-            <span class="experience-card__status">Playable</span>
+            <span class="experience-card__status">{({ 'incense-hall': 'Embers & smoke', 'snow-cabin': 'Falling snow', 'beach-bonfire': 'Rising embers' } as Record<string, string>)[experience.id]}</span>
           </div>
 
           <h3>{experience.name}</h3>
@@ -50,6 +51,24 @@ import {places,placeImage,placePlayUrl} from '../data/PlaceCatalog';
   </a>
 </section>
 
+<script>
+  import { createStudioRuntime } from '../lib/studio/StudioRuntime';
+  import temple from '../data/homepage/homepage-temple-01.aether.json';
+  import snow from '../data/homepage/homepage-snowcabin-01.aether.json';
+  import beach from '../data/homepage/homepage-beach01.aether.json';
+  import type { Experience } from '../lib/models/Experience';
+  const examples: Record<string, unknown> = { 'incense-hall': temple, 'snow-cabin': snow, 'beach-bonfire': beach };
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLElement>('[data-homepage-preview]').forEach(container => {
+      const stage = container.querySelector<HTMLElement>('.preview-stage');
+      const canvas = container.querySelector<HTMLCanvasElement>('.preview-canvas');
+      const settings = examples[container.dataset.homepagePreview || ''];
+      if (!stage || !canvas || !settings) return;
+      const runtime = createStudioRuntime({ previewStage: stage, previewCanvas: canvas, audioElement: null, audioEnabledToggle: null, volumeControl: null, layerVolumeControl: null, volumeValue: null, particlesToggle: null, lightingToggle: null, fogToggle: null, particlesStatus: null, lightingStatus: null, fogStatus: null });
+      runtime.experienceLoader.load(settings as Experience);
+    });
+  }
+</script>
 <style>
   .experience-showcase {
     padding: 3rem 0;
@@ -217,7 +236,8 @@ import {places,placeImage,placePlayUrl} from '../data/PlaceCatalog';
     }
   }
   .experience-card { display: flex; flex-direction: column; }
-  .experience-card__cover { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+  .experience-card__cover { display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+  .experience-card__cover :global(.preview-stage) { width: 100%; height: 100%; border: 0; border-radius: 0; }
   .experience-card__body { padding: 1.4rem; display: flex; flex-direction: column; flex: 1; }
   .experience-card__link { margin-top: auto; padding-top: 1.5rem; }
   @media (prefers-reduced-motion: reduce) { .experience-card { transition: none; } .experience-card:hover { transform: none; } }

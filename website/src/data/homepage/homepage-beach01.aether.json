@@ -1,0 +1,61 @@
+{
+  "id": "ocean-custom-1793047151296",
+  "name": "homepage-beach01",
+  "description": "An empty sitting blanket beside the sea, with warm firelight and embers rising from the logs.",
+  "status": "Custom",
+  "audio": {
+    "enabled": true,
+    "volume": 45,
+    "layerVolume": 0,
+    "track": "ocean-waves"
+  },
+  "atmosphere": {
+    "particles": true,
+    "lighting": true,
+    "fog": false
+  },
+  "environment": {
+    "colour": "#062c4d"
+  },
+  "particles": {
+    "preset": "beach-embers",
+    "motion": "rise",
+    "count": 298,
+    "colour": "#ffba66",
+    "glow": 19,
+    "minRadius": 0,
+    "maxRadius": 1.6,
+    "minSpeed": 16,
+    "maxSpeed": 28,
+    "drift": 4.5,
+    "minOpacity": 0.25,
+    "maxOpacity": 1,
+    "minLifetime": 2,
+    "maxLifetime": 5
+  },
+  "lighting": {
+    "preset": "ocean-blue",
+    "colour": "#0a61b0",
+    "intensity": 0.18,
+    "pulse": false,
+    "speed": 0.1
+  },
+  "fog": {
+    "preset": "coastal-mist",
+    "colour": "#c8e7f2",
+    "density": 0.62,
+    "speed": 0.28
+  },
+  "transition": {
+    "duration": 2400,
+    "easing": "ease-in-out"
+  },
+  "href": "/studio/experiences/ocean/",
+  "formatVersion": 1,
+  "sceneId": "ocean",
+  "smoke": {
+    "enabled": false,
+    "amount": 35
+  },
+  "backgroundId": "beach-bonfire"
+}

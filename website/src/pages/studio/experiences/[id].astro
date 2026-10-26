@@ -936,6 +936,7 @@ import { suggestedClearSpace } from '../../../lib/clear-space/ClearSpace';
     import { applyBackground } from '../../../lib/player/ScenePresentation';
     import { backgroundChoices, backgroundSource, backgroundAsset } from '../../../lib/player/BackgroundChoices';
     import { audioTracks } from '../../../data/audio/tracks';
+    import { homepagePreset } from '../../../data/homepage/presets';
     import {places,placeById,createPlaceExperience} from '../../../data/PlaceCatalog';
     import { applyWeatherBackground } from '../../../lib/player/WeatherBackgrounds';
     import { applyCoastalRain } from '../../../lib/player/CoastalRain';
@@ -1860,7 +1861,10 @@ import { suggestedClearSpace } from '../../../lib/clear-space/ClearSpace';
                 );
 
             const requestedPlace=placeById(new URLSearchParams(location.search).get('place'));
-            if(!stagedExperience && requestedPlace && !requestedPlace.session && requestedPlace.engineId===initialExperience.id) editableExperience=createPlaceExperience(requestedPlace);
+            if(!stagedExperience && requestedPlace && !requestedPlace.session && requestedPlace.engineId===initialExperience.id) {
+                const homepageId = new URLSearchParams(location.search).get('homepage');
+                editableExperience = homepageId === requestedPlace.id ? homepagePreset(homepageId) ?? createPlaceExperience(requestedPlace) : createPlaceExperience(requestedPlace);
+            }
             const requestedRetreat = new URLSearchParams(location.search).get('retreat');
             if (!stagedExperience && initialExperience.id === 'retreat' && ['quiet','rain','winter'].includes(requestedRetreat ?? '')) {
                 editableExperience = applyRetreatPreset(editableExperience, requestedRetreat as RetreatPreset);

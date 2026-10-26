@@ -1,0 +1,67 @@
+{
+  "id": "temple-custom-1793046601150",
+  "name": "Homepage Temple 01",
+  "description": "A spacious stone hall, warm lamps and optional incense smoke.",
+  "status": "Custom",
+  "audio": {
+    "enabled": true,
+    "volume": 40,
+    "layerVolume": 39,
+    "track": "temple-echoes"
+  },
+  "atmosphere": {
+    "particles": true,
+    "lighting": true,
+    "fog": false
+  },
+  "environment": {
+    "colour": "#3a1f16"
+  },
+  "particles": {
+    "preset": "temple-embers",
+    "motion": "rise",
+    "count": 147,
+    "colour": "#f6a449",
+    "glow": 19.5,
+    "minRadius": 0.4,
+    "maxRadius": 4.05,
+    "minSpeed": 14,
+    "maxSpeed": 26,
+    "drift": 13,
+    "minOpacity": 0.55,
+    "maxOpacity": 0.9,
+    "minLifetime": 7,
+    "maxLifetime": 14
+  },
+  "lighting": {
+    "preset": "temple-gold",
+    "colour": "#d98a45",
+    "intensity": 0.18,
+    "pulse": false,
+    "speed": 0.22
+  },
+  "fog": {
+    "preset": "ritual-haze",
+    "colour": "#c9b58a",
+    "density": 0.18,
+    "speed": 0.12
+  },
+  "transition": {
+    "duration": 1800,
+    "easing": "ease-in-out"
+  },
+  "smoke": {
+    "enabled": true,
+    "amount": 100
+  },
+  "href": "/studio/experiences/temple/",
+  "formatVersion": 1,
+  "sceneId": "temple",
+  "clearSpace": {
+    "enabled": true,
+    "x": 50,
+    "y": 72,
+    "width": 34,
+    "height": 58
+  }
+}
