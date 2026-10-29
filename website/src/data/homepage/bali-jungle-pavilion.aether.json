@@ -1,0 +1,61 @@
+{
+  "id": "bali-jungle-pavilion-demo",
+  "name": "Balinese Jungle Pavilion",
+  "description": "Rain beyond the shelter. Mist through the jungle.",
+  "status": "Custom",
+  "audio": {
+    "enabled": false,
+    "volume": 35,
+    "layerVolume": 0,
+    "track": "retreat-rain"
+  },
+  "atmosphere": {
+    "particles": true,
+    "fog": true,
+    "lighting": false
+  },
+  "environment": {
+    "colour": "#123524"
+  },
+  "particles": {
+    "preset": "storm-rain",
+    "motion": "rain",
+    "count": 300,
+    "colour": "#e2f1f8",
+    "glow": 0,
+    "minRadius": 0.6,
+    "maxRadius": 1.1,
+    "minSpeed": 38,
+    "maxSpeed": 50,
+    "drift": 2,
+    "minOpacity": 0.5,
+    "maxOpacity": 0.85,
+    "minLifetime": 5,
+    "maxLifetime": 9
+  },
+  "lighting": {
+    "preset": "forest-canopy",
+    "colour": "#eee2ce",
+    "intensity": 0.18,
+    "pulse": false,
+    "speed": 0.16
+  },
+  "fog": {
+    "preset": "woodland-mist",
+    "colour": "#dbe8df",
+    "density": 0.55,
+    "speed": 0.26
+  },
+  "transition": {
+    "duration": 450,
+    "easing": "ease-in-out"
+  },
+  "href": "/studio/experiences/forest/",
+  "formatVersion": 1,
+  "sceneId": "forest",
+  "smoke": {
+    "enabled": false,
+    "amount": 35
+  },
+  "backgroundId": "bali-jungle-pavilion"
+}

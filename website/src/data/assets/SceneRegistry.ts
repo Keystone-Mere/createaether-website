@@ -87,7 +87,10 @@ const lighthouseOpening: EffectBoundary = {kind:'polygons',polygons:[Array.from(
   const angle=Math.PI+Math.PI*i/48;
   return [.514+.190*Math.cos(angle),.390+.218*Math.sin(angle)] as const;
 }).concat([[.704,.723],[.324,.723]])]};
+// Conservative opening measured against the generated 1672 × 941 background.
+const baliOpening: EffectBoundary = {kind:'rectangle',x:.13,y:.15,width:.765,height:.55};
 export const sceneAssets: readonly SceneAsset[] = [
+  asset('bali-jungle-pavilion','Balinese Jungle Pavilion','/images/scene-library/bali-jungle-pavilion.webp','forest','alternative','custom',baliOpening,'measured',{status:'documented',creator:'AI-generated for Aether',note:'Imagined Balinese pavilion; generated with OpenAI image generation, October 2026.'},'illustration'),
   asset('polynesian-lagoon',"Polynesian Lagoon",'/images/scene-library/polynesian-lagoon.webp','ocean','alternative','custom',null,'none'),
 // Temporarily unavailable:   asset('moroccan-courtyard',"Moroccan Courtyard",'/images/scene-library/moroccan-courtyard.webp','temple','alternative','custom',null,'none'),
   asset('garden-room',"Garden Room",'/images/scene-library/garden-room.webp','forest','alternative','custom',null,'none'),

@@ -1,0 +1,44 @@
+---
+import SiteHeader from '../../components/SiteHeader.astro';
+import SceneStage from '../../components/studio/SceneStage.astro';
+import '../../styles/design-system.css';
+---
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="robots" content="noindex,nofollow"/><title>Balinese Jungle Pavilion — Aether scene test</title></head>
+<body><SiteHeader/><main id="main">
+<header><p class="eyebrow">Aether · Scene test</p><h1>A quiet place above the jungle.</h1><p>Rain beyond the shelter. Mist through the ravine. Compare the atmosphere with the original image.</p></header>
+<div class="controls" aria-label="Scene preview controls"><button id="bali-effects" type="button" aria-pressed="true">Effects on</button><button id="bali-size" type="button" aria-pressed="false">Enlarge preview</button></div>
+<div class="test-layout" id="bali-layout"><section class="scene-card" aria-label="Balinese Jungle Pavilion preview"><SceneStage sceneId="forest" name="Balinese Jungle Pavilion" assetId="bali-jungle-pavilion" stageId="bali-stage" exitButton={false}/><div class="caption"><p class="eyebrow" id="bali-label">Live scene · Rain &amp; mist</p><h2>Balinese Jungle Pavilion</h2><p>Stay dry beneath the pavilion while the jungle moves beyond it.</p></div></section><aside><h2>Can you see the difference?</h2><p>This preview starts at 540 pixels wide, close to a homepage card. Switch effects off, then on, to compare.</p><p>Look for rain against the dark trees and pale mist drifting through the middle of the ravine. The posts, roof and sitting mat stay clear.</p><p class="note">An imagined setting inspired by Bali. AI-generated background; rain and mist rendered live by Aether. Silent preview.</p></aside></div>
+<p id="bali-status" role="status">Loading atmosphere…</p><noscript><p>Enable JavaScript to compare animated rain and mist. The background remains visible.</p></noscript>
+</main></body></html>
+<script>
+import {createStudioRuntime} from '../../lib/studio/StudioRuntime';
+import {registerRuntimeCleanup} from '../../lib/runtime/RuntimeLifecycle';
+import settings from '../../data/homepage/bali-jungle-pavilion.aether.json';
+import type {Experience} from '../../lib/models/Experience';
+const stage=document.querySelector<HTMLElement>('#bali-stage')!;
+// The fixed weather mask stays still while the fog inside it drifts.
+const weather=document.createElement('div');weather.className='bali-mist-window';
+stage.querySelector('.preview-scene')!.append(weather);
+stage.querySelectorAll('.preview-fog').forEach(layer=>weather.append(layer));
+const runtime=createStudioRuntime({previewStage:stage,previewCanvas:stage.querySelector('canvas'),audioElement:null,audioEnabledToggle:null,volumeControl:null,layerVolumeControl:null,volumeValue:null,particlesToggle:null,lightingToggle:null,fogToggle:null,particlesStatus:null,lightingStatus:null,fogStatus:null});
+const button=document.querySelector<HTMLButtonElement>('#bali-effects')!;
+const status=document.querySelector<HTMLElement>('#bali-status')!;
+const label=document.querySelector<HTMLElement>('#bali-label')!;
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+let enabled=!reduced.matches;
+function render(){const value=structuredClone(settings) as Experience;value.atmosphere.particles=value.atmosphere.fog=enabled;runtime.experienceLoader.load(value);button.setAttribute('aria-pressed',String(enabled));button.textContent=enabled?'Effects on':'Effects off';label.textContent=enabled?'Live scene · Rain & mist':'Original image · Effects off';status.textContent=enabled?'Rain and mist are playing. The sheltered foreground stays dry.':reduced.matches?'Effects are off. Your device prefers reduced motion. You can choose to play them.':'Original image. Switch effects on to compare.';}
+button.addEventListener('click',()=>{enabled=!enabled;render();});
+const size=document.querySelector<HTMLButtonElement>('#bali-size')!;
+size.addEventListener('click',()=>{const large=size.getAttribute('aria-pressed')!=='true';size.setAttribute('aria-pressed',String(large));size.textContent=large?'Homepage size':'Enlarge preview';document.querySelector('#bali-layout')!.classList.toggle('large',large);});
+function preference(){enabled=!reduced.matches;render();}reduced.addEventListener('change',preference);
+registerRuntimeCleanup(()=>{reduced.removeEventListener('change',preference);runtime.destroy();});render();
+</script>
+<style>
+body{margin:0;background:#090d12;color:#f4f3ee;font-family:Inter,system-ui,sans-serif}main{max-width:1180px;margin:auto;padding:36px 24px 64px}header{max-width:780px}h1{font-size:clamp(32px,5vw,54px);line-height:1.08;letter-spacing:-.04em;margin:12px 0 18px}p{line-height:1.7;color:#b8c8c5}.eyebrow{font-size:11px;color:#8ee5c1;text-transform:uppercase;letter-spacing:.14em}button{font:inherit;padding:11px 18px;border-radius:999px;border:1px solid #41605b;background:#13211e;color:#e5f8ef;cursor:pointer;min-height:44px}button[aria-pressed=true]{background:#a2e6c7;color:#10241b}button:focus-visible{outline:3px solid #9ee9d9;outline-offset:4px}.controls{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.test-layout{display:grid;grid-template-columns:minmax(0,540px) minmax(0,1fr);gap:40px;align-items:center}.scene-card{overflow:hidden;border:1px solid #38504a;border-radius:18px;background:#101b19}.scene-card :global(.preview-stage){width:100%;border:0;border-radius:0;aspect-ratio:16/9}.caption{padding:18px 22px}.caption h2{margin:8px 0;font-size:24px;letter-spacing:-.025em}.caption p{margin:0;font-size:13px}aside h2{font-size:24px;letter-spacing:-.02em}aside .note{font-size:12px;color:#829a93}.large{grid-template-columns:1fr}.large aside{display:none}#bali-status{font-size:13px;margin-top:22px}
+/* Apply the same fixed opening to the fog as the registered canvas rain mask. */
+.scene-card :global(.bali-mist-window){position:absolute;inset:0;pointer-events:none;z-index:2;clip-path:polygon(13% 15%,89.5% 15%,89.5% 70%,13% 70%)}
+.scene-card :global(.bali-mist-window .preview-fog){top:32%;bottom:auto;left:-15%;width:130%;height:38%;border-radius:50%;background:radial-gradient(ellipse at 35% 55%,color-mix(in srgb,var(--aether-fog-colour) 95%,transparent),transparent 63%);filter:blur(12px)}
+.scene-card :global(.bali-mist-window .preview-fog--two){top:41%;left:-30%;height:29%;animation-delay:-8s}
+@media(max-width:850px){.test-layout{grid-template-columns:1fr;gap:20px}.scene-card{max-width:540px}.large .scene-card{max-width:none}}@media(prefers-reduced-motion:reduce){.scene-card :global(.preview-fog){animation:none}}
+</style>
