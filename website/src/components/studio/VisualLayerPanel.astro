@@ -6,6 +6,9 @@ const colour = layer === 'environment' ? (experience.environment?.colour ?? expe
 <section class="panel">
     <h2>{title}</h2>
     {layer !== 'environment' && <label class="toggle-row"><input id={`${layer}-toggle`} type="checkbox" checked={experience.atmosphere[layer]} /> {title} On</label>}
+    <div class="layer-settings">
     <label for={`${layer}-colour-control`}>{layer === 'environment' ? 'Background colour' : 'Colour'}</label>
     <div class="colour-picker"><input id={`${layer}-colour-control`} type="color" value={colour} aria-label={`${title} colour`} /><output id={`${layer}-colour-value`}>{colour.toUpperCase()}</output></div>
+    </div>
 </section>
+<style>.panel:has(.toggle-row input:not(:checked)) .layer-settings { display:none; }</style>

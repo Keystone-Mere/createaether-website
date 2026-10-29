@@ -52,7 +52,7 @@ import SiteFooter from '../components/SiteFooter.astro';
           <h1>Set the scene with Aether.</h1>
 
           <p class="hero-copy">
-            Create, control, save and reuse an atmosphere. Build a branded setting for your podcast or stream, or shape a space for relaxation with scenes, sound and gentle motion.
+            Create a branded setting for your podcast, or settle into a scene with sound and gentle motion. Personalise it in your browser and keep your own version.
           </p>
 
           <div class="actions">
@@ -73,7 +73,7 @@ import SiteFooter from '../components/SiteFooter.astro';
       <section id="applications" class="homepage-paths" aria-labelledby="paths-title">
         <h2 id="paths-title">How would you like to use Aether?</h2>
         <div class="homepage-paths-grid">
-          <article><p class="eyebrow">For your show</p><h3>A setting for your show</h3><p>Choose a background, add your branding and camera layout, then export a matching set of four screens for OBS.</p><a href="/studio/podcast/">Create your show setting →</a><a class="path-secondary" href="/podcasts/#early-access">Join early access →</a><small>Silent visuals · Add cameras and microphone in OBS</small></article>
+          <article><p class="eyebrow">For your show</p><h3>A setting for your show</h3><p>Choose a background, add your branding and camera layout, then download four matching screens as an OBS scene collection.</p><a href="/studio/podcast/">Create your show setting →</a><a class="path-secondary" href="/podcasts/#early-access">Join early access →</a><small>Silent visuals · Add cameras and microphone in OBS</small></article>
           <article><p class="eyebrow">For your space</p><h3>An atmosphere you can return to</h3><p>Start a personal relaxation session or customise a reusable environment. Explore how a scene could support a facilitated session or a physical space.</p><a href="/spaces/">Explore For your space →</a><a class="path-secondary" href="/studio/#experience-library">Explore all scenes →</a><small>5, 10 or 20 minutes · Untimed option · Optional guidance</small></article>
         </div>
       </section>
@@ -112,23 +112,15 @@ import SiteFooter from '../components/SiteFooter.astro';
             <span>02</span>
             <h3>Shape</h3>
             <p>
-              Adjust audio, lighting, particles, fog and atmospheric behaviour.
+              Adjust the available sound and effects, and see your changes in the live preview.
             </p>
           </article>
 
           <article class="workflow-step">
             <span>03</span>
-            <h3>Preview</h3>
-            <p>
-              See your changes immediately, then explore your environment in full screen.
-            </p>
-          </article>
-
-          <article class="workflow-step">
-            <span>04</span>
             <h3>Save and use</h3>
             <p>
-              Save your creation in this browser on this device. Export silent visuals for OBS, and export again after changing your design.
+              Keep a copy in this browser, enjoy it in full screen, or use a silent browser-source backdrop in OBS.
             </p>
           </article>
         </div>
@@ -1231,3 +1223,5 @@ import SiteFooter from '../components/SiteFooter.astro';
 .experimental-stories .stories-note{font-size:.85rem;}
 @media(max-width:650px){.homepage-paths-grid{grid-template-columns:1fr;}.homepage-paths article{padding:22px;}.workflow-section{padding:36px 0;}}
 </style>
+
+<style>.workflow-grid{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:650px){.workflow-grid{grid-template-columns:1fr}}</style>

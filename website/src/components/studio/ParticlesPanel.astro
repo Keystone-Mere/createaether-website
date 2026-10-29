@@ -9,6 +9,7 @@ const particles = experience.particles;
 <h2>Particles</h2>
 
 <label class="toggle-row"><input id="particles-toggle" type="checkbox" checked={experience.atmosphere.particles} /> <span id="effect-toggle-label">Particles on</span></label>
+<div class="particle-settings">
 <label for="particle-preset-select">Preset</label><select id="particle-preset-select">{experiences.map(item => <option value={item.particles.preset} selected={item.particles.preset === particles.preset}>{item.id === 'ocean' ? 'Ocean wave shimmer' : item.particles.preset.replaceAll('-', ' ')}</option>)}</select>
 <label>
 <span id="effect-count-label">Particle count</span>
@@ -108,8 +109,10 @@ value={particles.drift}
 
 </details>
 </div>
+</div>
 
 <style>
+.panel:not(:has(#particles-toggle:checked)) .particle-settings { display:none; }
 .particle-advanced { margin-top:1rem; border-top:1px solid #ffffff18; padding-top:1rem; }
 .particle-advanced summary { cursor:pointer; font-weight:700; padding:.4rem 0; }
 .particle-advanced summary span { display:block; margin-top:.35rem; font-size:.75rem; color:#94a3b8; font-weight:400; }

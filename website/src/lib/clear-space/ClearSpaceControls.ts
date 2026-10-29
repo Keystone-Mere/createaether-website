@@ -3,6 +3,7 @@ import { registerRuntimeCleanup } from '../runtime/RuntimeLifecycle';
 export function attachClearSpaceControls(panel: HTMLElement, stage: HTMLElement, get: () => ClearSpace | undefined, set: (value: ClearSpace) => void, suggest: () => ClearSpace) {
     const guide = document.createElement('div'); guide.className = 'clear-space-guide';
     guide.setAttribute('aria-hidden','true'); guide.innerHTML = '<span>Clear space</span>'; (stage.querySelector('.preview-scene') ?? stage).append(guide);
+    const advancedPanel = panel.closest<HTMLDetailsElement>('.advanced-scene-tools');
     const outline = panel.querySelector<HTMLInputElement>('[data-clear-outline]')!;
     const options = panel.querySelector<HTMLFieldSetElement>('[data-clear-options]')!;
     function sync() {
@@ -13,7 +14,7 @@ export function attachClearSpaceControls(panel: HTMLElement, stage: HTMLElement,
             else { input.value = String(value[key]); panel.querySelector<HTMLOutputElement>(`[data-clear-value="${key}"]`)!.value = `${value[key]}%`; }
         });
         options.disabled = !value.enabled;
-        guide.hidden = !value.enabled || !outline.checked || !!document.fullscreenElement;
+        guide.hidden = !value.enabled || !outline.checked || !panel.hasAttribute('open') || !!(advancedPanel && !advancedPanel.open) || !!document.fullscreenElement;
         Object.assign(guide.style, {left:`${value.x-value.width/2}%`,top:`${value.y-value.height/2}%`,width:`${value.width}%`,height:`${value.height}%`});
     }
     function input(event: Event) {
@@ -30,7 +31,9 @@ export function attachClearSpaceControls(panel: HTMLElement, stage: HTMLElement,
     function reset() { set({ ...suggest(), enabled:get()?.enabled ?? false }); sync(); }
     const resetButton = panel.querySelector<HTMLButtonElement>('[data-clear-reset]')!;
     panel.addEventListener('input',input); resetButton.addEventListener('click',reset);
+    panel.addEventListener('toggle',sync);
+    advancedPanel?.addEventListener('toggle',sync);
     document.addEventListener('fullscreenchange',sync);
-    registerRuntimeCleanup(() => { panel.removeEventListener('input',input); resetButton.removeEventListener('click',reset); document.removeEventListener('fullscreenchange',sync); guide.remove(); });
+    registerRuntimeCleanup(() => { panel.removeEventListener('input',input); panel.removeEventListener('toggle',sync); advancedPanel?.removeEventListener('toggle',sync); resetButton.removeEventListener('click',reset); document.removeEventListener('fullscreenchange',sync); guide.remove(); });
     sync(); return { sync };
 }

@@ -38,7 +38,7 @@ import SiteFooter from '../components/SiteFooter.astro';
         <div class="features-hero-content">
           <p class="eyebrow">Aether Features</p>
 
-          <h1>One engine. Atmosphere for your show and your space.</h1>
+          <h1>See what you can create with Aether.</h1>
 
           <p class="features-intro">
             Build a relaxation session, personalise a podcast setting, or shape an environment with sound, lighting and animated effects.
@@ -62,9 +62,15 @@ import SiteFooter from '../components/SiteFooter.astro';
         <h2>Choose your scene. Make it yours.</h2>
 
         <p>
-          Start with a ready-made setting and use the controls available for that experience. Enjoy it in full screen, save your own version, or export its visuals to OBS.
+          Start with a ready-made setting and use the controls available for that experience. Enjoy it in full screen, save your own version, or use a silent browser-source backdrop in OBS.
         </p>
       </section>
+
+      <section class="feature-proofs" aria-labelledby="feature-proofs-title"><h2 id="feature-proofs-title">A look inside the studio</h2><p>Real controls, a live preview and a setting you can return to.</p><div class="feature-proofs-grid">
+        <figure><a href="/studio/experiences/ocean/?place=lighthouse-retreat"><img src="/images/features/scene-editor.jpg" width="1363" height="926" loading="lazy" alt="Scene editor showing sea mist controls beside the Lighthouse Retreat preview" /></a><figcaption><h3>Shape the atmosphere</h3><p>Adjust the effects that suit your scene. Detailed controls stay tucked away until you need them.</p><a href="/studio/experiences/ocean/?place=lighthouse-retreat">Try the scene editor →</a></figcaption></figure>
+        <figure><a href="/studio/podcast/"><img src="/images/features/podcast-editor.jpg" width="1363" height="926" loading="lazy" alt="Podcast editor with show name, camera layout and the live branded preview" /></a><figcaption><h3>Make the show yours</h3><p>Choose a setting and camera layout, then add your title, names, colour and logo.</p><a href="/studio/podcast/">Design your show →</a></figcaption></figure>
+        <figure><a href="/podcasts/#show-preview"><img src="/images/features/four-screens.jpg" width="1363" height="926" loading="lazy" alt="Four broadcast screen choices with a matching Thanks for watching ending screen" /></a><figcaption><h3>Keep the whole show consistent</h3><p>Starting Soon, Live, Be Right Back and Ending share your background and branding.</p><a href="/podcasts/#show-preview">Try all four screens →</a></figcaption></figure>
+      </div></section>
 
       <section
         class="features-grid"
@@ -375,3 +381,9 @@ import SiteFooter from '../components/SiteFooter.astro';
 </style>
 
 <style>.technology-note{width:min(1180px,calc(100% - 3rem));margin:48px auto;color:#cbd5e1;line-height:1.8}.technology-note a{color:#7dd3fc}.features-hero{min-height:auto;padding:56px max(24px,calc((100% - 1180px)/2)) 64px}.features-hero h1{font-size:clamp(2.7rem,6vw,5.5rem)}.platform-introduction{padding:48px 0}.feature-card{min-height:0;padding:28px}.feature-number{margin-bottom:24px}.features-grid{padding-bottom:48px}</style>
+
+<style>
+.actions{display:flex;flex-wrap:wrap;gap:12px}.actions .button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 20px;border:1px solid #ffffff30;border-radius:999px;text-decoration:none;font-weight:650;line-height:1.4}.actions .primary{background:#f4efe7;color:#090b0f}.actions .secondary{background:#ffffff06;color:#e2e8f0}.actions a:focus-visible{outline:3px solid #7dd3fc;outline-offset:4px}
+</style>
+
+<style>.feature-proofs{width:min(1180px,calc(100% - 3rem));margin:0 auto 48px}.feature-proofs>h2{font-size:clamp(1.8rem,3vw,2.6rem);margin:0 0 12px}.feature-proofs p{color:#b9c7d9;line-height:1.7}.feature-proofs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:24px}.feature-proofs figure{margin:0;overflow:hidden;border:1px solid #ffffff24;border-radius:16px;background:#101827}.feature-proofs img{display:block;width:100%;height:auto}.feature-proofs figcaption{padding:22px}.feature-proofs h3{font-size:20px;margin:0 0 12px}.feature-proofs a{color:#7dd3fc}.feature-proofs a:focus-visible{outline:3px solid #7dd3fc;outline-offset:-3px}@media(max-width:850px){.feature-proofs-grid{grid-template-columns:1fr}}.features-hero h1{max-width:18ch}.features-cta{padding:48px 24px}.platform-introduction{padding-top:24px;padding-bottom:32px}</style>

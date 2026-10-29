@@ -20,7 +20,7 @@ import PostHog from '../components/posthog.astro';
       <section class="hero" aria-labelledby="page-title">
         <p class="eyebrow">Aether for podcasts and streams</p>
         <h1 id="page-title">A setting for<br />your video podcast.</h1>
-        <p class="lead">Give your show a distinctive look. Personalise your title, camera layout, names and colour, add your logo, and choose subtle background motion where available. Bring your setting into OBS for your next recording or stream.</p>
+        <p class="lead">Design a reusable setting with your show branding, camera layout and optional background motion. Download four matching screens for OBS, then add your cameras and microphone.</p>
         <div class="actions"><a class="button primary" href="/studio/podcast/">Open Podcast &amp; Stream →</a><a class="button secondary" href="https://tally.so/r/Y5ELad">Join early access →</a></div>
         <p class="hero-note">One host or two people · Your show branding · Silent visuals for OBS</p>
       </section>
@@ -44,25 +44,17 @@ import PostHog from '../components/posthog.astro';
           </div>
           <button type="button" id="show-motion" class="button secondary" aria-pressed="false">Play subtle motion</button>
         </div>
+        <aside class="setup-at-a-glance" aria-label="What you need"><strong>To record with this setting</strong><p>OBS Studio on your computer, your camera and microphone, and an internet connection to load Aether. Import the four-screen collection, then add your camera sources above the backdrop.</p><a href="#how-it-works">See the setup steps ↓</a></aside>
         <p class="caption">Live Aether preview with camera guides. Your camera appears here when you add it in OBS; Aether does not capture or request access to your camera on this page. This example uses the Liverpool setting; motion is silent and respects your device’s reduced-motion preference.</p>
       </section>
 
-
-      <section class="section" aria-labelledby="make-title">
-        <div class="section-heading"><div><p class="eyebrow">Your scene, your style</p><h2 id="make-title">Give your content a setting.</h2></div><p>Keep a consistent setting across episodes. Podcast Studio brings your show identity and camera layout together around a gently animated backdrop.</p></div>
-        <div class="card-grid">
-          <article class="card"><h3>Choose your layout</h3><p>Use one host, two people or no frames. Preview where your cameras will sit before composing the recording in OBS.</p></article>
-          <article class="card"><h3>Make the show yours</h3><p>Add your show title, episode text and participant names. Set your accent colour and upload your logo; use the downloaded OBS file or the four-scene collection to include it.</p></article>
-          <article class="card"><h3>Set the motion</h3><p>The Liverpool window setting offers Still, Subtle or Atmospheric motion. Other backgrounds are still. Output is silent, leaving your audio setup to OBS.</p></article>
-        </div>
-      </section>
 
       <section id="how-it-works" class="section" aria-labelledby="workflow-title">
         <div class="section-heading"><div><p class="eyebrow">From Studio to recording</p><h2 id="workflow-title">Personalise. Export. Record.</h2></div><p>Design your show setting in Aether. Add cameras and a microphone in OBS to record or stream.</p></div>
         <ol class="steps">
           <li><span class="step-number" aria-hidden="true">01</span><h3>Personalise your show</h3><p>Open Podcast Studio. Choose a layout, enter your show details, set your colour and motion, and optionally add a logo.</p></li>
           <li><span class="step-number" aria-hidden="true">02</span><h3>Keep your setting</h3><p>Changes are saved automatically in this browser on this device. Use My Shows to save a named show and download its JSON backup for restoring or importing into Aether. OBS exports are separate files for your recording setup.</p></li>
-          <li><span class="step-number" aria-hidden="true">03</span><h3>Export your setting</h3><p>Choose “Download all four OBS scenes” for a matching set: Starting Soon, Main Show, Be Right Back and Ending. Import the JSON through OBS → Scene Collection → Import. You can also use “Copy OBS link” or “Download OBS file” for an individual screen.</p></li>
+          <li><span class="step-number" aria-hidden="true">03</span><h3>Export your setting</h3><p>Choose “Download all four OBS scenes” for a matching set: Starting Soon, Main Show, Be Right Back and Ending. Import the JSON through OBS → Scene Collection → Import. You can also use “Copy OBS link” or “Download HTML backdrop” for an individual screen.</p></li>
           <li><span class="step-number" aria-hidden="true">04</span><h3>Add your camera</h3><p>Add the backdrop as a Browser source in OBS at 1920 × 1080. Place your camera sources above it and fit them inside the frames. Record or stream using your usual microphone setup.</p></li>
         </ol>
       </section>
@@ -189,3 +181,5 @@ import PostHog from '../components/posthog.astro';
 @media(max-width:700px){.screen-picker{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.screen-picker button{transition:none}}
 </style>
+
+<style>.setup-at-a-glance{margin-top:24px;padding:22px;border:1px solid #38584e;border-radius:14px;background:#11251e}.setup-at-a-glance p{color:#c0cfc8;line-height:1.7;margin:10px 0}.setup-at-a-glance a{color:#8ee5c1}.hero{padding-top:55px;padding-bottom:40px}.section,.preview-section{padding-bottom:48px;padding-top:48px}</style>

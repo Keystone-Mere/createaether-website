@@ -2,36 +2,41 @@
 import {placeById,placeImage,placeEditUrl} from '../data/PlaceCatalog';
 import SceneStage from './studio/SceneStage.astro';
 import BroadcastStage from './studio/BroadcastStage.astro';
+interface Props { relaxationOnly?: boolean; }
+const { relaxationOnly = false } = Astro.props;
 const scenes = [
   { id:'show',name:'Podcast & stream',mood:'A branded setting for your show.' },
   { id:'bamboo-rain-pavilion',name:'Bamboo Pavilion',mood:'A dry mat. Rain among the trees.' },
   { id:'lighthouse-retreat',name:'Lighthouse Retreat',mood:'A sheltered place beside the sea.' },
   { id:'snow-cabin',name:'Snow Cabin',mood:'Warm indoors. Snow beyond the glass.' },
-];
+].filter(scene => !relaxationOnly || scene.id !== 'show');
+const initial = scenes[0];
 ---
 <div class="atmosphere" data-hero-atmosphere>
-  <div class="scene" data-scene="show">
-    <div class="show-stage" data-show-stage aria-label="Example show layout with camera guides"><BroadcastStage /></div>
-    <div class="bamboo-stage" data-bamboo-stage hidden aria-hidden="true"><SceneStage sceneId="forest" name="Bamboo Pavilion" assetId="bamboo-rain-pavilion" stageId="hero-bamboo-stage" exitButton={false} /></div>
+  <div class="scene" data-scene={initial.id}>
+    <div class="show-stage" data-show-stage hidden={relaxationOnly} aria-label="Example show layout with camera guides"><BroadcastStage /></div>
+    <div class="bamboo-stage" data-bamboo-stage hidden={!relaxationOnly}><SceneStage sceneId="forest" name="Bamboo Pavilion" assetId="bamboo-rain-pavilion" stageId="hero-bamboo-stage" exitButton={false} /></div>
     {scenes.filter(scene => scene.id !== 'bamboo-rain-pavilion' && scene.id !== 'show').map((scene, index) => <img src={placeImage(placeById(scene.id)!)} alt={`${scene.name} atmosphere`} width="1024" height="576" hidden data-scene-image={scene.id} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} />)}
-    <span class="preview-label" data-preview-label>Podcast & stream · Example</span>
-    <div class="scene-caption" aria-live="polite"><h2 data-scene-name>Podcast & stream</h2><p data-scene-mood>A branded setting for your show.</p></div>
+    <span class="preview-label" data-preview-label>{relaxationOnly ? 'Live scene · Rain' : 'Podcast & stream · Example'}</span>
+    <div class="scene-caption" aria-live="polite"><h2 data-scene-name>{initial.name}</h2><p data-scene-mood>{initial.mood}</p></div>
   </div>
   <div class="scene-controls" role="group" aria-label="Choose an atmosphere preview">
     {scenes.map((scene,index) => <button type="button" aria-pressed={index === 0 ? 'true' : 'false'} data-scene-choice={scene.id} data-mood={scene.mood} data-href={scene.id === 'show' ? '/studio/podcast/' : `${placeEditUrl(placeById(scene.id)!)}${scene.id === 'bamboo-rain-pavilion' ? '&homepage=bamboo-rain-pavilion' : ''}`}>{scene.name}</button>)}
-    <a href="/studio/podcast/" data-scene-link>Open podcast studio →</a>
+    <a href={relaxationOnly ? placeEditUrl(placeById(initial.id)!) : '/studio/podcast/'} data-scene-link>{relaxationOnly ? 'Edit this scene →' : 'Open podcast studio →'}</a>
   </div>
 </div>
 <script>
   import { createStudioRuntime } from '../lib/studio/StudioRuntime';
   import bamboo from '../data/homepage/homepage-bamboo-rain01.aether.json';
   import type { Experience } from '../lib/models/Experience';
+  import { registerRuntimeCleanup } from '../lib/runtime/RuntimeLifecycle';
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const stage = document.querySelector<HTMLElement>('#hero-bamboo-stage');
     const canvas = stage?.querySelector<HTMLCanvasElement>('.preview-canvas');
     if (stage && canvas) {
       const runtime = createStudioRuntime({ previewStage: stage, previewCanvas: canvas, audioElement: null, audioEnabledToggle: null, volumeControl: null, layerVolumeControl: null, volumeValue: null, particlesToggle: null, lightingToggle: null, fogToggle: null, particlesStatus: null, lightingStatus: null, fogStatus: null });
       runtime.experienceLoader.load(bamboo as Experience);
+      registerRuntimeCleanup(() => runtime.destroy());
     }
   }
   document.querySelectorAll<HTMLElement>('[data-hero-atmosphere]').forEach(root => {
@@ -62,9 +67,9 @@ const scenes = [
   .show-stage :global(.broadcast-stage) { width:100%; border-radius:0; }
   .show-stage :global(.broadcast-camera) { width:38%; left:8%; top:35%; }
   .show-stage :global(.broadcast-camera--guest) { left:54%; }
-  .scene[data-scene="show"] .scene-caption { display:none; }
-  .scene[data-scene="show"]::after { display:none; }
-  .scene[data-scene="show"] .preview-label { top:8px; left:8px; z-index:6; }
+  .scene[data-scene={initial.id}] .scene-caption { display:none; }
+  .scene[data-scene={initial.id}]::after { display:none; }
+  .scene[data-scene={initial.id}] .preview-label { top:8px; left:8px; z-index:6; }
   .bamboo-stage { position:absolute; inset:0; }
   .bamboo-stage[hidden] { display:none; }
   .bamboo-stage :global(.preview-stage) { width:100%; height:100%; border:0; border-radius:0; }
