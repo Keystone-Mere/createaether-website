@@ -195,3 +195,15 @@ html body#aether-workspace[data-studio-design="master"][data-workspace] .podcast
 @media (prefers-reduced-motion: reduce) {
   html body#aether-workspace[data-studio-design="master"][data-workspace] .studio-sidebar__link { transition: none; }
 }
+
+/* Keep the preview beside long control panels without covering Save or OBS actions.
+   The output column scrolls as one panel; its individual cards never overlap. */
+@media (min-width: 901px) {
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor-output, .podcast-output) {
+    position: sticky; top: 16px; align-self: start; max-height: calc(100dvh - 32px);
+    overflow-y: auto; scrollbar-gutter: stable; padding-bottom: 2px;
+  }
+  html body#aether-workspace[data-studio-design="master"][data-workspace] :is(.editor .preview-panel, .podcast-preview) {
+    position: static; max-height: none; overflow: visible;
+  }
+}

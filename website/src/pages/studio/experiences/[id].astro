@@ -58,11 +58,11 @@ const selectedAudioTrack =
                 <p style="font-size:12px;color:#94a3b8;margin-bottom:0">Each choice resets sound, weather and lighting. Play Audio when you are ready.</p>
             </section>
             <details class="control-section" open>
-                <summary>Audio</summary>
+                <summary>Sound</summary>
                 <div class="audio-slot"><AudioPanel experience={experience} /></div>
             </details>
             <details class="control-section" open>
-                <summary>Effects</summary>
+                <summary>Scene effects</summary>
                 <div id="coastal-rain-preset" hidden style="padding:18px">
                     <button id="apply-coastal-rain" type="button">Coastal rain + incense</button>
                     <p>Rain stays outside the entrance. Optional incense smoke rises from the small pot inside.</p>
@@ -86,9 +86,9 @@ const selectedAudioTrack =
                     <input id="smoke-amount" type="range" min="0" max="100" step="1" value="35" style="width:100%;accent-color:#60a5fa" />
                 </section>
             </details>
-            <ClearSpacePanel />
+            <details class="control-section advanced-scene-tools"><summary>Advanced tools</summary><p class="advanced-help">Keep an area free of effects for a presenter or practice space.</p><ClearSpacePanel /></details>
             <details class="control-section">
-                <summary>Atmosphere</summary>
+                <summary>Lighting &amp; fog</summary>
                 <h3 class="effect-subheading">Lighting</h3>
                 <div class="lighting-slot"><VisualLayerPanel layer="lighting" experience={experience} /></div>
                 <h3 class="effect-subheading">Fog</h3>
@@ -129,7 +129,7 @@ const selectedAudioTrack =
         </div>
         <section class="panel background-panel" aria-label="Background and appearance">
             <details class="scene-settings" open>
-                <summary>Background &amp; appearance</summary>
+                <summary>Appearance</summary>
             <fieldset class="background-choices" id="background-choices" hidden>
                 <legend>Background alternatives</legend>
                 <div id="background-choice-buttons"></div>
@@ -151,13 +151,15 @@ const selectedAudioTrack =
                 <span id="lighting-status">Lighting active</span><span id="fog-status">Fog active</span>
             </div>
         <div class="panel save-panel">
-            <h2>Save and export</h2>
+            <h2>Save your scene</h2>
             <label for="creation-name">Name your creation</label>
             <input id="creation-name" type="text" maxlength="120" placeholder="For example, Storm podcast backdrop" />
             <small>Your saved scene appears under My saved in the scene library.</small>
-            <p>Save your creation or use it as a silent animated backdrop in OBS. Export again after changing its settings.</p>
+            <p>Keep a named copy in this browser. Download an experience backup to move it to another device.</p>
             <div class="preview-actions">
                 <button type="button" id="save-experience-button">Save as Copy</button>
+                </div>
+            <details class="scene-export-options"><summary>OBS, backups &amp; other exports</summary><p>Use a silent backdrop in OBS, import a saved experience or add page effects to a website. Export again after editing.</p><div class="preview-actions">
                 <button type="button" id="website-embed" class="button-secondary" aria-controls="website-embed-setup" aria-expanded="false">Export page effects</button>
                 <button type="button" id="use-in-obs" class="button-secondary" aria-controls="obs-setup">Use in OBS</button>
                 <button type="button" id="import-experience-button" class="button-secondary">Import experience</button>
@@ -186,6 +188,7 @@ const selectedAudioTrack =
                 <p id="obs-host-warning" hidden>This export uses your local development server. Keep it running, or export from createaether.com for use without that server.</p>
                 <small>Sound is off. Export again after changes. An internet connection is required for exports from the live website.</small>
             </div>
+            </details>
             <p id="save-experience-feedback" class="save-feedback" role="status" aria-live="polite"></p>
             <a id="saved-experiences-link" class="saved-experiences-link" href="/studio/#my-experiences-title" hidden>View saved scenes →</a>
             <input type="file" id="import-experience-input" accept=".aether.json,.json,application/json" hidden />
@@ -2823,4 +2826,9 @@ import { suggestedClearSpace } from '../../../lib/clear-space/ClearSpace';
 <style>
 #retreat-presets button { border:1px solid #475569;background:#192537;color:#e2e8f0;padding:10px 12px;border-radius:8px;cursor:pointer; }
 #retreat-presets button[aria-pressed="true"] { border-color:#34d399;background:#14342e; }
+</style>
+
+<style>
+#sea-mist-controls:not(:has(#sea-mist-toggle:checked)) :is(label[for="sea-mist-density"],label[for="sea-mist-speed"],#sea-mist-density,#sea-mist-speed),#smoke-panel:not(:has(#smoke-enabled:checked)) :is(label[for="smoke-amount"],#smoke-amount){display:none}
+.scene-export-options{margin-top:20px;border-top:1px solid #334155;padding-top:16px}.scene-export-options>summary{cursor:pointer;font-weight:600}.advanced-help{margin:12px 24px;color:#a6b7cc;font-size:13px}.scene-export-options:not([open]){padding-bottom:0}
 </style>

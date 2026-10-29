@@ -7,6 +7,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 <StudioLayout workspace="podcast" title="Podcast & Stream" description="Create a personalised, gently animated setting for your show.">
 <section class="podcast-workspace">
     <header class="podcast-header"><div><h1>Podcast &amp; Stream</h1><p>Make it yours. Add it to OBS. Reuse it every episode.</p></div><button type="button" id="open-saved-shows" class="workspace-button" aria-controls="show-library">My saved shows</button></header>
+    <nav class="workspace-steps" aria-label="Show workflow"><a href="#podcast-form">1 · Design your show</a><a href="#show-live-preview">2 · Preview</a><a href="#show-obs-export">3 · Use in OBS</a></nav>
     <div class="podcast-grid">
         <form class="podcast-controls" id="podcast-form">
             <section class="workspace-card podcast-show-card"><h2>Your show</h2>
@@ -26,7 +27,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             </div>
             <div class="podcast-names"><div><label for="host-name">Host name</label><input id="host-name" name="host" maxlength="40" value="Host" /></div><div id="guest-name-field"><label for="guest-name">Guest name</label><input id="guest-name" name="guest" maxlength="40" value="Guest" /></div></div></details>
             </section>
-            <details class="podcast-control-section" open><summary>Branding</summary>
+            <details class="podcast-control-section"><summary>Branding</summary>
             <label for="show-episode">Episode title or tagline</label><textarea id="show-episode" name="episode" maxlength="120" rows="2">Good conversations. A little space to unwind.</textarea>
 
             <label for="show-social">Social handle or website <span class="podcast-optional">optional</span></label><input id="show-social" name="social" maxlength="80" placeholder="@yourshow" />
@@ -49,7 +50,7 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
             <button id="podcast-reset" type="button">Reset to demo</button>
         </form>
         <div class="podcast-output">
-        <section class="podcast-preview" aria-label="Show preview">
+        <section class="podcast-preview" id="show-live-preview" aria-label="Show preview">
             <div class="podcast-preview-heading"><div><h2>Live preview</h2><p><span id="podcast-background-name">Liverpool from the Wirral</span></p></div><div class="preview-heading-actions"><button id="podcast-preview-toggle" type="button" aria-expanded="true" aria-controls="podcast-preview-body" hidden>Hide preview</button><button id="podcast-fullscreen" type="button">Full-screen editor</button></div></div>
             <div id="podcast-preview-body">
             <fieldset class="podcast-screen-tabs"><legend>Broadcast screen</legend>{broadcastScreens.map(screen => <label><input form="podcast-form" type="radio" name="screen" value={screen} checked={screen === 'live'} /><span>{screenLabels[screen]}</span></label>)}</fieldset>
@@ -62,16 +63,18 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 
             </div>
         </section>
-            <div class="podcast-export podcast-export-panel">
-                <h2>Save and use in OBS</h2>
-                <p id="podcast-export-description">Export your Live screen. Branding and background are shared across all four screens.</p>
+            <div class="podcast-export podcast-export-panel" id="show-obs-export">
+                <h2>Use in OBS</h2>
+                <h3>Complete show</h3><p>Get all four matching screens in one OBS scene collection.</p>
+
                 <button id="podcast-collection" type="button" class="podcast-primary">Download all four OBS scenes</button>
                 <p>Import the JSON through OBS → Scene Collection → Import, then select the new Aether collection. Add your camera and microphone to Main Show. Uses your current design for all four screens.</p>
-                <div class="podcast-export-actions">
-                    <button id="podcast-add-obs" type="button" class="podcast-primary">Copy OBS link</button>
+                <details class="single-screen-export"><summary>Current screen only</summary><p id="podcast-export-description">Export your Live screen. Branding and background are shared across all four screens.</p><div class="podcast-export-actions">
+                    <button id="podcast-add-obs" type="button">Copy OBS link</button>
                     <button id="podcast-open" type="button">Open clean output ↗</button>
-                    <button id="podcast-download" type="button">Download OBS file</button>
+                    <button id="podcast-download" type="button">Download HTML backdrop</button>
                 </div>
+                </details>
                 <p id="podcast-feedback" role="status" aria-live="polite"></p>
 
             </div>
@@ -467,4 +470,8 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){cameraEditor?.de
 .broadcast-stage[data-camera-editing="true"] .camera-resize-handle{display:block;position:absolute;z-index:6;right:-5px;bottom:-5px;width:18px;height:18px;border:2px solid #07101c;background:#8ee5c1;border-radius:4px;cursor:nwse-resize}
 .broadcast-stage[data-camera-editing="true"] .broadcast-brand{pointer-events:none}
 .broadcast-stage[data-camera-editing="true"]:fullscreen::after{content:'Drag to move · Corner to resize · Escape to finish';position:absolute;left:2%;bottom:2%;padding:8px 12px;color:#e2e8f0;background:#07101ce8;border-radius:6px;font:12px system-ui;pointer-events:none;z-index:8}
+</style>
+
+<style>
+.workspace-steps{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}.workspace-steps a{padding:9px 14px;border:1px solid #2a3a50;border-radius:999px;background:#101c2c;color:#b4f4d8;font-size:13px;text-decoration:none}.workspace-steps a:focus-visible{outline:2px solid #84dfc0;outline-offset:3px}#podcast-form,#show-live-preview,#show-obs-export{scroll-margin-top:20px}.single-screen-export>summary{font-weight:600;padding:6px 0}
 </style>
