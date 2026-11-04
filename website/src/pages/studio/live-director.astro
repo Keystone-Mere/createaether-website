@@ -1,0 +1,92 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+---
+<StudioLayout title="Live Director — Aether" workspace="scene">
+<main class="director">
+<header><h1>Live Director</h1><p>Garden meditation · Manual cue pilot</p></header>
+<div class="director-grid">
+<section class="stage-card"><h2>Live environment</h2><div class="preview-shell"><iframe id="director-preview" title="Live Aether environment" allow="autoplay" referrerpolicy="same-origin"></iframe></div><p id="director-status" role="status">Preparing garden scene…</p></section>
+<section class="cues"><h2>Atmosphere cues</h2><div id="cue-list"></div><div class="actions"><button id="previous" type="button">← Previous</button><button id="next" type="button">Next →</button><button id="reset" type="button">Reset</button></div><p class="hint">Garden rain, pond mist, warm light and ripples use the same renderer as the Garden Lab. Cue times are suggested timings; changes are manual. Clearing takes 30 seconds. Connect OBS below to send cue changes to its garden Browser Source. Audio remains muted.</p></section>
+</div>
+<section class="obs-panel" aria-labelledby="obs-title"><h2 id="obs-title">Connect to OBS</h2>
+<p>Use this page on localhost, with OBS running on this computer.</p>
+<form id="obs-form" autocomplete="off">
+<label for="obs-port">Server port <input id="obs-port" type="number" min="1" max="65535" value="4455" required /></label>
+<label for="obs-password">WebSocket password <input id="obs-password" type="password" autocomplete="off" /></label>
+<div class="actions"><button id="obs-connect" type="submit">Connect OBS</button><button id="obs-disconnect" type="button" disabled>Disconnect</button><button id="obs-resend" type="button" disabled>Send current cue</button></div>
+</form>
+<p id="obs-status" role="status">OBS disconnected. Preview controls still work.</p>
+<p class="hint">Password is cleared from the field on connection and is never saved. Cue delivery to the player must be checked visually in OBS.</p>
+<label for="obs-player-url">OBS Browser Source URL</label><input id="obs-player-url" type="text" readonly />
+<p class="hint">Add a Browser Source using this URL, width 1920 and height 1080. Keep it below your camera. Leave “Shutdown source when not visible” and “Refresh browser when scene becomes active” unticked. After a source refresh, use Send current cue; this restarts that cue’s transition.</p>
+</section></main>
+</StudioLayout>
+<script>
+import {ObsCueConnection} from '../../lib/director/ObsCueConnection';
+import {registerRuntimeCleanup} from '../../lib/runtime/RuntimeLifecycle';
+const cues = [
+ {time:'00:00',name:'Dry Garden',key:'dry',detail:'No added rain or mist · gentle warm light'},
+ {time:'03:00',name:'Gentle Rain',key:'gentle',detail:'Light rain · subtle pond mist'},
+ {time:'07:00',name:'Passing Shower',key:'shower',detail:'Heavier rain · stronger water ripples'},
+ {time:'10:00',name:'Clearing Skies',key:'clearing',detail:'Rain eases, mist thins, then light returns over 30 seconds'},
+ {time:'14:00',name:'Peaceful Ending',key:'ending',detail:'Rain stops · light mist and warm light'}
+];
+let current=0, ready=false;
+const list=document.querySelector<HTMLElement>('#cue-list')!;
+const frame=document.querySelector<HTMLIFrameElement>('#director-preview')!;
+const status=document.querySelector<HTMLElement>('#director-status')!;
+const previous=document.querySelector<HTMLButtonElement>('#previous')!;
+const next=document.querySelector<HTMLButtonElement>('#next')!;
+const obsStatus=document.querySelector<HTMLElement>('#obs-status')!;
+const connect=document.querySelector<HTMLButtonElement>('#obs-connect')!;
+const disconnect=document.querySelector<HTMLButtonElement>('#obs-disconnect')!;
+const resend=document.querySelector<HTMLButtonElement>('#obs-resend')!;
+const password=document.querySelector<HTMLInputElement>('#obs-password')!;
+let delivery=0;
+const obs=new ObsCueConnection((message,connected)=>{
+ delivery++;obsStatus.textContent=message;connect.disabled=connected;disconnect.disabled=!connected;resend.disabled=!connected;
+});
+const sendObsCue=()=>{
+ if(!obs.connected)return;
+ const sequence=++delivery;const cue=cues[current];
+ obsStatus.textContent=`Sending ${cue.name} to OBS…`;
+ void obs.sendCue(cue.key).then(()=>{
+  if(sequence===delivery)obsStatus.textContent=`OBS accepted ${cue.name}. Check the garden in OBS to confirm delivery.`;
+ }).catch(error=>{if(sequence===delivery)obsStatus.textContent=error instanceof Error?error.message:'OBS could not receive the cue.';});
+};
+document.querySelector<HTMLFormElement>('#obs-form')!.addEventListener('submit',event=>{
+ event.preventDefault();const secret=password.value;password.value='';
+ obs.connect(Number(document.querySelector<HTMLInputElement>('#obs-port')!.value),secret);
+});
+disconnect.addEventListener('click',()=>obs.disconnect());resend.addEventListener('click',sendObsCue);
+document.querySelector<HTMLInputElement>('#obs-player-url')!.value=new URL('/scene-lab/garden-player/?obs=1',location.origin).href;
+registerRuntimeCleanup(()=>{delivery++;password.value='';obs.disconnect(false);});
+function selectCue(index:number){
+ current=Math.max(0,Math.min(cues.length-1,index));
+ const cue=cues[current];
+ if(ready){frame.contentWindow?.postMessage({type:'aether:garden:cue',cue:cue.key},location.origin);status.textContent=`Active cue: ${cue.name}. ${current===3?'Clearing takes 30 seconds.':'Transition takes 4 seconds.'}`;}
+ list.replaceChildren();
+ cues.forEach((item,i)=>{
+  const button=document.createElement('button');button.type='button';button.className='cue'+(i===current?' selected':'');button.setAttribute('aria-pressed',String(i===current));
+  const time=document.createElement('span');time.textContent=item.time;time.className='time';
+  const info=document.createElement('span');const name=document.createElement('strong');name.textContent=item.name;const detail=document.createElement('small');detail.textContent=item.detail;info.append(name,detail);
+  button.append(time,info);button.addEventListener('click',()=>selectCue(i));list.append(button);
+ });
+ sendObsCue();
+ previous.disabled=current===0;next.disabled=current===cues.length-1;
+}
+previous.addEventListener('click',()=>selectCue(current-1));next.addEventListener('click',()=>selectCue(current+1));document.querySelector('#reset')!.addEventListener('click',()=>selectCue(0));
+const onMessage=(event:MessageEvent)=>{
+ if(event.origin!==location.origin || event.source!==frame.contentWindow)return;
+ if(event.data?.type==='aether:garden:ready'){ready=true;selectCue(current);}
+};
+window.addEventListener('message',onMessage);
+registerRuntimeCleanup(()=>window.removeEventListener('message',onMessage));
+selectCue(0);
+frame.src='/scene-lab/garden-player/';
+</script>
+<style>
+.obs-panel{margin-top:20px;background:#152131;border:1px solid #304359;border-radius:16px;padding:20px}.obs-panel h2{margin-top:0}.obs-panel label{display:block;margin-top:12px;color:#b4c4d5}.obs-panel input{display:block;box-sizing:border-box;width:100%;max-width:520px;margin-top:6px;padding:10px;border:1px solid #49637b;border-radius:8px;background:#0b1725;color:#e7edf7}.obs-panel #obs-player-url{max-width:none}.obs-panel form{max-width:520px}
+
+.director{padding:24px;max-width:1450px;margin:auto;color:#e7edf7}.director header{margin-bottom:24px}.director h1{font-size:clamp(28px,3vw,40px);margin:0 0 5px}.director p{color:#a8b7ca}.director-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:20px}.stage-card,.cues{background:#152131;border:1px solid #304359;border-radius:16px;padding:18px}.stage-card{align-self:start;position:sticky;top:20px}.stage-card h2,.cues h2{margin:0 0 16px;font-size:19px}iframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#05090e;border-radius:10px}.cues #cue-list{display:grid;gap:9px}.preview-shell{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#05090e}.preview-shell iframe{width:100%;height:100%;aspect-ratio:auto}.preview-shell canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.cues #cue-list{display:grid;gap:9px}.cues :global(.cue){display:grid;grid-template-columns:54px minmax(0,1fr);align-items:start;text-align:left;gap:12px;width:100%;padding:13px 12px;border-radius:9px;border:1px solid #34485e;background:#1b2b3e;color:#e7edf7;cursor:pointer;font:inherit;line-height:1.4}.cues :global(.cue.selected){background:#21496a;border-color:#74b7e5}.cues :global(.cue .time){font-variant-numeric:tabular-nums;color:#9dc4df;font-size:12px;white-space:nowrap;padding-top:2px}.cues :global(.cue strong),.cues :global(.cue small){display:block;overflow-wrap:anywhere}.cues :global(.cue small){color:#b4c4d5;margin-top:4px;font-size:12px}.cues :global(.cue:focus-visible){outline:2px solid #a9d7ff;outline-offset:2px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.actions button{background:#2773a4;color:white;border:0;border-radius:8px;padding:10px 13px;cursor:pointer}.actions button:disabled{opacity:.4;cursor:not-allowed}.hint{font-size:12px;line-height:1.5}@media(max-width:850px){.director-grid{grid-template-columns:1fr}.stage-card{position:static}.director{padding:14px}}
+</style>

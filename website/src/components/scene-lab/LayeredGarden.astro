@@ -1,0 +1,335 @@
+---
+const { player = false } = Astro.props;
+---
+<main class:list={["garden-lab", {"garden-player": player}]}>
+  <p class="eyebrow">AETHER · ISOLATED DEPTH EXPERIMENT</p>
+  <h1>Layered Garden Lab</h1>
+  <p>Test whether rain stays outside the veranda and pond mist sits behind the foreground. Rain uses the Figma-authored black-and-white visibility mask covering the main garden and side openings. This is a hand-masked 2.5D scene, not full 3D. V7 adds gently rising, variable-density water-origin mist with a subtle rainfall response and mist visibility diagnostic while retaining the Figma masks and rain/ripple behaviour.</p>
+  <div class="layout">
+    <section class="viewer">
+      <div class="stage" id="stage">
+        <img class="base" src="/scene-lab/garden/japanese-garden-day.webp" alt="Japanese garden pond seen from a covered veranda" />
+        <div class="light" id="light"></div>
+        <canvas id="weather" aria-hidden="true"></canvas>
+        <img class="foreground" src="/scene-lab/garden/garden-foreground-v2.png" alt="" />
+        <canvas class="debug" id="debug" aria-hidden="true"></canvas>
+      </div>
+      <p id="status" role="status">Ready · the veranda should stay dry while rain falls beyond it.</p>
+    </section>
+    <aside>
+      <h2>Atmosphere controls</h2>
+      <div class="presets">
+        <button data-preset="dry">Dry garden</button>
+        <button data-preset="rain">Rain outside</button>
+        <button data-preset="mist">Pond mist</button>
+        <button data-preset="clearing">Clearing</button>
+      </div>
+      <label for="rain">Rain intensity <output id="rainValue">50%</output></label>
+      <input id="rain" type="range" min="0" max="100" value="50" />
+      <label for="mist">Mist density <output id="mistValue">35%</output></label>
+      <input id="mist" type="range" min="0" max="100" value="35" />
+      <label for="sun">Warm light <output id="sunValue">10%</output></label>
+      <input id="sun" type="range" min="0" max="100" value="10" />
+      <label for="ripples">Pond ripple strength <output id="rippleValue">70%</output></label>
+      <input id="ripples" type="range" min="0" max="100" value="70" />
+      <label class="check"><input id="mistDiagnostic" type="checkbox" /> Mist visibility diagnostic (magenta)</label>
+       <label class="check"><input id="pondDiagnostic" type="checkbox" /> Show pond-water mask (green)</label>
+      <label class="check"><input id="diagnostic" type="checkbox" /> High-contrast rain diagnostic</label>
+      <label class="check"><input id="showMasks" type="checkbox" /> Show depth regions</label>
+      <p class="note">Blue = Figma rain-visible outdoor openings. Red = high-contrast rain diagnostic. Green = Figma pond-water mask. Magenta = mist diagnostic. Mist originates on the pond and rises only within the outdoor rain visibility mask.</p>
+      <p class="note">Green reveals the exact Figma pond-water mask. If a ripple crosses a rock or bank, the water mask needs refining; the Figma rain mask is unchanged.</p>
+      <p class="note">Limit: existing haze and water reflections remain baked into the original photograph. Mist is an animated layered 2.5D effect, not physically simulated volumetric fog.</p>
+    </aside>
+  </div>
+</main>
+
+<style>
+.garden-player{position:fixed;inset:0;padding:0;max-width:none;margin:0;background:#05090e}.garden-player>p,.garden-player>h1,.garden-player aside,.garden-player .viewer>p{display:none}.garden-player .layout{display:block;margin:0;height:100%}.garden-player .viewer{padding:0;border:0;border-radius:0;height:100%}.garden-player .stage{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
+
+.garden-lab{max-width:1450px;margin:auto;padding:24px;color:#e7edf7}.garden-lab h1{font-size:clamp(28px,3vw,40px);margin:4px 0}.garden-lab p{color:#b6c6d9;line-height:1.5}.eyebrow{font-size:12px;letter-spacing:.13em}.layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(275px,1fr);gap:18px;margin-top:20px}.viewer,aside{background:#152131;border:1px solid #34475c;border-radius:16px;padding:16px}.stage{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#0b1717;isolation:isolate}.stage>*{position:absolute;inset:0;width:100%;height:100%}.base,.foreground{object-fit:cover}.light{background:radial-gradient(ellipse at 60% 25%,rgba(255,214,131,.48),transparent 62%);mix-blend-mode:screen;pointer-events:none;opacity:.1}.foreground{pointer-events:none;z-index:2}#weather{z-index:3}.light{z-index:1}.base{z-index:0}.debug{z-index:4;pointer-events:none;display:none;object-fit:cover;opacity:.45;}.stage.show-debug .debug{display:block}.stage.show-debug:after{content:"BLUE: rain visibility through all garden openings";position:absolute;left:10px;bottom:10px;padding:7px;background:#102132db;color:#fff;font-size:12px;pointer-events:none}canvas{pointer-events:none}.presets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 22px}.presets button{background:#1c344c;border:1px solid #49637b;border-radius:8px;padding:12px;color:#fff;cursor:pointer}.presets button:hover{background:#28597b}aside label{display:flex;justify-content:space-between;margin-top:16px;font-size:14px}aside input[type=range]{width:100%;accent-color:#78bfe6}.check{justify-content:flex-start;gap:9px;align-items:center}.note{font-size:12px;border-top:1px solid #33485d;padding-top:12px;margin-top:18px}@media(max-width:850px){.layout{grid-template-columns:1fr}.garden-lab{padding:14px}}
+</style>
+<script>
+import {registerRuntimeCleanup} from "../../lib/runtime/RuntimeLifecycle";
+
+const stage=document.querySelector<HTMLElement>('#stage')!;
+const canvas=document.querySelector<HTMLCanvasElement>('#weather')!;
+const ctx=canvas.getContext('2d')!;
+const debugCanvas=document.querySelector<HTMLCanvasElement>('#debug')!;
+const debugCtx=debugCanvas.getContext('2d')!;
+const rainInput=document.querySelector<HTMLInputElement>('#rain')!;
+const mistInput=document.querySelector<HTMLInputElement>('#mist')!;
+const sunInput=document.querySelector<HTMLInputElement>('#sun')!;
+const light=document.querySelector<HTMLElement>('#light')!;
+const status=document.querySelector<HTMLElement>('#status')!;
+const diagnostic=document.querySelector<HTMLInputElement>('#diagnostic')!;
+const maskToggle=document.querySelector<HTMLInputElement>('#showMasks')!;
+const rippleInput=document.querySelector<HTMLInputElement>('#ripples')!;
+const pondDiagnostic=document.querySelector<HTMLInputElement>('#pondDiagnostic')!;
+const mistDiagnostic=document.querySelector<HTMLInputElement>('#mistDiagnostic')!;
+// Figma pond mask is opaque black/white, so luminance must become alpha.
+const pondMask=new Image();pondMask.src='/scene-lab/garden/garden-pond-water-mask-v2.png';
+const pondAlpha=document.createElement('canvas');
+const pondAlphaCtx=pondAlpha.getContext('2d',{willReadFrequently:true})!;
+let pondReady=false;
+let pondPoints:{x:number;y:number}[]=[];
+pondMask.onload=()=>{
+  pondAlpha.width=pondMask.naturalWidth;pondAlpha.height=pondMask.naturalHeight;
+  pondAlphaCtx.drawImage(pondMask,0,0);
+  const data=pondAlphaCtx.getImageData(0,0,pondAlpha.width,pondAlpha.height);
+  for(let i=0;i<data.data.length;i+=4){
+    const brightness=.2126*data.data[i]+.7152*data.data[i+1]+.0722*data.data[i+2];
+    data.data[i]=255;data.data[i+1]=255;data.data[i+2]=255;
+    data.data[i+3]=brightness>180?255:0;
+  }
+  pondAlphaCtx.putImageData(data,0,0);
+  // Sample eligible water positions from the actual mask, avoiding its edges.
+  pondPoints=[];
+  for(let y=8;y<pondAlpha.height-8;y+=8){
+    for(let x=8;x<pondAlpha.width-8;x+=8){
+      const idx=(y*pondAlpha.width+x)*4+3;
+      if(data.data[idx]===255 && data.data[idx-8*4]===255 && data.data[idx+8*4]===255 &&
+         data.data[idx-8*pondAlpha.width*4]===255 && data.data[idx+8*pondAlpha.width*4]===255){
+        pondPoints.push({x:x/pondAlpha.width,y:y/pondAlpha.height});
+      }
+    }
+  }
+  pondReady=pondPoints.length>0;
+  if(pondReady)initialiseMist();
+  if(!pondReady)status.textContent='Pond mask has no usable white water area.';
+};
+pondMask.onerror=()=>{status.textContent='Pond mask not found: /scene-lab/garden/garden-pond-water-mask-v2.png';};
+// Mist uses the water mask as a SOURCE, and the rain visibility mask as a
+// structural OCCLUSION mask. The plume may rise above water without fogging the roof.
+const mistCanvas=document.createElement('canvas');
+const mistCtx=mistCanvas.getContext('2d')!;
+type MistWisp={x:number;y:number;phase:number;speed:number;radius:number;rise:number;drift:number;variation:number;group:number};
+let mistWisps:MistWisp[]=[];
+function initialiseMist(){
+  // Spawn on actual pond pixels. The nearer and farther water provide different depths.
+  const candidates=pondPoints.filter(p=>p.y>.46 && p.y<.82);
+  const sources=candidates.length?candidates:pondPoints;
+  mistWisps=Array.from({length:110},(_,i)=>{
+    const p=sources[Math.floor(Math.random()*sources.length)];
+    const distant=p.y<.64;
+    return {x:p.x,y:p.y,phase:Math.random(),speed:.038+Math.random()*.052,
+      radius:(distant?.055:.075)+Math.random()*(distant?.065:.085),
+      rise:(distant?.075:.105)+Math.random()*.085,
+      drift:(Math.random()-.5)*.055,variation:Math.random()*Math.PI*2,group:i%7};
+  });
+}
+const rippleCanvas=document.createElement('canvas');const rippleCtx=rippleCanvas.getContext('2d')!;
+type Ripple={x:number;y:number;age:number;duration:number;size:number};
+const ripples:Ripple[]=[];let rippleSpawn=0;let rippleStrength=.7;
+let rain=.5,mist=.35,sun=.1,frame=0,last=0;
+const rainMask=new Image();rainMask.src='/scene-lab/garden/garden-rain-mask.png';
+const maskCanvas=document.createElement('canvas');const maskCtx=maskCanvas.getContext('2d')!;
+// Figma exports opaque black/white pixels. Convert luminance to alpha once,
+// otherwise destination-in treats opaque BLACK as rain-visible too.
+const alphaMask=document.createElement('canvas');const alphaCtx=alphaMask.getContext('2d',{willReadFrequently:true})!;
+let alphaReady=false;
+rainMask.onload=()=>{
+  alphaMask.width=rainMask.naturalWidth;alphaMask.height=rainMask.naturalHeight;
+  alphaCtx.clearRect(0,0,alphaMask.width,alphaMask.height);
+  alphaCtx.drawImage(rainMask,0,0);
+  const pixels=alphaCtx.getImageData(0,0,alphaMask.width,alphaMask.height);
+  for(let i=0;i<pixels.data.length;i+=4){
+    const r=pixels.data[i],g=pixels.data[i+1],b=pixels.data[i+2],a=pixels.data[i+3];
+    pixels.data[i]=255;pixels.data[i+1]=255;pixels.data[i+2]=255;
+    pixels.data[i+3]=Math.round((.2126*r+.7152*g+.0722*b)*a/255);
+  }
+  alphaCtx.putImageData(pixels,0,0);alphaReady=true;
+  renderDebugMask();
+};
+rainMask.onerror=()=>{status.textContent='Rain mask failed to load: /scene-lab/garden/garden-rain-mask.png';};
+function renderDebugMask(){
+  if(!alphaReady || !debugCanvas.width || !debugCanvas.height)return;
+  const w=debugCanvas.width,h=debugCanvas.height;
+  debugCtx.clearRect(0,0,w,h);
+  debugCtx.fillStyle='rgba(36,166,235,1)';
+  debugCtx.fillRect(0,0,w,h);
+  debugCtx.globalCompositeOperation='destination-in';
+  debugCtx.drawImage(alphaMask,0,0,w,h);
+  debugCtx.globalCompositeOperation='source-over';
+}
+// Three stable depth populations. All share the exact existing Figma visibility mask.
+// Density uses a per-drop threshold rather than per-frame random flicker.
+type RainDrop = { x:number; y:number; layer:number; speed:number; length:number; drift:number; opacity:number; width:number; threshold:number };
+const rainLayers = [
+  { count:310, speed:[.17,.32], length:[.006,.013], drift:[.006,.016], opacity:[.10,.19], width:[.45,.75] }, // distant
+  { count:260, speed:[.37,.65], length:[.014,.025], drift:[.014,.030], opacity:[.19,.34], width:[.75,1.15] }, // midground
+  { count:130, speed:[.72,1.12], length:[.026,.044], drift:[.025,.050], opacity:[.28,.48], width:[1.05,1.65] } // foreground
+];
+const between=(range:number[])=>range[0]+Math.random()*(range[1]-range[0]);
+const drops:RainDrop[]=rainLayers.flatMap((layer,layerIndex)=>Array.from({length:layer.count},()=>({
+  x:Math.random(),y:Math.random(),layer:layerIndex,speed:between(layer.speed),
+  length:between(layer.length),drift:between(layer.drift),opacity:between(layer.opacity),
+  width:between(layer.width),threshold:Math.random()
+})));
+// Weather presets can transition without stopping the existing animation loop.
+// Clearing is intentionally staged: rainfall eases, mist thins, then light returns.
+type WeatherTransition = { startedAt:number; rainStart:number; mistStart:number; sunStart:number };
+let clearing:WeatherTransition|null=null;
+const cueSettings = {
+ dry: [0,0,35,70], gentle: [30,18,10,70], shower: [85,35,0,85], ending: [0,8,65,70]
+} as const;
+let cueTransition: {start:number; from:number[]; to:readonly number[]}|null=null;
+function setDirectorCue(cue:string){
+ if(cue!=='clearing' && !(cue in cueSettings))return;
+ cueTransition=null;clearing=null;
+ if(cue==='clearing')clearing={startedAt:performance.now(),rainStart:rain,mistStart:mist,sunStart:sun};
+ else cueTransition={start:performance.now(),from:[rain*100,mist*100,sun*100,rippleStrength*100],to:cueSettings[cue as keyof typeof cueSettings]};
+}
+function onDirectorMessage(event:MessageEvent){
+ if(event.origin!==location.origin || event.source!==window.parent || window.parent===window)return;
+ if(event.data?.type==='aether:garden:cue' && typeof event.data.cue==='string')setDirectorCue(event.data.cue);
+}
+// OBS emits this custom event into Browser Sources, independent of browser storage.
+const isObsPlayer=!!(window as Window & {obsstudio?:unknown}).obsstudio && new URLSearchParams(location.search).get('obs')==='1';
+const onObsCue=(event:Event)=>{
+ const data=(event as CustomEvent).detail;
+ if(isObsPlayer && data?.scene==='garden' && typeof data.cue==='string')setDirectorCue(data.cue);
+};
+window.addEventListener('aether_garden_cue',onObsCue);
+registerRuntimeCleanup(()=>window.removeEventListener('aether_garden_cue',onObsCue));
+window.addEventListener('message',onDirectorMessage);
+registerRuntimeCleanup(()=>window.removeEventListener('message',onDirectorMessage));
+function advanceCue(now:number){
+ if(!cueTransition)return;
+ const progress=(now-cueTransition.start)/4000;
+ [rainInput,mistInput,sunInput,rippleInput].forEach((input,i)=>input.value=String(Math.round(blend(cueTransition!.from[i],cueTransition!.to[i],progress))));
+ sync();if(progress>=1)cueTransition=null;
+}
+
+const clamp01=(n:number)=>Math.max(0,Math.min(1,n));
+const ease=(n:number)=>{const x=clamp01(n);return x*x*(3-2*x);};
+const blend=(a:number,b:number,t:number)=>a+(b-a)*ease(t);
+function sync(){
+  rippleStrength=+rippleInput.value/100;
+  document.getElementById('rippleValue')!.textContent=`${Math.round(rippleStrength*100)}%`;
+  rain=+rainInput.value/100;mist=+mistInput.value/100;sun=+sunInput.value/100;
+  light.style.opacity=String(sun*.85);
+  for(const [id,value] of [['rainValue',rain],['mistValue',mist],['sunValue',sun]] as const){
+    document.getElementById(id)!.textContent=`${Math.round(value*100)}%`;
+  }
+  status.textContent=`Rain ${Math.round(rain*100)}% · Pond mist ${Math.round(mist*100)}% · Light ${Math.round(sun*100)}%`;
+}
+for(const el of [rainInput,mistInput,sunInput,rippleInput])el.addEventListener('input',()=>{
+  cueTransition=null;clearing=null;sync();
+});
+maskToggle.addEventListener('change',()=>stage.classList.toggle('show-debug',maskToggle.checked));
+document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
+  const p=b.dataset.preset;
+  cueTransition=null;
+  clearing=null;
+  if(p==='clearing'){
+    clearing={startedAt:performance.now(),rainStart:rain,mistStart:mist,sunStart:sun};
+    status.textContent='Clearing · rain easing, mist lifting and sunlight returning';
+    return;
+  }
+  const v=p==='dry'?[0,0,35]:p==='rain'?[85,12,0]:[8,80,15];
+  rainInput.value=String(v[0]);mistInput.value=String(v[1]);sunInput.value=String(v[2]);sync();
+}));
+function advanceClearing(now:number){
+  if(!clearing)return;
+  const elapsed=(now-clearing.startedAt)/1000;
+  // Each value changes smoothly, with overlapping stages rather than hard cuts.
+  rainInput.value=String(Math.round(100*blend(clearing.rainStart,0,elapsed/10)));
+  mistInput.value=String(Math.round(100*blend(clearing.mistStart,.08,(elapsed-5)/23)));
+  sunInput.value=String(Math.round(100*blend(clearing.sunStart,.65,(elapsed-10)/20)));
+  sync();
+  if(elapsed>=30){clearing=null;status.textContent='Clearing complete · rain stopped, light mist remaining';}
+  else status.textContent=`Clearing · ${Math.round(elapsed)} of 30 seconds`;
+}
+function resize(){const r=canvas.getBoundingClientRect();const d=Math.min(window.devicePixelRatio||1,1.5);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);maskCanvas.width=canvas.width;maskCanvas.height=canvas.height;rippleCanvas.width=canvas.width;rippleCanvas.height=canvas.height;mistCanvas.width=canvas.width;mistCanvas.height=canvas.height;debugCanvas.width=canvas.width;debugCanvas.height=canvas.height;renderDebugMask()}const observer=new ResizeObserver(resize);observer.observe(canvas);
+function draw(t:number){frame=requestAnimationFrame(draw);advanceCue(t);advanceClearing(t);const dt=Math.min(.05,(t-(last||t))/1000);last=t;const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
+// Rain is rendered on a separate buffer, then alpha-masked to the exact outdoor openings.
+// This keeps the veranda dry and includes the narrow garden views at both sides.
+maskCtx.clearRect(0,0,w,h);
+for(const d of drops){
+  d.y+=dt*d.speed;d.x+=dt*d.drift;
+  if(d.y>1.06){d.y=-d.length;d.x=Math.random();d.threshold=Math.random();}
+  if(d.x>1.03)d.x=0;
+  // Intensity reveals a stable subset of drops; depth remains independent of intensity.
+  if(d.threshold>rain)continue;
+  const test=diagnostic.checked;
+  maskCtx.strokeStyle=test?'rgba(255,45,65,.95)':`rgba(220,239,250,${d.opacity*(.45+rain*.55)})`;
+  maskCtx.lineWidth=test?Math.max(1.8,w/500):Math.max(.5,d.width*w/950);
+  maskCtx.beginPath();maskCtx.moveTo(d.x*w,d.y*h);
+  maskCtx.lineTo((d.x+d.drift*.12)*w,(d.y+d.length)*h);maskCtx.stroke();
+}
+if(alphaReady){maskCtx.save();maskCtx.globalCompositeOperation='destination-in';maskCtx.drawImage(alphaMask,0,0,w,h);maskCtx.restore();ctx.drawImage(maskCanvas,0,0)}
+// V3: ripple rings rendered in their own buffer, clipped to the independent water mask.
+// Rings are a visual approximation, not a physically simulated water surface.
+if(pondReady && !diagnostic.checked){
+  rippleCtx.clearRect(0,0,w,h);
+  const rate=rain*rippleStrength*17; // approximate new impacts per second
+  rippleSpawn+=dt*rate;
+  while(rippleSpawn>=1){rippleSpawn-=1;
+    const p=pondPoints[Math.floor(Math.random()*pondPoints.length)];
+    ripples.push({x:p.x,y:p.y,age:0,duration:.55+Math.random()*.6,size:.006+Math.random()*.009});
+  }
+  for(let i=ripples.length-1;i>=0;i--){
+    const r=ripples[i];r.age+=dt;if(r.age>=r.duration){ripples.splice(i,1);continue;}
+    const progress=r.age/r.duration,rx=(r.size+progress*.011)*w,ry=rx*.28;
+    rippleCtx.beginPath();rippleCtx.ellipse(r.x*w,r.y*h,rx,ry,0,0,Math.PI*2);
+    rippleCtx.strokeStyle=`rgba(222,242,246,${(1-progress)*.45*rippleStrength})`;
+    rippleCtx.lineWidth=Math.max(.6,w/1100);rippleCtx.stroke();
+  }
+  rippleCtx.save();rippleCtx.globalCompositeOperation='destination-in';rippleCtx.drawImage(pondAlpha,0,0,w,h);rippleCtx.restore();
+  ctx.drawImage(rippleCanvas,0,0);
+}
+if(pondDiagnostic.checked && pondReady){
+  rippleCtx.clearRect(0,0,w,h);rippleCtx.fillStyle='#29ee85';rippleCtx.fillRect(0,0,w,h);
+  rippleCtx.globalCompositeOperation='destination-in';rippleCtx.drawImage(pondAlpha,0,0,w,h);rippleCtx.globalCompositeOperation='source-over';
+  ctx.save();ctx.globalAlpha=.38;ctx.drawImage(rippleCanvas,0,0);ctx.restore();
+}
+// V7: Natural pond mist. Spawn points come only from the Figma water mask;
+// the outdoor visibility mask remains the final occlusion boundary.
+if(mist>.005 && pondReady && alphaReady && !diagnostic.checked){
+  mistCtx.clearRect(0,0,w,h);
+  const debugMist=mistDiagnostic.checked;
+  const density=Math.pow(mist,.82);
+  const seconds=t*.001;
+  // Slow, coherent density pulses make the fog breathe without flashing.
+  // Rain slightly increases turbulence, not the overall fog opacity.
+  const rainTurbulence=.15+rain*.85;
+  for(const p of mistWisps){
+    const cycle=(p.phase+seconds*p.speed)%1;
+    const envelope=Math.pow(Math.sin(Math.PI*cycle),1.15);
+    const pocket=.72+.28*Math.sin(seconds*.16+p.group*1.7+p.variation);
+    const micro=.9+.1*Math.sin(seconds*.31+p.variation);
+    const strength=density*envelope*pocket*micro;
+    const sway=Math.sin(seconds*.27+p.variation)*(.009+.007*rainTurbulence);
+    const flutter=Math.sin(seconds*.8+p.variation*2)*.0025*rainTurbulence;
+    const x=(p.x+sway+flutter+cycle*p.drift)*w;
+    const y=(p.y-cycle*p.rise)*h;
+    const radius=p.radius*w*(.84+cycle*.48);
+    mistCtx.save();
+    mistCtx.translate(x,y);
+    mistCtx.scale(1,.23+cycle*.12);
+    const g=mistCtx.createRadialGradient(0,0,radius*.04,0,0,radius);
+    if(debugMist){
+      g.addColorStop(0,`rgba(255,30,200,${.65*strength})`);
+      g.addColorStop(.55,`rgba(255,30,200,${.33*strength})`);
+    }else{
+      g.addColorStop(0,`rgba(222,238,232,${.32*strength})`);
+      g.addColorStop(.55,`rgba(219,237,233,${.15*strength})`);
+    }
+    g.addColorStop(1,'rgba(220,238,233,0)');
+    mistCtx.fillStyle=g;
+    mistCtx.fillRect(-radius,-radius,2*radius,2*radius);
+    mistCtx.restore();
+  }
+  mistCtx.save();mistCtx.globalCompositeOperation='destination-in';
+  mistCtx.drawImage(alphaMask,0,0,w,h);mistCtx.restore();
+  ctx.drawImage(mistCanvas,0,0);
+}
+if(maskToggle.checked && pondReady){
+  // The green pond diagnostic already displays the exact water footprint.
+}
+}
+sync();if(isObsPlayer)setDirectorCue("dry");frame=requestAnimationFrame(draw);
+registerRuntimeCleanup(()=>{cancelAnimationFrame(frame);observer.disconnect();});
+if(window.parent!==window)window.parent.postMessage({type:'aether:garden:ready'},location.origin);
+</script>
+
