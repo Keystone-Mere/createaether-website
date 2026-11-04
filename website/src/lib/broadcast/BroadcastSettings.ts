@@ -2,10 +2,12 @@ import { isClearSpace, type ClearSpace } from '../clear-space/ClearSpace';
 import { validateCameraLayouts, type CameraLayouts } from './CameraGeometry';
 import { sceneAsset } from '../../data/assets/SceneRegistry';
 export const studioBackgroundIds = ['warm-studio', 'liverpool-waterfront', 'botanical-observatory'] as const;
-export const broadcastBackgroundIds = [...studioBackgroundIds, 'wirral-liverpool', 'retreat', 'temple', 'ocean'] as const;
+export const broadcastBackgroundIds = [...studioBackgroundIds, 'wirral-liverpool', 'retreat', 'temple', 'ocean', 'layered-garden'] as const;
 export type BroadcastBackground = typeof broadcastBackgroundIds[number];
 export const broadcastBackgrounds = broadcastBackgroundIds.map(id => {
-    const asset = sceneAsset(id);
+    const asset = id === 'layered-garden'
+        ? { id: 'layered-garden', name: 'Japanese garden veranda', src: '/scene-lab/garden/japanese-garden-day.webp' }
+        : sceneAsset(id);
     if (!asset) throw new Error(`Unregistered broadcast background: ${id}`);
     return asset;
 });
@@ -14,7 +16,7 @@ export const broadcastBackgroundGroups = [
     { name: 'Experience backgrounds', assets: broadcastBackgrounds.filter(asset => !studioBackgroundIds.some(id => id === asset.id)) },
 ];
 export function broadcastFraming(background?: BroadcastBackground): 'presenter-safe' | 'legacy' {
-    return studioBackgroundIds.some(id => id === background) ? 'presenter-safe' : 'legacy';
+    return background === 'layered-garden' || studioBackgroundIds.some(id => id === background) ? 'presenter-safe' : 'legacy';
 }
 export type Layout = 'duo' | 'solo' | 'background';
 export const broadcastScreens = ['starting', 'live', 'break', 'ending'] as const;

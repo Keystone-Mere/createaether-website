@@ -1,7 +1,6 @@
 import { cameraFrames } from './CameraPlacement';
-import { sceneAsset } from '../../data/assets/SceneRegistry';
 import type { Experience } from '../models/Experience';
-import { broadcastFraming, type BroadcastSettings } from './BroadcastSettings';
+import { broadcastBackgrounds, broadcastFraming, type BroadcastSettings } from './BroadcastSettings';
 import { createStudioRuntime } from '../studio/StudioRuntime';
 import storm from '../../data/experiences/storm.json';
 
@@ -9,6 +8,11 @@ export function createBroadcastController(root: HTMLElement) {
     const stage = root.querySelector<HTMLElement>('.preview-stage')!;
     let runtime: ReturnType<typeof createStudioRuntime> | null = null;
     let motion: string | null = null;
+    let gardenFrame: HTMLIFrameElement | null = null;
+    let gardenSource = '';
+    function removeGarden() {
+        gardenFrame?.remove(); gardenFrame = null; gardenSource = '';
+    }
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let currentSettings: BroadcastSettings | null = null;
     let countdownKey = '';
@@ -51,14 +55,33 @@ export function createBroadcastController(root: HTMLElement) {
         }
         const logoImage = root.querySelector<HTMLImageElement>('.broadcast-logo')!;
         logoImage.hidden = !logo; if (logo) logoImage.src = logo; else logoImage.removeAttribute('src');
-        const asset = sceneAsset(settings.background)!;
+        const asset = broadcastBackgrounds.find(asset => asset.id === settings.background)!;
         stage.dataset.assetId = asset.id;
         stage.dataset.scene = 'custom';
         stage.setAttribute('aria-label', `${asset.name} show background`);
         const image = stage.querySelector<HTMLImageElement>('.preview-scene-image')!;
         if (image.getAttribute('src') !== asset.src) image.src = asset.src;
         root.querySelector<HTMLElement>('.broadcast-scene-credit')!.textContent = asset.name;
-        const effectiveMotion = reducedMotion.matches || settings.background !== 'wirral-liverpool' ? 'still' : settings.motion;
+        const garden = settings.background === 'layered-garden';
+        const effectiveMotion = reducedMotion.matches || (!garden && settings.background !== 'wirral-liverpool') ? 'still' : settings.motion;
+        if (garden) {
+            // Reuse the masked garden renderer in its own document. Text, frames and
+            // countdown remain in the broadcast layer above it, including in OBS.
+            runtime?.destroy(); runtime = null; motion = null;
+            root.dataset.motion = effectiveMotion;
+            const source = `/scene-lab/garden-player/?broadcast=1&motion=${effectiveMotion}`;
+            if (!gardenFrame) {
+                gardenFrame = document.createElement('iframe');
+                gardenFrame.title = 'Japanese garden atmosphere';
+                gardenFrame.tabIndex = -1;
+                gardenFrame.setAttribute('aria-hidden', 'true');
+                Object.assign(gardenFrame.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', border: '0', pointerEvents: 'none', zIndex: '3' });
+                stage.append(gardenFrame);
+            }
+            if (gardenSource !== source) { gardenSource = source; gardenFrame.src = source; }
+            return;
+        }
+        removeGarden();
         root.dataset.motion = effectiveMotion;
         if (runtime) { runtime.experienceState.data.clearSpace = settings.clearSpace; runtime.experienceRuntime.update(runtime.experienceState.data); }
         if (motion === effectiveMotion) return;
@@ -78,5 +101,5 @@ export function createBroadcastController(root: HTMLElement) {
     }
     function preferenceChanged() { motion = null; if (currentSettings) update(currentSettings, root.querySelector<HTMLImageElement>('.broadcast-logo')?.getAttribute('src') ?? '', root.dataset.guides === 'true'); }
     reducedMotion.addEventListener('change', preferenceChanged);
-    return { update, restartCountdown() { if (currentSettings) syncCountdown(currentSettings, true); }, stop() { clearTimer(); countdownKey=""; runtime?.destroy(); runtime=null; motion=null; }, destroy() { clearTimer(); countdownKey=""; runtime?.destroy(); runtime=null; motion=null; reducedMotion.removeEventListener('change', preferenceChanged); } };
+    return { update, restartCountdown() { if (currentSettings) syncCountdown(currentSettings, true); }, stop() { removeGarden(); clearTimer(); countdownKey=""; runtime?.destroy(); runtime=null; motion=null; }, destroy() { removeGarden(); clearTimer(); countdownKey=""; runtime?.destroy(); runtime=null; motion=null; reducedMotion.removeEventListener('change', preferenceChanged); } };
 }

@@ -47,10 +47,19 @@ const { player = false } = Astro.props;
 .garden-player{position:fixed;inset:0;padding:0;max-width:none;margin:0;background:#05090e}.garden-player>p,.garden-player>h1,.garden-player aside,.garden-player .viewer>p{display:none}.garden-player .layout{display:block;margin:0;height:100%}.garden-player .viewer{padding:0;border:0;border-radius:0;height:100%}.garden-player .stage{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
 
 .garden-lab{max-width:1450px;margin:auto;padding:24px;color:#e7edf7}.garden-lab h1{font-size:clamp(28px,3vw,40px);margin:4px 0}.garden-lab p{color:#b6c6d9;line-height:1.5}.eyebrow{font-size:12px;letter-spacing:.13em}.layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(275px,1fr);gap:18px;margin-top:20px}.viewer,aside{background:#152131;border:1px solid #34475c;border-radius:16px;padding:16px}.stage{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#0b1717;isolation:isolate}.stage>*{position:absolute;inset:0;width:100%;height:100%}.base,.foreground{object-fit:cover}.light{background:radial-gradient(ellipse at 60% 25%,rgba(255,214,131,.48),transparent 62%);mix-blend-mode:screen;pointer-events:none;opacity:.1}.foreground{pointer-events:none;z-index:2}#weather{z-index:3}.light{z-index:1}.base{z-index:0}.debug{z-index:4;pointer-events:none;display:none;object-fit:cover;opacity:.45;}.stage.show-debug .debug{display:block}.stage.show-debug:after{content:"BLUE: rain visibility through all garden openings";position:absolute;left:10px;bottom:10px;padding:7px;background:#102132db;color:#fff;font-size:12px;pointer-events:none}canvas{pointer-events:none}.presets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 22px}.presets button{background:#1c344c;border:1px solid #49637b;border-radius:8px;padding:12px;color:#fff;cursor:pointer}.presets button:hover{background:#28597b}aside label{display:flex;justify-content:space-between;margin-top:16px;font-size:14px}aside input[type=range]{width:100%;accent-color:#78bfe6}.check{justify-content:flex-start;gap:9px;align-items:center}.note{font-size:12px;border-top:1px solid #33485d;padding-top:12px;margin-top:18px}@media(max-width:850px){.layout{grid-template-columns:1fr}.garden-lab{padding:14px}}
+.garden-lab.garden-player{position:fixed;inset:0;padding:0;max-width:none;margin:0}
+.garden-player .layout{display:block;margin:0;height:100%}
+.garden-player .viewer{padding:0;border:0;border-radius:0;height:100%}
+.garden-player .stage{height:100%;aspect-ratio:auto;border-radius:0}
 </style>
 <script>
 import {registerRuntimeCleanup} from "../../lib/runtime/RuntimeLifecycle";
 
+const broadcastParams = new URLSearchParams(location.search);
+const broadcastMode = broadcastParams.get('broadcast') === '1';
+const broadcastMotion = broadcastParams.get('motion');
+const broadcastReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+let broadcastStill = broadcastMode && (broadcastMotion === 'still' || broadcastReduced.matches);
 const stage=document.querySelector<HTMLElement>('#stage')!;
 const canvas=document.querySelector<HTMLCanvasElement>('#weather')!;
 const ctx=canvas.getContext('2d')!;
@@ -180,6 +189,7 @@ function setDirectorCue(cue:string){
  else cueTransition={start:performance.now(),from:[rain*100,mist*100,sun*100,rippleStrength*100],to:cueSettings[cue as keyof typeof cueSettings]};
 }
 function onDirectorMessage(event:MessageEvent){
+ if(broadcastMode)return;
  if(event.origin!==location.origin || event.source!==window.parent || window.parent===window)return;
  if(event.data?.type==='aether:garden:cue' && typeof event.data.cue==='string')setDirectorCue(event.data.cue);
 }
@@ -241,7 +251,7 @@ function advanceClearing(now:number){
   else status.textContent=`Clearing · ${Math.round(elapsed)} of 30 seconds`;
 }
 function resize(){const r=canvas.getBoundingClientRect();const d=Math.min(window.devicePixelRatio||1,1.5);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);maskCanvas.width=canvas.width;maskCanvas.height=canvas.height;rippleCanvas.width=canvas.width;rippleCanvas.height=canvas.height;mistCanvas.width=canvas.width;mistCanvas.height=canvas.height;debugCanvas.width=canvas.width;debugCanvas.height=canvas.height;renderDebugMask()}const observer=new ResizeObserver(resize);observer.observe(canvas);
-function draw(t:number){frame=requestAnimationFrame(draw);advanceCue(t);advanceClearing(t);const dt=Math.min(.05,(t-(last||t))/1000);last=t;const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
+function draw(t:number){frame=0;if(broadcastStill){ctx.clearRect(0,0,canvas.width,canvas.height);return;}frame=requestAnimationFrame(draw);advanceCue(t);advanceClearing(t);const dt=Math.min(.05,(t-(last||t))/1000);last=t;const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
 // Rain is rendered on a separate buffer, then alpha-masked to the exact outdoor openings.
 // This keeps the veranda dry and includes the narrow garden views at both sides.
 maskCtx.clearRect(0,0,w,h);
@@ -328,7 +338,21 @@ if(maskToggle.checked && pondReady){
   // The green pond diagnostic already displays the exact water footprint.
 }
 }
-sync();if(isObsPlayer)setDirectorCue("dry");frame=requestAnimationFrame(draw);
+function applyBroadcastMotion() {
+  if (!broadcastMode) return;
+  broadcastStill = broadcastMotion === 'still' || broadcastReduced.matches;
+  const values = broadcastStill ? [0,0,10,0] : broadcastMotion === 'atmospheric' ? [65,35,10,70] : [30,18,10,45];
+  [rainInput,mistInput,sunInput,rippleInput].forEach((input,i)=>input.value=String(values[i]));
+  cueTransition=null;clearing=null;sync();
+  if (broadcastStill) { cancelAnimationFrame(frame);frame=0;ctx.clearRect(0,0,canvas.width,canvas.height); }
+  else if (!frame) { last=0;frame=requestAnimationFrame(draw); }
+}
+sync();
+if (broadcastMode) {
+  applyBroadcastMotion();
+  broadcastReduced.addEventListener('change',applyBroadcastMotion);
+  registerRuntimeCleanup(()=>broadcastReduced.removeEventListener('change',applyBroadcastMotion));
+} else { if(isObsPlayer)setDirectorCue("dry");frame=requestAnimationFrame(draw); }
 registerRuntimeCleanup(()=>{cancelAnimationFrame(frame);observer.disconnect();});
 if(window.parent!==window)window.parent.postMessage({type:'aether:garden:ready'},location.origin);
 </script>

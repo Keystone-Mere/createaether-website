@@ -8,6 +8,11 @@ import BroadcastStage from '../../components/studio/BroadcastStage.astro';
 <section class="podcast-workspace">
     <header class="podcast-header"><div><h1>Podcast &amp; Stream</h1><p>Make it yours. Add it to OBS. Reuse it every episode.</p></div><button type="button" id="open-saved-shows" class="workspace-button" aria-controls="show-library">My saved shows</button></header>
     <nav class="workspace-steps" aria-label="Show workflow"><a href="#podcast-form">1 · Design your show</a><a href="#show-live-preview">2 · Preview</a><a href="#show-obs-export">3 · Use in OBS</a></nav>
+    <section class="garden-workflow" aria-labelledby="garden-workflow-title">
+        <h2 id="garden-workflow-title">Create a show in the garden</h2>
+        <p>Choose <strong>Japanese garden veranda</strong> under Background. Select One host for a guided session, or No hosts for an environment interlude. Preview the atmosphere, then export your show to OBS.</p>
+        <details><summary>Change the weather during a session</summary><p><a href="/studio/live-director/" target="_blank" rel="noopener">Open Live Director in a new tab ↗</a> for manual garden weather cues. It uses a separate garden Browser Source and OBS connection, with its own setup instructions. Its cues do not control the four-screen show export below. Your saved studio draft stays in this tab.</p></details>
+    </section>
     <div class="podcast-grid">
         <form class="podcast-controls" id="podcast-form">
             <section class="workspace-card podcast-show-card"><h2>Your show</h2>
@@ -237,12 +242,14 @@ function render(persist=true) {
     document.querySelector<HTMLElement>('#podcast-guides')!.closest('label')!.hidden=s.screen!=='live';
     document.querySelector<HTMLElement>('.podcast-hint')!.textContent=s.screen==='live'?'Camera placeholders are guides only. Add your actual camera sources over the frames in OBS.':'Export this screen into its own OBS scene. Switch screens in OBS during your broadcast.';
     document.querySelector<HTMLElement>('#podcast-background-name')!.textContent=broadcastBackgrounds.find(asset=>asset.id===s.background)!.name;
-    for(const input of form.querySelectorAll<HTMLInputElement>('input[name=motion]')) input.disabled=s.background!=='wirral-liverpool';
-    document.querySelector<HTMLElement>('#podcast-motion-help')!.textContent=s.background==='wirral-liverpool'?'Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.':'Motion isn’t available for this background.';
+    const hasMotion = s.background === 'wirral-liverpool' || s.background === 'layered-garden';
+    for(const input of form.querySelectorAll<HTMLInputElement>('input[name=motion]')) input.disabled=!hasMotion;
+    document.querySelector<HTMLElement>('#podcast-motion-help')!.textContent=s.background==='layered-garden'?'The garden uses fixed outdoor masks; Clear Space is unavailable here. Subtle suits conversation; Atmospheric adds stronger rain and mist.':s.background==='wirral-liverpool'?'Rain stays outside the Liverpool window. Subtle is a good starting point for conversation.':'Motion isn’t available for this background.';
     const asset=broadcastBackgrounds.find(asset=>asset.id===s.background)!;
     document.querySelector<HTMLImageElement>('#selected-background-image')!.src=asset.src;
     document.querySelector<HTMLElement>('#selected-background-label')!.textContent=asset.name;
-    document.querySelector<HTMLElement>('.podcast-motion')!.hidden=s.background!=='wirral-liverpool';
+    document.querySelector<HTMLElement>('.podcast-motion')!.hidden=!hasMotion;
+    document.querySelector<HTMLElement>('[data-clear-space-panel]')!.hidden=s.background==='layered-garden';
     link.value=createBroadcastUrl(s,location.origin);
     document.querySelector<HTMLElement>('#show-accent-value')!.textContent=s.accent;
     document.querySelector<HTMLElement>('#guest-name-field')!.hidden=s.screen!=='live'||s.layout!=='duo';
@@ -474,4 +481,11 @@ window.addEventListener('pagehide',event=>{if(!event.persisted){cameraEditor?.de
 
 <style>
 .workspace-steps{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}.workspace-steps a{padding:9px 14px;border:1px solid #2a3a50;border-radius:999px;background:#101c2c;color:#b4f4d8;font-size:13px;text-decoration:none}.workspace-steps a:focus-visible{outline:2px solid #84dfc0;outline-offset:3px}#podcast-form,#show-live-preview,#show-obs-export{scroll-margin-top:20px}.single-screen-export>summary{font-weight:600;padding:6px 0}
+</style>
+
+<style>
+.garden-workflow{margin:0 0 24px;padding:18px 22px;border:1px solid #28514c;border-radius:16px;background:#0c242155}
+.garden-workflow p{font-size:13px;line-height:1.7;color:#becbd8;margin:8px 0}
+.garden-workflow summary{cursor:pointer;color:#b4f4d8;font-size:13px}
+.garden-workflow a{color:#b4f4d8;text-decoration:underline}
 </style>
