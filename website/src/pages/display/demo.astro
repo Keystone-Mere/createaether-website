@@ -1,17 +1,69 @@
 ﻿---
-import LayeredGarden from '../../components/scene-lab/LayeredGarden.astro';
 ---
-
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Aether Environmental Canvas | Demo</title>
+    <title>Aether Environmental Canvas</title>
   </head>
+
   <body>
-    <LayeredGarden player />
+    <iframe
+      id="environment"
+      title="Aether Living Garden"
+      src="/scene-lab/garden-player/"
+      allow="fullscreen"
+    ></iframe>
+
+    <script>
+      import {
+        SignageScheduler
+      } from '../../lib/signage/SignageScheduler';
+
+      const frame =
+        document.querySelector<HTMLIFrameElement>(
+          '#environment'
+        )!;
+
+      let scheduler: SignageScheduler | null = null;
+
+      const onMessage = (event: MessageEvent) => {
+        if (
+          event.origin !== window.location.origin ||
+          event.source !== frame.contentWindow ||
+          event.data?.type !== 'aether:garden:ready'
+        ) return;
+
+        scheduler?.stop();
+
+        scheduler = new SignageScheduler((cue) => {
+          frame.contentWindow?.postMessage(
+            {
+              type: 'aether:garden:cue',
+              cue
+            },
+            window.location.origin
+          );
+        });
+
+        scheduler.start();
+      };
+
+      window.addEventListener('message', onMessage);
+
+      const cleanup = () => {
+        scheduler?.stop();
+        window.removeEventListener('message', onMessage);
+        window.removeEventListener('pagehide', cleanup);
+        document.removeEventListener('astro:before-swap', cleanup);
+      };
+
+      window.addEventListener('pagehide', cleanup);
+      document.addEventListener('astro:before-swap', cleanup);
+    </script>
   </body>
 </html>
 
@@ -24,7 +76,10 @@ import LayeredGarden from '../../components/scene-lab/LayeredGarden.astro';
     background: #05090e;
   }
 
-  * {
-    box-sizing: border-box;
+  iframe {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    border: 0;
   }
 </style>
