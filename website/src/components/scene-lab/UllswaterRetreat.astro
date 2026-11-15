@@ -1,8 +1,8 @@
-﻿---
+---
 const { player = false } = Astro.props;
 ---
 <main class:list={["ullswater-lab", {"ullswater-player":player}]}>
-  <header><h1>Ullswater Retreat</h1><p>Natural shoreline, perspective ripples, rainfall, lake vapour and weather transitions, Phase 5</p></header>
+  <header><h1>Ullswater Retreat</h1><p>Natural shoreline, full-scene rainfall, ripples, lake vapour and weather transitions, Phase 6.1</p></header>
   <div class="layout">
     <section class="viewer">
       <div class="stage" id="ullswater-stage">
@@ -29,7 +29,7 @@ const { player = false } = Astro.props;
       </div>
       <label class="check"><input id="ullswater-mask-check" type="checkbox" /> Show water mask (green)</label>
        <label class="check"><input id="ullswater-rain-check" type="checkbox" /> Show rain region (blue)</label>
-      <p>Green shows the provisional new lake mask. Check that grass, rocks and shoreline remain unmasked. Blue shows the provisional rain region. The rain boundary still requires refinement. Vapour is experimental and remains clipped to the lake mask. Weather transitions are optional and use the existing effects. Manual controls remain available.</p>
+      <p>Green shows the provisional new lake mask. Check that grass, rocks and shoreline remain unmasked. Blue shows full-scene rain coverage. Foreground occlusion can be refined with a future Figma mask. Vapour is experimental and remains clipped to the lake mask. Weather transitions are optional and use the existing effects. Manual controls remain available.</p>
       <p><a href="/scene-lab/ullswater/?player=1&quality=pi4&debug=1">Fullscreen Pi 4 test</a></p>
     </aside>
   </div>
@@ -126,8 +126,8 @@ function spawnVapour(){
  }
 }
 
-// Provisional rain boundary, deliberately above the terrace. Replace with a Figma rain mask.
-const RAIN_BOTTOM=0.86;
+// V6.1: full-scene rain. A future non-white Figma mask can add foreground occlusion.
+const RAIN_BOTTOM=1;
 type Drop={x:number;y:number;speed:number;length:number;opacity:number;threshold:number;depth:number};
 const drops:Drop[]=Array.from({length:380},(_,i)=>({
  x:Math.random(),y:Math.random()*RAIN_BOTTOM,
