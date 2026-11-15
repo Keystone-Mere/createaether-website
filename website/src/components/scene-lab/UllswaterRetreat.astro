@@ -1,0 +1,217 @@
+﻿---
+const { player = false } = Astro.props;
+---
+<main class:list={["ullswater-lab", {"ullswater-player":player}]}>
+  <header><h1>Ullswater Retreat</h1><p>Natural shoreline, perspective ripples, rainfall, lake vapour and weather transitions, Phase 5</p></header>
+  <div class="layout">
+    <section class="viewer">
+      <div class="stage" id="ullswater-stage">
+        <img src="/scene-lab/ullswater/ullswater-background.jpg" alt="Lake District inspired lakeside retreat" />
+        <canvas id="ullswater-weather" aria-hidden="true"></canvas>
+      </div>
+      <p id="ullswater-status" role="status">Loading water mask...</p>
+    </section>
+    <aside>
+      <h2>Environmental controls</h2>
+       <label for="ullswater-rainfall">Rain intensity <output id="ullswater-rainfall-value">65%</output></label>
+       <input id="ullswater-rainfall" type="range" min="0" max="100" value="100" />
+       <label for="ullswater-vapour">Lake vapour <output id="ullswater-vapour-value">0%</output></label>
+<input id="ullswater-vapour" type="range" min="0" max="100" value="100" />
+<label for="ullswater-wind">Wind drift <output id="ullswater-wind-value">20%</output></label>
+       <input id="ullswater-wind" type="range" min="-100" max="100" value="20" />
+      <label for="ullswater-rain">Ripple activity <output id="ullswater-rain-value">70%</output></label>
+      <input id="ullswater-rain" type="range" min="0" max="100" value="100" />
+      <div class="weather-controls">
+        <h3>Weather sequence</h3>
+        <button id="ullswater-weather-toggle" type="button">Start weather sequence</button>
+        <output id="ullswater-weather-state" aria-live="polite">Manual settings</output>
+        <p>Each weather stage lasts 20 seconds. Changes blend over 10 seconds. Moving any intensity slider returns to manual control.</p>
+      </div>
+      <label class="check"><input id="ullswater-mask-check" type="checkbox" /> Show water mask (green)</label>
+       <label class="check"><input id="ullswater-rain-check" type="checkbox" /> Show rain region (blue)</label>
+      <p>Green shows the provisional new lake mask. Check that grass, rocks and shoreline remain unmasked. Blue shows the provisional rain region. The rain boundary still requires refinement. Vapour is experimental and remains clipped to the lake mask. Weather transitions are optional and use the existing effects. Manual controls remain available.</p>
+      <p><a href="/scene-lab/ullswater/?player=1&quality=pi4&debug=1">Fullscreen Pi 4 test</a></p>
+    </aside>
+  </div>
+</main>
+<style>
+.ullswater-lab{max-width:1450px;margin:auto;padding:24px;color:#e7edf7}.ullswater-lab h1{font-size:30px;margin:0}.ullswater-lab p{color:#b6c6d9}.layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(270px,1fr);gap:18px;margin-top:20px}.viewer,aside{background:#152131;border:1px solid #34475c;border-radius:14px;padding:16px}.stage{position:relative;aspect-ratio:15/8;overflow:hidden;border-radius:8px;background:#0b1717}.stage img,.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}.stage img{object-fit:fill}.stage canvas{pointer-events:none}aside label{display:flex;justify-content:space-between;margin:18px 0 8px}aside input[type=range]{width:100%}.check{justify-content:flex-start;gap:8px}aside a{color:#a8d9ff}.weather-controls{border-top:1px solid #34475c;margin-top:18px;padding-top:12px}.weather-controls h3{margin:0 0 10px;font-size:17px}.weather-controls button{background:#24465d;color:#e7edf7;border:1px solid #6d9bbb;border-radius:7px;padding:9px 12px;cursor:pointer}.weather-controls output{display:block;margin-top:8px;color:#c4e9dc}@media(max-width:850px){.layout{grid-template-columns:1fr}}.ullswater-player{position:fixed;inset:0;max-width:none;margin:0;padding:0;background:#05090e}.ullswater-player header,.ullswater-player aside,.ullswater-player .viewer>p{display:none}.ullswater-player .layout,.ullswater-player .viewer,.ullswater-player .stage{width:100%;height:100%;margin:0;padding:0;border:0;border-radius:0;display:block;aspect-ratio:auto}
+</style>
+<script>
+import { UllswaterWeatherController } from '../../lib/scene-lab/ullswater-weather-controller';
+const params=new URLSearchParams(location.search);
+const player=params.get('player')==='1';
+const debug=params.get('debug')==='1';
+const stage=document.querySelector<HTMLElement>('#ullswater-stage')!;
+const canvas=document.querySelector<HTMLCanvasElement>('#ullswater-weather')!;
+const ctx=canvas.getContext('2d')!;
+const activity=document.querySelector<HTMLInputElement>('#ullswater-rain')!;
+const rainfall=document.querySelector<HTMLInputElement>('#ullswater-rainfall')!;
+const rainOutput=document.querySelector<HTMLOutputElement>('#ullswater-rainfall-value')!;
+const vapourInput=document.querySelector<HTMLInputElement>('#ullswater-vapour')!;
+const vapourOutput=document.querySelector<HTMLOutputElement>('#ullswater-vapour-value')!;
+const wind=document.querySelector<HTMLInputElement>('#ullswater-wind')!;
+const windOutput=document.querySelector<HTMLOutputElement>('#ullswater-wind-value')!;
+const rainCheck=document.querySelector<HTMLInputElement>('#ullswater-rain-check')!;
+const output=document.querySelector<HTMLOutputElement>('#ullswater-rain-value')!;
+const maskCheck=document.querySelector<HTMLInputElement>('#ullswater-mask-check')!;
+const status=document.querySelector<HTMLElement>('#ullswater-status')!;
+const weatherButton=document.querySelector<HTMLButtonElement>('#ullswater-weather-toggle')!;
+const weatherState=document.querySelector<HTMLOutputElement>('#ullswater-weather-state')!;
+const weatherController=new UllswaterWeatherController();
+function syncWeatherControls(){
+ weatherButton.textContent=weatherController.active?'Stop weather sequence':'Start weather sequence';
+ weatherState.textContent=weatherController.active?weatherController.label:'Manual settings';
+}
+function stopWeatherOnManualInput(){if(weatherController.active){weatherController.stop();syncWeatherControls();}}
+function toggleWeather(){
+ if(weatherController.active){weatherController.stop();}
+ else{weatherController.start({rain:Number(rainfall.value),ripples:Number(activity.value),vapour:Number(vapourInput.value)});}
+ syncWeatherControls();
+}
+weatherButton.addEventListener('click',toggleWeather);
+for(const slider of [rainfall,activity,vapourInput])slider.addEventListener('input',stopWeatherOnManualInput);
+if(params.get('weather')==='auto')toggleWeather();
+
+if(player)document.querySelector('.ullswater-lab')?.classList.add('ullswater-player');
+const maskImage=new Image();
+const mask=document.createElement('canvas');
+const maskCtx=mask.getContext('2d',{willReadFrequently:true})!;
+const layer=document.createElement('canvas');
+const layerCtx=layer.getContext('2d')!;
+let points:{x:number;y:number}[]=[];
+let ready=false;
+maskImage.onload=()=>{
+ mask.width=maskImage.naturalWidth;mask.height=maskImage.naturalHeight;
+ maskCtx.drawImage(maskImage,0,0);
+ const image=maskCtx.getImageData(0,0,mask.width,mask.height);
+ for(let i=0;i<image.data.length;i+=4){
+  const brightness=.2126*image.data[i]+.7152*image.data[i+1]+.0722*image.data[i+2];
+  image.data[i]=255;image.data[i+1]=255;image.data[i+2]=255;image.data[i+3]=brightness>180?255:0;
+ }
+ maskCtx.putImageData(image,0,0);
+ for(let y=8;y<mask.height-8;y+=8)for(let x=8;x<mask.width-8;x+=8){
+  const idx=(y*mask.width+x)*4+3;
+  if(image.data[idx]===255 && image.data[idx-32]===255 && image.data[idx+32]===255 && image.data[idx-8*mask.width*4]===255 && image.data[idx+8*mask.width*4]===255)points.push({x:x/mask.width,y:y/mask.height});
+ }
+ ready=points.length>0;
+ status.textContent=ready?`Water mask ready: ${points.length} eligible ripple positions`:'No usable lake pixels found in water mask';
+};
+maskImage.onerror=()=>{status.textContent='Failed to load Ullswater water mask';};
+maskImage.src='/scene-lab/ullswater/ullswater-water-mask-v3.png';
+function resize(){const r=canvas.getBoundingClientRect();const d=Math.min(devicePixelRatio||1,1.5);const scale=params.get('quality')==='pi4'?Math.min(d,850/Math.max(r.width,1),480/Math.max(r.height,1)):d;canvas.width=Math.max(1,Math.round(r.width*scale));canvas.height=Math.max(1,Math.round(r.height*scale));layer.width=canvas.width;layer.height=canvas.height;}
+const observer=new ResizeObserver(resize);observer.observe(canvas);
+type Ripple={x:number;y:number;age:number;duration:number;size:number;growth:number;perspective:number};
+const ripples:Ripple[]=[];let accumulator=0;let last=0;let frame=0;
+// Pre-render one soft sprite, avoiding radial gradients inside the animation loop.
+const vapourSprite=document.createElement('canvas');
+vapourSprite.width=64;vapourSprite.height=64;
+const spriteCtx=vapourSprite.getContext('2d')!;
+const vapourGradient=spriteCtx.createRadialGradient(32,32,2,32,32,32);
+vapourGradient.addColorStop(0,'rgba(229,241,238,.34)');
+vapourGradient.addColorStop(.48,'rgba(220,237,234,.17)');
+vapourGradient.addColorStop(1,'rgba(220,237,234,0)');
+spriteCtx.fillStyle=vapourGradient;spriteCtx.fillRect(0,0,64,64);
+type Vapour={x:number;y:number;age:number;life:number;size:number;drift:number};
+const vapours:Vapour[]=[];let vapourTimer=0;
+const MAX_VAPOUR=params.get('quality')==='pi4'?20:25;
+function spawnVapour(){
+ // Pick water pixels, favouring the central and near shoreline lake.
+ if(!points.length)return;
+ for(let attempt=0;attempt<14;attempt++){
+  const p=points[Math.floor(Math.random()*points.length)];
+  if(p.y<.55||p.y>.83)continue;
+  vapours.push({x:p.x,y:p.y,age:0,life:4+Math.random()*3,size:.045+Math.random()*.045,drift:(Math.random()-.5)*.012});
+  return;
+ }
+}
+
+// Provisional rain boundary, deliberately above the terrace. Replace with a Figma rain mask.
+const RAIN_BOTTOM=0.86;
+type Drop={x:number;y:number;speed:number;length:number;opacity:number;threshold:number;depth:number};
+const drops:Drop[]=Array.from({length:380},(_,i)=>({
+ x:Math.random(),y:Math.random()*RAIN_BOTTOM,
+ speed:(i<240?.30:.66)+Math.random()*(i<240?.27:.34),
+ length:(i<240?.010:.021)+Math.random()*(i<240?.010:.015),
+ opacity:(i<240?.12:.23)+Math.random()*.13,
+ threshold:Math.random(),depth:i<240?0:1
+}));
+let windowStart=0,frames=0,worst=0,previous=0;
+const panel=debug?document.createElement('div'):null;
+if(panel){panel.style.cssText='position:fixed;top:12px;left:12px;z-index:9999;background:#000d;color:#b9fbd0;padding:10px 14px;border-radius:7px;font:13px/1.6 monospace;white-space:pre;pointer-events:none';panel.textContent='Aether FPS: warming up';document.body.appendChild(panel);}
+function draw(now:number){frame=requestAnimationFrame(draw);const dt=Math.min(.05,(now-(last||now))/1000);last=now;const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);if(!w||!h)return;
+ if(debug){if(!windowStart)windowStart=now;if(previous)worst=Math.max(worst,now-previous);previous=now;frames++;const elapsed=now-windowStart;if(elapsed>=5000){const fps=frames*1000/elapsed;if(panel)panel.textContent=`Aether FPS: ${fps.toFixed(1)}\nWorst frame gap: ${Math.round(worst)} ms\nCanvas: ${w} x ${h}`;windowStart=now;frames=0;worst=0;}}
+ if(!ready)return;
+  const weatherValues=weatherController.tick(dt);
+  if(weatherValues){
+   rainfall.value=String(Math.round(weatherValues.rain));
+   activity.value=String(Math.round(weatherValues.ripples));
+   vapourInput.value=String(Math.round(weatherValues.vapour));
+   onRain();onActivity();onVapour();
+   weatherState.textContent=weatherController.label;
+  }
+ const rainLevel=Number(rainfall.value)/100;
+ const windLevel=Number(wind.value)/100;
+ // A single clipped drawing pass avoids an additional full-screen rain buffer.
+ ctx.save();ctx.beginPath();ctx.rect(0,0,w,h*RAIN_BOTTOM);ctx.clip();
+ if(rainCheck.checked){
+   ctx.fillStyle='rgba(30,145,235,.30)';ctx.fillRect(0,0,w,h*RAIN_BOTTOM);
+ }else if(rainLevel>0){
+   for(const drop of drops){
+     drop.y+=dt*drop.speed;drop.x+=dt*(.016+windLevel*.085)*drop.speed;
+     if(drop.y>RAIN_BOTTOM+.03){drop.y=-drop.length;drop.x=Math.random();drop.threshold=Math.random();}
+     if(drop.x>1.04)drop.x=-.02;if(drop.x<-.04)drop.x=1.02;
+     if(drop.threshold>rainLevel)continue;
+     ctx.beginPath();ctx.moveTo(drop.x*w,drop.y*h);
+     ctx.lineTo((drop.x+windLevel*drop.length*.55)*w,(drop.y+drop.length)*h);
+     ctx.strokeStyle=`rgba(219,238,250,${drop.opacity*(.45+.55*rainLevel)})`;
+     ctx.lineWidth=drop.depth?Math.max(.8,w/950):Math.max(.55,w/1500);
+     ctx.stroke();
+   }
+ }
+ ctx.restore();
+ layerCtx.clearRect(0,0,w,h);
+ if(maskCheck.checked){layerCtx.fillStyle='#29ee85';layerCtx.fillRect(0,0,w,h);layerCtx.globalCompositeOperation='destination-in';layerCtx.drawImage(mask,0,0,w,h);layerCtx.globalCompositeOperation='source-over';ctx.globalAlpha=.45;ctx.drawImage(layer,0,0);ctx.globalAlpha=1;return;}
+ // Draw vapour onto the existing masked effects layer; no additional fullscreen canvas.
+ const vapourLevel=Number(vapourInput.value)/100;
+ if(vapourLevel>0){
+  vapourTimer+=dt*vapourLevel*5;
+  while(vapourTimer>=1&&vapours.length<MAX_VAPOUR){vapourTimer--;spawnVapour();}
+  vapourTimer=Math.min(vapourTimer,1);
+ }else{vapourTimer=0;}
+ for(let i=vapours.length-1;i>=0;i--){
+  const v=vapours[i];v.age+=dt;
+  if(v.age>=v.life){vapours.splice(i,1);continue;}
+  if(vapourLevel<=0)continue;
+  const t=v.age/v.life;
+  const alpha=Math.sin(Math.PI*t)*vapourLevel*.9;
+  const size=v.size*w*(.8+t*.75);
+  const x=(v.x+v.drift*v.age+windLevel*v.age*.002)*w;
+  const y=(v.y-v.age*.007)*h;
+  layerCtx.globalAlpha=alpha;
+  layerCtx.drawImage(vapourSprite,x-size/2,y-size*.22,size,size*.44);
+ }
+ layerCtx.globalAlpha=1;
+ const intensity=Number(activity.value)/100;
+ accumulator+=dt*intensity*28;
+ while(accumulator>=1){accumulator-=1;const p=points[Math.floor(Math.random()*points.length)];const depth=Math.max(0,Math.min(1,(p.y-.47)/.35));
+   const perspective=.30+1.55*Math.pow(depth,1.35);
+   ripples.push({x:p.x,y:p.y,age:0,duration:.55+Math.random()*.6,size:(.006+Math.random()*.009)*perspective,growth:.011*perspective,perspective});}
+ for(let i=ripples.length-1;i>=0;i--){const r=ripples[i];r.age+=dt;if(r.age>=r.duration){ripples.splice(i,1);continue;}const progress=r.age/r.duration,rx=(r.size+progress*r.growth)*w,ry=rx*.28;layerCtx.beginPath();layerCtx.ellipse(r.x*w,r.y*h,rx,ry,0,0,Math.PI*2);layerCtx.strokeStyle=`rgba(222,242,246,${(1-progress)*.68*intensity*(.55+.45*Math.min(1,r.perspective))})`;layerCtx.lineWidth=Math.max(.38,(w/1100)*(.45+.55*Math.min(1.5,r.perspective)));layerCtx.stroke();}
+ layerCtx.save();layerCtx.globalCompositeOperation='destination-in';layerCtx.drawImage(mask,0,0,w,h);layerCtx.restore();ctx.drawImage(layer,0,0);
+}
+const onActivity=()=>output.textContent=`${activity.value}%`;
+const onRain=()=>rainOutput.textContent=`${rainfall.value}%`;
+const onWind=()=>windOutput.textContent=`${wind.value}%`;
+const onVapour=()=>vapourOutput.textContent=`${vapourInput.value}%`;
+activity.addEventListener('input',onActivity);rainfall.addEventListener('input',onRain);wind.addEventListener('input',onWind);vapourInput.addEventListener('input',onVapour);onActivity();onRain();onWind();onVapour();
+frame=requestAnimationFrame(draw);
+const cleanup=()=>{weatherButton.removeEventListener('click',toggleWeather);for(const slider of [rainfall,activity,vapourInput])slider.removeEventListener('input',stopWeatherOnManualInput);cancelAnimationFrame(frame);observer.disconnect();activity.removeEventListener('input',onActivity);rainfall.removeEventListener('input',onRain);wind.removeEventListener('input',onWind);vapourInput.removeEventListener('input',onVapour);panel?.remove();};
+window.addEventListener('pagehide',cleanup,{once:true});
+document.addEventListener('astro:before-swap',cleanup,{once:true});
+</script>
+
+
+
+
+
