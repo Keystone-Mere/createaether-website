@@ -97,3 +97,76 @@ test('reset requests scene selection again', () => {
 
   assert.equal(result.changed, true);
 });
+
+test('reports initial environmental state', () => {
+  const controller = new SignagePlayerController(config);
+
+  const result = controller.update(
+    new Date('2026-11-19T12:00:00Z')
+  );
+
+  assert.equal(result.changed, true);
+  assert.equal(result.stateChanged, true);
+});
+
+test('does not report unchanged environmental state', () => {
+  const controller = new SignagePlayerController(config);
+
+  controller.update(new Date('2026-11-19T12:00:00Z'));
+
+  const result = controller.update(
+    new Date('2026-11-19T13:00:00Z')
+  );
+
+  assert.equal(result.changed, false);
+  assert.equal(result.stateChanged, false);
+});
+
+test('detects scheduled state changes without reloading the scene', () => {
+  const scheduledConfig: SignageConfig = {
+    ...config,
+    defaultSceneId: 'ullswater',
+    schedule: [
+      {
+        id: 'morning',
+        startTime: '09:00',
+        endTime: '14:00',
+        sceneId: 'ullswater',
+        state: { rain: 20 }
+      },
+      {
+        id: 'afternoon',
+        startTime: '14:00',
+        endTime: '19:00',
+        sceneId: 'ullswater',
+        state: { rain: 80 }
+      }
+    ]
+  };
+
+  const controller = new SignagePlayerController(scheduledConfig);
+
+  controller.update(new Date('2026-11-19T13:59:00Z'));
+
+  const result = controller.update(
+    new Date('2026-11-19T14:00:00Z')
+  );
+
+  assert.equal(result.changed, false);
+  assert.equal(result.stateChanged, true);
+  assert.equal(result.current.state.rain, 80);
+});
+
+test('reset triggers scene and state updates', () => {
+  const controller = new SignagePlayerController(config);
+
+  controller.update(new Date('2026-11-19T12:00:00Z'));
+  controller.reset();
+
+  const result = controller.update(
+    new Date('2026-11-19T12:01:00Z')
+  );
+
+  assert.equal(result.changed, true);
+  assert.equal(result.stateChanged, true);
+});
