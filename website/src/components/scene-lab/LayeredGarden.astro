@@ -2,7 +2,7 @@
 const { player = false } = Astro.props;
 ---
 <main class:list={["garden-lab", {"garden-player": player}]}>
-  <p class="eyebrow">AETHER · ISOLATED DEPTH EXPERIMENT</p>
+  <p class="eyebrow">AETHER Â· ISOLATED DEPTH EXPERIMENT</p>
   <h1>Layered Garden Lab</h1>
   <p>Test whether rain stays outside the veranda and pond mist sits behind the foreground. Rain uses the Figma-authored black-and-white visibility mask covering the main garden and side openings. This is a hand-masked 2.5D scene, not full 3D. V7 adds gently rising, variable-density water-origin mist with a subtle rainfall response and mist visibility diagnostic while retaining the Figma masks and rain/ripple behaviour.</p>
   <div class="layout">
@@ -14,7 +14,7 @@ const { player = false } = Astro.props;
         <img class="foreground" src="/scene-lab/garden/garden-foreground-v2.png" alt="" />
         <canvas class="debug" id="debug" aria-hidden="true"></canvas>
       </div>
-      <p id="status" role="status">Ready · the veranda should stay dry while rain falls beyond it.</p>
+      <p id="status" role="status">Ready Â· the veranda should stay dry while rain falls beyond it.</p>
     </section>
     <aside>
       <h2>Atmosphere controls</h2>
@@ -62,7 +62,7 @@ if (fpsPanel) {
   fpsPanel.id = 'aether-fps-panel';
   fpsPanel.setAttribute('role', 'status');
   fpsPanel.style.cssText = 'position:fixed;top:12px;left:12px;z-index:99999;background:rgba(0,0,0,.82);color:#b9fbd0;padding:10px 14px;border-radius:7px;font:13px/1.6 monospace;pointer-events:none;white-space:pre';
-  fpsPanel.textContent = 'Aether FPS: warming up…';
+  fpsPanel.textContent = 'Aether FPS: warming upâ€¦';
   document.body.appendChild(fpsPanel);
 }
 let fpsWindowStart = 0;
@@ -80,7 +80,7 @@ function samplePerformance(now:number, width:number, height:number) {
   const fps = Math.round(fpsFrames * 10000 / elapsed) / 10;
   const worstGap = Math.round(fpsWorstGap);
   const sample = {type:'aether:performance', fps, worstGapMs:worstGap, width, height, timestamp:Date.now()};
-  if (fpsPanel) fpsPanel.textContent = `Aether FPS: ${fps.toFixed(1)}\nWorst frame gap: ${worstGap} ms\nCanvas: ${width} × ${height}`;
+  if (fpsPanel) fpsPanel.textContent = `Aether FPS: ${fps.toFixed(1)}\nWorst frame gap: ${worstGap} ms\nCanvas: ${width} Ã— ${height}`;
   if (window.parent !== window) window.parent.postMessage(sample, location.origin);
   fpsWindowStart = now;
   fpsFrames = 0;
@@ -252,7 +252,7 @@ function sync(){
   for(const [id,value] of [['rainValue',rain],['mistValue',mist],['sunValue',sun]] as const){
     document.getElementById(id)!.textContent=`${Math.round(value*100)}%`;
   }
-  status.textContent=`Rain ${Math.round(rain*100)}% · Pond mist ${Math.round(mist*100)}% · Light ${Math.round(sun*100)}%`;
+  status.textContent=`Rain ${Math.round(rain*100)}% Â· Pond mist ${Math.round(mist*100)}% Â· Light ${Math.round(sun*100)}%`;
 }
 for(const el of [rainInput,mistInput,sunInput,rippleInput])el.addEventListener('input',()=>{
   cueTransition=null;clearing=null;sync();
@@ -264,7 +264,7 @@ document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(b=>b.addEv
   clearing=null;
   if(p==='clearing'){
     clearing={startedAt:performance.now(),rainStart:rain,mistStart:mist,sunStart:sun};
-    status.textContent='Clearing · rain easing, mist lifting and sunlight returning';
+    status.textContent='Clearing Â· rain easing, mist lifting and sunlight returning';
     return;
   }
   const v=p==='dry'?[0,0,35]:p==='rain'?[85,12,0]:[8,80,15];
@@ -278,10 +278,10 @@ function advanceClearing(now:number){
   mistInput.value=String(Math.round(100*blend(clearing.mistStart,.08,(elapsed-5)/23)));
   sunInput.value=String(Math.round(100*blend(clearing.sunStart,.65,(elapsed-10)/20)));
   sync();
-  if(elapsed>=30){clearing=null;status.textContent='Clearing complete · rain stopped, light mist remaining';}
-  else status.textContent=`Clearing · ${Math.round(elapsed)} of 30 seconds`;
+  if(elapsed>=30){clearing=null;status.textContent='Clearing complete Â· rain stopped, light mist remaining';}
+  else status.textContent=`Clearing Â· ${Math.round(elapsed)} of 30 seconds`;
 }
-function resize(){const r=canvas.getBoundingClientRect();const d=Math.min(window.devicePixelRatio||1,1.5);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);maskCanvas.width=canvas.width;maskCanvas.height=canvas.height;rippleCanvas.width=canvas.width;rippleCanvas.height=canvas.height;mistCanvas.width=canvas.width;mistCanvas.height=canvas.height;debugCanvas.width=canvas.width;debugCanvas.height=canvas.height;renderDebugMask()}const observer=new ResizeObserver(resize);observer.observe(canvas);
+function resize(){const r=canvas.getBoundingClientRect();const d=Math.min(window.devicePixelRatio||1,1.5);const pi4Mode=new URLSearchParams(location.search).get("quality")==="pi4";const scale=pi4Mode?Math.min(d,850/Math.max(r.width,1),480/Math.max(r.height,1)):d;canvas.width=Math.max(1,Math.round(r.width*scale));canvas.height=Math.max(1,Math.round(r.height*scale));maskCanvas.width=canvas.width;maskCanvas.height=canvas.height;rippleCanvas.width=canvas.width;rippleCanvas.height=canvas.height;mistCanvas.width=canvas.width;mistCanvas.height=canvas.height;debugCanvas.width=canvas.width;debugCanvas.height=canvas.height;renderDebugMask()}const observer=new ResizeObserver(resize);observer.observe(canvas);
 function draw(t:number){frame=0;if(broadcastStill){ctx.clearRect(0,0,canvas.width,canvas.height);return;}frame=requestAnimationFrame(draw);advanceCue(t);advanceClearing(t);const dt=Math.min(.05,(t-(last||t))/1000);last=t;const w=canvas.width,h=canvas.height;samplePerformance(t,w,h);ctx.clearRect(0,0,w,h);
 // Rain is rendered on a separate buffer, then alpha-masked to the exact outdoor openings.
 // This keeps the veranda dry and includes the narrow garden views at both sides.
@@ -334,20 +334,20 @@ if(mist>.005 && pondReady && alphaReady && !diagnostic.checked){
   // Slow, coherent density pulses make the fog breathe without flashing.
   // Rain slightly increases turbulence, not the overall fog opacity.
   const rainTurbulence=.15+rain*.85;
-  for(const p of mistWisps){
+  for(const [mistIndex,p] of mistWisps.entries()){if(new URLSearchParams(location.search).get("mistStyle")==="v2" && mistIndex>=40)continue;
     const cycle=(p.phase+seconds*p.speed)%1;
     const envelope=Math.pow(Math.sin(Math.PI*cycle),1.15);
     const pocket=.72+.28*Math.sin(seconds*.16+p.group*1.7+p.variation);
     const micro=.9+.1*Math.sin(seconds*.31+p.variation);
-    const strength=density*envelope*pocket*micro;
+    const strength=density*envelope*pocket*micro*(new URLSearchParams(location.search).get("mistStyle")==="v2"?1.5:1);
     const sway=Math.sin(seconds*.27+p.variation)*(.009+.007*rainTurbulence);
     const flutter=Math.sin(seconds*.8+p.variation*2)*.0025*rainTurbulence;
     const x=(p.x+sway+flutter+cycle*p.drift)*w;
-    const y=(p.y-cycle*p.rise)*h;
-    const radius=p.radius*w*(.84+cycle*.48);
+    const y=(p.y-cycle*p.rise*(new URLSearchParams(location.search).get("mistStyle")==="v2"?1.7:1))*h;
+    const radius=p.radius*w*(new URLSearchParams(location.search).get("mistStyle")==="v2"?.7:1)*(.84+cycle*.48);
     mistCtx.save();
     mistCtx.translate(x,y);
-    mistCtx.scale(1,.23+cycle*.12);
+    mistCtx.scale(1,new URLSearchParams(location.search).get("mistStyle")==="v2"?.65+cycle*.25:.23+cycle*.12);
     const g=mistCtx.createRadialGradient(0,0,radius*.04,0,0,radius);
     if(debugMist){
       g.addColorStop(0,`rgba(255,30,200,${.65*strength})`);
@@ -387,4 +387,5 @@ if (broadcastMode) {
 registerRuntimeCleanup(()=>{cancelAnimationFrame(frame);observer.disconnect();fpsPanel?.remove();});
 if(window.parent!==window)window.parent.postMessage({type:'aether:garden:ready'},location.origin);
 </script>
+
 

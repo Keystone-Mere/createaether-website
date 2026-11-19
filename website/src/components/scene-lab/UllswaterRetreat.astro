@@ -2,7 +2,7 @@
 const { player = false } = Astro.props;
 ---
 <main class:list={["ullswater-lab", {"ullswater-player":player}]}>
-  <header><h1>Ullswater Retreat</h1><p>Natural shoreline, full-scene rainfall, ripples, rising lake vapour and weather transitions, Phase 6.3</p></header>
+  <header><h1>Ullswater Retreat</h1><p>Natural shoreline, full-scene rainfall, ripples, rising lake vapour and weather transitions, Phase 7.1</p></header>
   <div class="layout">
     <section class="viewer">
       <div class="stage" id="ullswater-stage">
@@ -148,11 +148,31 @@ const drops:Drop[]=Array.from({length:380},(_,i)=>({
  opacity:(i<240?.12:.23)+Math.random()*.13,
  threshold:Math.random(),depth:i<240?0:1
 }));
+// V7.1: bounded, debug-only frame diagnostics; no persistent per-frame allocations in normal mode.
 let windowStart=0,frames=0,worst=0,previous=0;
+const frameIntervals:number[]=[];
+const renderDurations:number[]=[];
+let visibleDrops=0;
+function percentile(values:number[],p:number){
+ if(!values.length)return 0;
+ const sorted=values.slice().sort((a,b)=>a-b);
+ return sorted[Math.min(sorted.length-1,Math.ceil(p*sorted.length)-1)];
+}
+function reportDiagnostics(now:number,w:number,h:number){
+ if(!debug)return;
+ const elapsed=now-windowStart;
+ if(elapsed<5000)return;
+ const mean=renderDurations.reduce((sum,v)=>sum+v,0)/Math.max(1,renderDurations.length);
+ const fps=frames*1000/elapsed;
+ const memory=(performance as Performance & {memory?:{usedJSHeapSize:number}}).memory;
+ const heap=memory?`${(memory.usedJSHeapSize/1048576).toFixed(1)} MB`:'unavailable';
+ if(panel)panel.textContent=`Aether V7.1 diagnostics\nFPS: ${fps.toFixed(1)}\nWorst frame gap: ${Math.round(worst)} ms\nFrame interval p95: ${percentile(frameIntervals,.95).toFixed(1)} ms\nJS draw avg: ${mean.toFixed(2)} ms\nJS draw p95: ${percentile(renderDurations,.95).toFixed(2)} ms\nRain strokes: ${visibleDrops}/${drops.length}\nRipples: ${ripples.length}  Vapour: ${vapours.length}\nWeather: ${weatherController.active?weatherController.label:'Manual'}\nJS heap: ${heap}\nCanvas: ${w} x ${h}`;
+ windowStart=now;frames=0;worst=0;frameIntervals.length=0;renderDurations.length=0;
+}
 const panel=debug?document.createElement('div'):null;
 if(panel){panel.style.cssText='position:fixed;top:12px;left:12px;z-index:9999;background:#000d;color:#b9fbd0;padding:10px 14px;border-radius:7px;font:13px/1.6 monospace;white-space:pre;pointer-events:none';panel.textContent='Aether FPS: warming up';document.body.appendChild(panel);}
-function draw(now:number){frame=requestAnimationFrame(draw);const dt=Math.min(.05,(now-(last||now))/1000);last=now;const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);if(!w||!h)return;
- if(debug){if(!windowStart)windowStart=now;if(previous)worst=Math.max(worst,now-previous);previous=now;frames++;const elapsed=now-windowStart;if(elapsed>=5000){const fps=frames*1000/elapsed;if(panel)panel.textContent=`Aether FPS: ${fps.toFixed(1)}\nWorst frame gap: ${Math.round(worst)} ms\nCanvas: ${w} x ${h}`;windowStart=now;frames=0;worst=0;}}
+function draw(now:number){frame=requestAnimationFrame(draw);const renderStart=debug?performance.now():0;const dt=Math.min(.05,(now-(last||now))/1000);last=now;const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);if(!w||!h)return;
+ if(debug){if(!windowStart)windowStart=now;if(previous){const gap=now-previous;worst=Math.max(worst,gap);frameIntervals.push(gap);}previous=now;frames++;visibleDrops=0;}
  if(!ready)return;
   const weatherValues=weatherController.tick(dt);
   if(weatherValues){
@@ -179,6 +199,7 @@ function draw(now:number){frame=requestAnimationFrame(draw);const dt=Math.min(.0
      ctx.strokeStyle=`rgba(219,238,250,${drop.opacity*(.45+.55*rainLevel)})`;
      ctx.lineWidth=drop.depth?Math.max(.8,w/950):Math.max(.55,w/1500);
      ctx.stroke();
+     if(debug)visibleDrops++;
    }
  }
  ctx.restore();
@@ -212,6 +233,7 @@ function draw(now:number){frame=requestAnimationFrame(draw);const dt=Math.min(.0
   ctx.drawImage(vapourSprites[v.variant],x-size*.5,y-size*.72,size,size*1.05);
  }
  ctx.globalAlpha=1;
+ if(debug){renderDurations.push(performance.now()-renderStart);reportDiagnostics(now,w,h);}
 }
 const onActivity=()=>output.textContent=`${activity.value}%`;
 const onRain=()=>rainOutput.textContent=`${rainfall.value}%`;
