@@ -241,12 +241,59 @@ const onWind=()=>windOutput.textContent=`${wind.value}%`;
 const onVapour=()=>vapourOutput.textContent=`${vapourInput.value}%`;
 activity.addEventListener('input',onActivity);rainfall.addEventListener('input',onRain);wind.addEventListener('input',onWind);vapourInput.addEventListener('input',onVapour);onActivity();onRain();onWind();onVapour();
 frame=requestAnimationFrame(draw);
-const cleanup=()=>{weatherButton.removeEventListener('click',toggleWeather);for(const slider of [rainfall,activity,vapourInput])slider.removeEventListener('input',stopWeatherOnManualInput);cancelAnimationFrame(frame);observer.disconnect();activity.removeEventListener('input',onActivity);rainfall.removeEventListener('input',onRain);wind.removeEventListener('input',onWind);vapourInput.removeEventListener('input',onVapour);panel?.remove();};
+function onSignageMessage(event: MessageEvent) {
+  if (
+    window.parent === window ||
+    event.source !== window.parent ||
+    event.origin !== location.origin ||
+    event.data?.type !== 'aether:signage:state'
+  ) return;
+
+  const state = event.data.state;
+
+  if (!state || typeof state !== 'object' || Array.isArray(state)) return;
+
+  const controls = [
+    ['rain', rainfall],
+    ['ripples', activity],
+    ['vapour', vapourInput]
+  ] as const;
+
+  const updates: Array<[HTMLInputElement, number]> = [];
+
+  for (const [key, input] of controls) {
+    const value = state[key];
+
+    if (value === undefined) continue;
+
+    if (
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      value < 0 ||
+      value > 100
+    ) return;
+
+    updates.push([input, value]);
+  }
+
+  if (updates.length === 0) return;
+
+  if (weatherController.active) {
+    weatherController.stop();
+    syncWeatherControls();
+  }
+
+  for (const [input, value] of updates) {
+    input.value = String(value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+}
+
+window.addEventListener('message', onSignageMessage);
+const cleanup=()=>{window.removeEventListener('message',onSignageMessage);weatherButton.removeEventListener('click',toggleWeather);for(const slider of [rainfall,activity,vapourInput])slider.removeEventListener('input',stopWeatherOnManualInput);cancelAnimationFrame(frame);observer.disconnect();activity.removeEventListener('input',onActivity);rainfall.removeEventListener('input',onRain);wind.removeEventListener('input',onWind);vapourInput.removeEventListener('input',onVapour);panel?.remove();};
 window.addEventListener('pagehide',cleanup,{once:true});
 document.addEventListener('astro:before-swap',cleanup,{once:true});
 </script>
-
-
 
 
 
