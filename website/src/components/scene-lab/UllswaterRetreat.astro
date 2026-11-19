@@ -287,13 +287,26 @@ function onSignageMessage(event: MessageEvent) {
     input.value = String(value);
     input.dispatchEvent(new Event('input', { bubbles: true }));
   }
+
+  const requestId = event.data.requestId;
+
+  if (typeof requestId === 'string' && requestId.length > 0 && requestId.length <= 128) {
+    window.parent.postMessage(
+      { type: 'aether:signage:applied', requestId },
+      location.origin
+    );
+  }
 }
 
 window.addEventListener('message', onSignageMessage);
+
+if (window.parent !== window) {
+  window.parent.postMessage(
+    { type: 'aether:signage:ready' },
+    location.origin
+  );
+}
 const cleanup=()=>{window.removeEventListener('message',onSignageMessage);weatherButton.removeEventListener('click',toggleWeather);for(const slider of [rainfall,activity,vapourInput])slider.removeEventListener('input',stopWeatherOnManualInput);cancelAnimationFrame(frame);observer.disconnect();activity.removeEventListener('input',onActivity);rainfall.removeEventListener('input',onRain);wind.removeEventListener('input',onWind);vapourInput.removeEventListener('input',onVapour);panel?.remove();};
 window.addEventListener('pagehide',cleanup,{once:true});
 document.addEventListener('astro:before-swap',cleanup,{once:true});
 </script>
-
-
-
