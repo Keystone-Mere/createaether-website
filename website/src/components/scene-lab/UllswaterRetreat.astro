@@ -153,6 +153,8 @@ let windowStart=0,frames=0,worst=0,previous=0;
 const frameIntervals:number[]=[];
 const renderDurations:number[]=[];
 let visibleDrops=0;
+// Signage health: counts completed rendering cycles.
+let signageCompletedFrames=0;
 function percentile(values:number[],p:number){
  if(!values.length)return 0;
  const sorted=values.slice().sort((a,b)=>a-b);
@@ -233,6 +235,7 @@ function draw(now:number){frame=requestAnimationFrame(draw);const renderStart=de
   ctx.drawImage(vapourSprites[v.variant],x-size*.5,y-size*.72,size,size*1.05);
  }
  ctx.globalAlpha=1;
+ signageCompletedFrames++;
  if(debug){renderDurations.push(performance.now()-renderStart);reportDiagnostics(now,w,h);}
 }
 const onActivity=()=>output.textContent=`${activity.value}%`;
@@ -245,9 +248,27 @@ function onSignageMessage(event: MessageEvent) {
   if (
     window.parent === window ||
     event.source !== window.parent ||
-    event.origin !== location.origin ||
-    event.data?.type !== 'aether:signage:state'
+    event.origin !== location.origin
   ) return;
+
+  if (event.data?.type === 'aether:signage:ping') {
+    const requestId = event.data.requestId;
+
+    if (
+      typeof requestId === 'string' &&
+      requestId.length > 0 &&
+      requestId.length <= 128
+    ) {
+      window.parent.postMessage(
+        { type: 'aether:signage:pong', requestId, completedFrames: signageCompletedFrames },
+        location.origin
+      );
+    }
+
+    return;
+  }
+
+  if (event.data?.type !== 'aether:signage:state') return;
 
   const state = event.data.state;
 

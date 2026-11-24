@@ -1,0 +1,381 @@
+---
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Aether Commercial Display</title>
+</head>
+<body>
+  <iframe id="environment" title="Aether Environmental Canvas"></iframe>
+  <div id="status" role="status" aria-live="polite">Starting Aether...</div>
+
+  <script>
+    import { signagePilotConfig } from '../../lib/signage/SignagePilotConfig.ts';
+    import { parseSignageConfig } from '../../lib/signage/SignageConfigParser.ts';
+    import { SignagePlayerController } from '../../lib/signage/SignagePlayerController.ts';
+
+    const frame = document.querySelector<HTMLIFrameElement>('#environment')!;
+    const status = document.querySelector<HTMLDivElement>('#status')!;
+
+    const parsed = parseSignageConfig(signagePilotConfig);
+
+    const POLL_MS = 15000;
+    const TIMEOUT_MS = 10000;
+    const MAX_RETRIES = 3;
+    const RECOVERY_COOLDOWN_MS = 60000;
+    const HEARTBEAT_INTERVAL_MS = 15000;
+    const HEARTBEAT_TIMEOUT_MS = 5000;
+
+    let controller: SignagePlayerController | null = null;
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+    let timeoutTimer: ReturnType<typeof setTimeout> | null = null;
+    let recoveryTimer: ReturnType<typeof setTimeout> | null = null;
+    let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+    let heartbeatTimeout: ReturnType<typeof setTimeout> | null = null;
+    let pendingHeartbeat: string | null = null;
+    let heartbeatCounter = 0;
+    let lastCompletedFrames: number | null = null;
+    let consecutiveStalls = 0;
+
+    let ready = false;
+    let retries = 0;
+    let requestCounter = 0;
+    let pendingRequest: string | null = null;
+    let desiredState: Record<string, unknown> = {};
+    let sentState: Record<string, unknown> | null = null;
+    let acknowledgedState: Record<string, unknown> | null = null;
+    let activePath = '';
+
+    function statesEqual(
+      a: Record<string, unknown>,
+      b: Record<string, unknown>
+    ): boolean {
+      const keys = Object.keys(a);
+      return keys.length === Object.keys(b).length &&
+        keys.every(key =>
+          Object.prototype.hasOwnProperty.call(b, key) &&
+          Object.is(a[key], b[key])
+        );
+    }
+    let disposed = false;
+
+    function clearTimeoutTimer() {
+      if (timeoutTimer !== null) {
+        clearTimeout(timeoutTimer);
+        timeoutTimer = null;
+      }
+    }
+
+    function stopHeartbeat() {
+      if (heartbeatTimer !== null) {
+        clearInterval(heartbeatTimer);
+        heartbeatTimer = null;
+      }
+
+      if (heartbeatTimeout !== null) {
+        clearTimeout(heartbeatTimeout);
+        heartbeatTimeout = null;
+      }
+
+      pendingHeartbeat = null;
+    }
+
+    function showStatus(message: string) {
+      status.textContent = message;
+      status.hidden = false;
+    }
+
+    function hideStatus() {
+      status.hidden = true;
+    }
+
+    function fail(message: string) {
+      stopHeartbeat();
+      clearTimeoutTimer();
+      lastCompletedFrames = null;
+      consecutiveStalls = 0;
+      pendingRequest = null;
+      sentState = null;
+      acknowledgedState = null;
+      ready = false;
+
+      if (retries >= MAX_RETRIES) {
+        showStatus('Aether display unavailable. Retrying in 60 seconds.');
+
+        if (recoveryTimer === null) {
+          recoveryTimer = setTimeout(() => {
+            recoveryTimer = null;
+
+            if (disposed) return;
+
+            retries = 0;
+            const previousPath = activePath;
+
+            updateSchedule();
+
+            if (activePath === previousPath) {
+              showStatus('Attempting display recovery...');
+              frame.src = activePath;
+              startTimeout('Renderer did not become ready');
+            }
+          }, RECOVERY_COOLDOWN_MS);
+        }
+
+        return;
+      }
+
+      retries++;
+      showStatus('Reconnecting display (' + retries + '/' + MAX_RETRIES + ')');
+
+      frame.src = activePath;
+      startTimeout('Renderer did not become ready');
+    }
+
+    function startTimeout(message: string) {
+      clearTimeoutTimer();
+      timeoutTimer = setTimeout(() => {
+        if (!disposed) fail(message);
+      }, TIMEOUT_MS);
+    }
+
+    function startHeartbeat() {
+      stopHeartbeat();
+
+      heartbeatTimer = setInterval(() => {
+        if (
+          disposed ||
+          !ready ||
+          pendingRequest !== null ||
+          pendingHeartbeat !== null
+        ) return;
+
+        const requestId = 'heartbeat-' + (++heartbeatCounter);
+        pendingHeartbeat = requestId;
+
+        frame.contentWindow?.postMessage({
+          type: 'aether:signage:ping',
+          requestId
+        }, location.origin);
+
+        heartbeatTimeout = setTimeout(() => {
+          if (disposed || pendingHeartbeat !== requestId) return;
+
+          fail('Renderer heartbeat not acknowledged');
+        }, HEARTBEAT_TIMEOUT_MS);
+      }, HEARTBEAT_INTERVAL_MS);
+    }
+
+    function sendState() {
+      if (!ready || pendingRequest || disposed) return;
+
+      if (
+        acknowledgedState !== null &&
+        statesEqual(acknowledgedState, desiredState)
+      ) return;
+
+      const requestId = 'state-' + (++requestCounter);
+      sentState = { ...desiredState };
+      pendingRequest = requestId;
+
+      frame.contentWindow?.postMessage({
+        type: 'aether:signage:state',
+        requestId,
+        state: sentState
+      }, location.origin);
+
+      startTimeout('Environmental state not acknowledged');
+    }
+
+    function loadScene(path: string) {
+      stopHeartbeat();
+
+      if (recoveryTimer !== null) {
+        clearTimeout(recoveryTimer);
+        recoveryTimer = null;
+      }
+
+      clearTimeoutTimer();
+      lastCompletedFrames = null;
+      consecutiveStalls = 0;
+      ready = false;
+      pendingRequest = null;
+      sentState = null;
+      acknowledgedState = null;
+      retries = 0;
+      const sceneUrl = new URL(path, location.origin);
+      sceneUrl.searchParams.set('player', '1');
+
+      if (signagePilotConfig.performanceProfile === 'pi4') {
+        sceneUrl.searchParams.set('quality', 'pi4');
+      }
+
+      activePath = sceneUrl.pathname + sceneUrl.search;
+
+      showStatus('Loading environmental canvas...');
+      frame.src = activePath;
+      startTimeout('Renderer did not become ready');
+    }
+
+    function updateSchedule() {
+      if (!controller || disposed) return;
+
+      try {
+        const result = controller.update();
+        desiredState = { ...result.current.state };
+
+        if (result.changed || !activePath) {
+          loadScene(result.current.scene.path);
+        } else {
+          sendState();
+        }
+      } catch {
+        showStatus('Unable to resolve venue schedule');
+      }
+    }
+
+    function onMessage(event: MessageEvent) {
+      if (
+        disposed ||
+        event.origin !== location.origin ||
+        event.source !== frame.contentWindow
+      ) return;
+
+      if (event.data?.type === 'aether:signage:ready') {
+        if (ready || pendingRequest !== null) return;
+
+        clearTimeoutTimer();
+        ready = true;
+        sendState();
+      }
+
+      if (
+        event.data?.type === 'aether:signage:pong' &&
+        pendingHeartbeat !== null &&
+        event.data.requestId === pendingHeartbeat
+      ) {
+        if (heartbeatTimeout !== null) {
+          clearTimeout(heartbeatTimeout);
+          heartbeatTimeout = null;
+        }
+
+        pendingHeartbeat = null;
+
+        const completedFrames = event.data.completedFrames;
+
+        if (
+          typeof completedFrames !== 'number' ||
+          !Number.isSafeInteger(completedFrames) ||
+          completedFrames < 0
+        ) {
+          fail('Invalid renderer frame telemetry');
+          return;
+        }
+
+        if (lastCompletedFrames !== null) {
+          if (completedFrames > lastCompletedFrames) {
+            consecutiveStalls = 0;
+          } else if (completedFrames === lastCompletedFrames) {
+            consecutiveStalls++;
+
+            if (consecutiveStalls >= 2) {
+              fail('Renderer animation stalled');
+              return;
+            }
+          } else {
+            fail('Renderer frame counter unexpectedly reset');
+            return;
+          }
+        }
+
+        lastCompletedFrames = completedFrames;
+        return;
+      }
+
+
+      if (
+        event.data?.type === 'aether:signage:applied' &&
+        event.data.requestId === pendingRequest
+      ) {
+        clearTimeoutTimer();
+        acknowledgedState = sentState === null ? null : { ...sentState };
+        sentState = null;
+        pendingRequest = null;
+        retries = 0;
+        hideStatus();
+
+        if (heartbeatTimer === null) {
+          startHeartbeat();
+        }
+
+        updateSchedule();
+      }
+    }
+
+    function cleanup() {
+      disposed = true;
+      stopHeartbeat();
+      clearTimeoutTimer();
+
+      if (recoveryTimer !== null) {
+        clearTimeout(recoveryTimer);
+        recoveryTimer = null;
+      }
+
+      if (pollTimer !== null) clearInterval(pollTimer);
+
+      window.removeEventListener('message', onMessage);
+      window.removeEventListener('pagehide', cleanup);
+      document.removeEventListener('astro:before-swap', cleanup);
+    }
+
+    window.addEventListener('message', onMessage);
+    window.addEventListener('pagehide', cleanup);
+    document.addEventListener('astro:before-swap', cleanup);
+
+    if (!parsed.valid || !parsed.config) {
+      showStatus('Invalid signage configuration');
+      console.error('Signage configuration errors:', parsed.errors);
+    } else {
+      controller = new SignagePlayerController(parsed.config);
+      updateSchedule();
+      pollTimer = setInterval(updateSchedule, POLL_MS);
+    }
+  </script>
+</body>
+</html>
+
+<style is:global>
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #05090e;
+  }
+
+  iframe {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    border: 0;
+  }
+
+  #status {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: #05090e;
+    color: #fff;
+    font: 16px system-ui, sans-serif;
+    text-align: center;
+    padding: 24px;
+  }
+
+  #status[hidden] {
+    display: none;
+  }
+</style>
