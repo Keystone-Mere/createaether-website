@@ -1,0 +1,19 @@
+
+# Aether local development backups
+.aether-*-backup-*/
+*.bak
+*.bak-*
+*.backup
+*.backup-*
+*.before-*
+*.v*-backup-*
+/website/ullswater-v2-backup-*/
+/website/ullswater-v4-stable-*.astro
+
+# Local source and rollback archives
+/aether-sprint-rollback.zip
+/website/src.zip
+
+# Inactive scene assets
+/website/public/images/scene-library/andean-retreat.webp
+/website/public/images/scene-library/moroccan-courtyard.webp
