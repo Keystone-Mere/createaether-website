@@ -1,0 +1,24 @@
+<section data-mersey>
+ <div data-stage><img src="/scene-lab/mersey/mersey-base.webp" alt="Liverpool waterfront at blue hour"/><canvas></canvas><output data-status>Loading assets</output></div>
+ <div class="controls">
+ <label>Reflection intensity <span data-value="reflection"></span> <input data-param="reflection" type="range" min="0" max="1" step=".01" value=".85"/></label>
+ <label>Wind <span data-value="wind"></span> <input data-param="wind" type="range" min="0" max="1" step=".01" value=".35"/></label>
+ <label>Water roughness <span data-value="turbulence"></span> <input data-param="turbulence" type="range" min="0" max="1" step=".01" value=".45"/></label>
+ <label>Tidal current <span data-value="current"></span> <input data-param="current" type="range" min="-1" max="1" step=".01" value=".3"/></label>
+ <label>Surface shimmer <span data-value="shimmer"></span> <input data-param="shimmer" type="range" min="0" max="1" step=".01" value=".7"/></label>
+ <label>Wave scale <span data-value="waveScale"></span> <input data-param="waveScale" type="range" min=".4" max="2" step=".01" value="1"/></label>
+ <label>Effects resolution <select data-param="width"><option value="640">Economy</option><option value="850" selected>Pi 4</option><option value="1280">Standard</option><option value="1920">Premium</option></select></label>
+ <label>Frame cap <select data-param="fps"><option value="30" selected>30 FPS</option><option value="60">60 FPS</option></select></label>
+ <button type="button" data-pause>Pause animation</button><button type="button" data-reset>Reset</button><button data-fullscreen>Fullscreen</button>
+ </div>
+</section>
+<script>
+ import { mountMersey } from '../../lib/scene-lab/mersey-controller';
+ document.querySelectorAll<HTMLElement>('[data-mersey]').forEach(mountMersey);
+</script>
+<style>
+ [data-stage]{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden;}
+ img,canvas{position:absolute;width:100%;height:100%;inset:0;object-fit:contain;}
+ output{position:absolute;top:12px;left:12px;background:#000b;padding:8px;color:white;font:14px monospace;}
+ .controls{display:flex;flex-wrap:wrap;gap:20px;padding:20px 0;align-items:center;} label{display:grid;gap:8px;} button,select{padding:8px;}
+</style>
